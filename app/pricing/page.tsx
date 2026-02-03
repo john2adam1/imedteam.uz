@@ -80,7 +80,7 @@ export default function PricingPage() {
                                     <span className="text-4xl font-extrabold text-blue-600">
                                         {new Intl.NumberFormat('uz-UZ', { style: 'currency', currency: 'UZS', maximumSignificantDigits: 3 }).format(tariff.price)}
                                     </span>
-                                    <span className="text-gray-500 ml-2">/ {tariff.duration_days} days</span>
+                                    <span className="text-gray-500 ml-2">/ {tariff.duration} days</span>
                                 </div>
                                 {tariff.description && (
                                     <p className="text-gray-600 mb-6">{tariff.description}</p>

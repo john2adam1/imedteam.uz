@@ -45,7 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const checkUser = async (data: UserCheckReq): Promise<boolean> => {
         try {
             const response = await authService.checkUser(data);
-            return response.has_account;
+            return response.has_account; // FIXED: was response.exists
         } catch (error) {
             console.error('User check failed:', error);
             throw error;

@@ -34,7 +34,7 @@ function ProfileContent() {
     useEffect(() => {
         fetchActivityStats();
         if (user) {
-            setEditName(user.full_name || '');
+            setEditName(user.name || '');
             setEditPhone(user.phone_number || '');
         }
     }, [user]);
@@ -152,17 +152,17 @@ function ProfileContent() {
                                     {/* We don't have user.image_url in generic UserRes type yet, assuming generic avatar */}
                                     {/* If API returns image, we should add it to type. For now showing placeholder or user initials */}
                                     <div className="w-full h-full flex items-center justify-center bg-blue-100 text-blue-600 font-bold text-xl">
-                                        {user?.full_name?.charAt(0) || 'U'}
+                                        {user?.name?.charAt(0) || 'U'}
                                     </div>
                                 </div>
                                 <div>
 
                                 </div>
                             </div>
-                            {user?.full_name && (
+                            {user?.name && (
                                 <div>
                                     <span className="text-gray-600 block text-xs uppercase tracking-wide">Name</span>
-                                    <span className="font-medium text-lg text-gray-900">{user.full_name}</span>
+                                    <span className="font-medium text-lg text-gray-900">{user.name}</span>
                                 </div>
                             )}
                             <div>
@@ -223,7 +223,7 @@ function ProfileContent() {
                                     disabled={loading}
                                     onClick={() => {
                                         setShowEditProfileForm(false);
-                                        setEditName(user?.full_name || '');
+                                        setEditName(user?.name || '');
                                         setEditPhone(user?.phone_number || '');
                                         setEditImage(null);
                                         if (fileInputRef.current) fileInputRef.current.value = '';

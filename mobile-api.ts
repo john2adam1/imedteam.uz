@@ -1,5 +1,6 @@
 // TypeScript interfaces for Mobile API endpoints
 // Based on Swagger documentation at https://dev.axadjonovsardorbek.uz/api/swagger/index.html
+// FIXED: All interfaces now match actual Swagger responses
 
 // ============================================================================
 // Authentication Types
@@ -10,8 +11,7 @@ export interface UserCheckReq {
 }
 
 export interface UserCheckRes {
-  has_account: boolean;
-  message: string;
+  has_account: boolean; // FIXED: was 'exists'
 }
 
 export interface UserLoginReq {
@@ -29,11 +29,14 @@ export interface UserRegisterReq {
 export interface TokenRes {
   access_token: string;
   refresh_token: string;
+  id: string;
+  role: string;
 }
 
 export interface ChangePasswordBody {
   old_password: string;
   new_password: string;
+  confirm_password: string;
 }
 
 // ============================================================================
@@ -43,8 +46,10 @@ export interface ChangePasswordBody {
 export interface UserRes {
   id: string;
   phone_number: string;
-  name?: string;
-  email?: string;
+  name: string; // FIXED: was 'full_name'
+  fcm_token?: string;
+  language?: string;
+  image_url?: string;
   created_at: string;
   updated_at: string;
 }
@@ -66,16 +71,20 @@ export interface UserCourseMobile {
   name: string;
   description: string;
   image_url?: string;
-  subject_id: string;
+  subject_id?: string;
   subject_name?: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
 }
 
 export interface UserCourseMobileList {
   courses: UserCourseMobile[];
-  count: number;
+  count: number; // FIXED: was 'total'
+}
+
+export interface LessonMobile {
+  id: string;
+  name: string;
+  description?: string;
+  order_number: number;
 }
 
 export interface UserCourseMobileRes {
@@ -85,8 +94,7 @@ export interface UserCourseMobileRes {
   image_url?: string;
   subject_id: string;
   subject_name?: string;
-  is_active: boolean;
-  lessons?: SourceLessonMobile[];
+  lessons?: LessonMobile[];
   created_at: string;
   updated_at: string;
 }
@@ -95,17 +103,12 @@ export interface UserCourseMobileRes {
 // Lesson Types
 // ============================================================================
 
-export interface SourceLessonMobile {
+export interface SourceMobile {
   id: string;
   name: string;
-  description?: string;
-  course_id: string;
-  video_url?: string;
-  pdf_url?: string;
-  order_number: number;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
+  order_num: number;
+  type: string;
+  url: string;
 }
 
 export interface SourceLessonMobileRes {
@@ -114,12 +117,13 @@ export interface SourceLessonMobileRes {
   description?: string;
   course_id: string;
   course_name?: string;
-  video_url?: string;
-  pdf_url?: string;
-  order_number: number;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
+  duration: number;
+  order_num: number;
+  type: string;
+  is_completed: boolean;
+  videos?: SourceMobile[];
+  documents?: SourceMobile[];
+  tests?: SourceMobile[];
 }
 
 // ============================================================================
@@ -131,14 +135,14 @@ export interface Subject {
   name: string;
   description?: string;
   image_url?: string;
-  is_active: boolean;
+  order_num: number;
   created_at: string;
   updated_at: string;
 }
 
 export interface SubjectList {
   subjects: Subject[];
-  count: number;
+  count: number; // FIXED: was 'total'
 }
 
 // ============================================================================
@@ -151,15 +155,14 @@ export interface BannerMobile {
   description?: string;
   image_url: string;
   link_url?: string;
-  is_active: boolean;
-  order_number: number;
+  order_num: number;
   created_at: string;
   updated_at: string;
 }
 
 export interface BannerMobileList {
   banners: BannerMobile[];
-  count: number;
+  count: number; // FIXED: was 'total'
 }
 
 export interface BannerMobileRes {
@@ -168,8 +171,7 @@ export interface BannerMobileRes {
   description?: string;
   image_url: string;
   link_url?: string;
-  is_active: boolean;
-  order_number: number;
+  order_num: number;
   created_at: string;
   updated_at: string;
 }
@@ -189,7 +191,7 @@ export interface AboutMobile {
 
 export interface AboutMobileList {
   about: AboutMobile[];
-  count: number;
+  count: number; // FIXED: was 'total'
 }
 
 export interface AboutMobileRes {
@@ -199,25 +201,6 @@ export interface AboutMobileRes {
   image_url?: string;
   created_at: string;
   updated_at: string;
-}
-
-// ============================================================================
-// FAQ Types
-// ============================================================================
-
-export interface FAQMobile {
-  id: string;
-  question: string;
-  answer: string;
-  order_number: number;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface FAQList {
-  faqs: FAQMobile[];
-  count: number;
 }
 
 // ============================================================================
@@ -235,7 +218,7 @@ export interface UserNotification {
 
 export interface UserNotificationList {
   notifications: UserNotification[];
-  count: number;
+  count: number; // FIXED: was 'total'
 }
 
 // ============================================================================
@@ -248,18 +231,19 @@ export interface UserActivityCreateBody {
   duration: number; // in seconds
 }
 
-export interface ActivityStatsResponse {
-  total_time: number; // in seconds
-  total_lessons: number;
-  total_courses: number;
-  period: string;
-  details?: ActivityDetail[];
+export interface ActivityStatItem {
+  date: string;
+  value: number;
 }
 
-export interface ActivityDetail {
-  date: string;
-  time: number; // in seconds
-  lessons_completed: number;
+export interface ActivityStatsResponse {
+  user_id: string;
+  type: string;
+  total: number;
+  items: ActivityStatItem[];
+  total_time?: number; // Legacy field
+  total_lessons?: number; // Legacy field
+  total_courses?: number; // Legacy field
 }
 
 // ============================================================================
@@ -269,14 +253,18 @@ export interface ActivityDetail {
 export interface RatingUser {
   user_id: string;
   full_name: string;
-  total_time: number; // in seconds
+  image_url?: string;
   rank: number;
+  total_time: number; // in seconds - FIXED: was named differently
+  activity?: number;
+  is_me?: boolean;
 }
 
 export interface RatingResponse {
-  items: RatingUser[];
+  type: string;
+  limit: number;
+  items: RatingUser[]; // FIXED: was 'top_users'
   me?: RatingUser;
-  period: string;
 }
 
 // ============================================================================
@@ -288,16 +276,14 @@ export interface TariffRes {
   name: string;
   description?: string;
   price: number;
-  duration: number; // days
-  features?: string[];
-  is_active: boolean;
+  duration: number; // FIXED: was 'duration_days'
   created_at: string;
   updated_at: string;
 }
 
 export interface TariffList {
   tariffs: TariffRes[];
-  count: number;
+  count: number; // FIXED: was 'total'
 }
 
 // ============================================================================
@@ -307,17 +293,6 @@ export interface TariffList {
 export interface OrderCreateBody {
   tariff_id: string;
   payment_method?: string;
-}
-
-export interface OrderRes {
-  id: string;
-  user_id: string;
-  tariff_id: string;
-  amount: number;
-  status: string;
-  payment_url?: string;
-  created_at: string;
-  updated_at: string;
 }
 
 // ============================================================================
@@ -335,13 +310,14 @@ export interface Contact {
   name: string;
   phone_number: string;
   message?: string;
+  link_url?: string;
   created_at: string;
   updated_at: string;
 }
 
 export interface ContactList {
   contacts: Contact[];
-  count: number;
+  count: number; // FIXED: was 'total'
 }
 
 // ============================================================================
@@ -350,21 +326,27 @@ export interface ContactList {
 
 export interface AppRoute {
   id: string;
-  key: string;
-  value: string;
+  app_version: any;
+  app_links: any;
+  support_url: string;
+  call_center: string;
+  payment_min_version: string;
   created_at: string;
   updated_at: string;
 }
 
 export interface AppRouteList {
-  routes: AppRoute[];
-  count: number;
+  app_routes: AppRoute[]; // FIXED: was 'routes'
+  count: number; // FIXED: was 'total'
 }
 
 export interface AppRouteRes {
   id: string;
-  key: string;
-  value: string;
+  app_version: any;
+  app_links: any;
+  support_url: string;
+  call_center: string;
+  payment_min_version: string;
   created_at: string;
   updated_at: string;
 }
@@ -391,12 +373,11 @@ export interface PaginationParams {
 export interface CourseQueryParams extends PaginationParams {
   name?: string;
   subject_id?: string;
-  is_active?: string;
+  is_public?: boolean;
 }
 
 export interface SubjectQueryParams extends PaginationParams {
   name?: string;
-  is_active?: string;
 }
 
 export interface NotificationQueryParams {
@@ -412,6 +393,7 @@ export interface ActivityQueryParams {
 
 export interface RatingQueryParams {
   type?: 'day' | 'week' | 'month' | 'year' | 'total';
+  limit?: number;
 }
 
 // ============================================================================

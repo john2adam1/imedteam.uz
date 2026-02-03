@@ -63,8 +63,8 @@ function LeaderboardContent() {
                                 key={p}
                                 onClick={() => setPeriod(p)}
                                 className={`px-4 py-2 rounded-lg capitalize transition-colors ${period === p
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                    ? 'bg-blue-600 text-white'
+                                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                     }`}
                             >
                                 {p}
@@ -74,11 +74,11 @@ function LeaderboardContent() {
                 </div>
 
                 {/* Top Users */}
-                {ratings?.top_users && ratings.top_users.length > 0 && (
+                {ratings?.items && ratings.items.length > 0 && (
                     <div className="bg-white rounded-lg shadow-md p-6 mb-6">
                         <h2 className="text-xl font-semibold text-gray-800 mb-4">Top Learners</h2>
                         <div className="space-y-3">
-                            {ratings.top_users.map((user) => (
+                            {ratings.items.map((user) => (
                                 <div
                                     key={user.user_id}
                                     className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
@@ -121,7 +121,7 @@ function LeaderboardContent() {
                 )}
 
                 {/* Empty State */}
-                {(!ratings?.top_users || ratings.top_users.length === 0) && (
+                {(!ratings?.items || ratings.items.length === 0) && (
                     <div className="bg-white rounded-lg shadow-md p-8 text-center">
                         <p className="text-gray-600">No rankings available for this period yet.</p>
                     </div>

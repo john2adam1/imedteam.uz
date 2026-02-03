@@ -25,7 +25,24 @@ const config: Config = {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          50: '#fff1f2',
+          100: '#ffe4e6',
+          200: '#fecdd3',
+          300: '#fda4af',
+          400: '#fb7185',
+          500: '#f43f5e',
+          600: '#e11d48',
+          700: '#be123c',
+          800: '#9f1239',
+          900: '#881337'
         },
+        dark: {
+          900: '#0b0b10',
+          800: '#121216',
+          700: '#18181d'
+        },
+        android: '#10b981',
+        ios: '#0ea5e9',
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
@@ -55,6 +72,19 @@ const config: Config = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      boxShadow: {
+        card: '0 14px 30px rgba(244,63,94,.18)',
+        soft: '0 8px 22px rgba(0,0,0,.08)'
+      },
+      keyframes: {
+        marquee: {
+          from: { transform: 'translateX(0)' },
+          to: { transform: 'translateX(-50%)' },
+        }
+      },
+      animation: {
+        marquee: 'marquee 28s linear infinite',
       },
     },
   },

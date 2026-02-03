@@ -1,5 +1,6 @@
 // Mobile API Service Layer
 // Handles all API calls to /mobile/* endpoints
+// FIXED: All endpoints now correctly map to Swagger specification
 
 import {
     UserCheckReq,
@@ -20,7 +21,6 @@ import {
     BannerMobileRes,
     AboutMobileList,
     AboutMobileRes,
-    FAQList,
     UserNotificationList,
     NotificationQueryParams,
     UserActivityCreateBody,
@@ -61,7 +61,7 @@ function getCurrentLanguage(): Language {
 }
 
 /**
- * Generic fetch wrapper for API calls
+ * Generic fetch wrapper for API calls with improved error handling
  */
 export async function fetchAPI<T>(
     endpoint: string,
@@ -86,18 +86,19 @@ export async function fetchAPI<T>(
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         ...options,
-        headers,
+        headers: {
+            ...headers,
+            ...options.headers,
+        },
     });
 
     if (!response.ok) {
         let errorMessage = `API call failed: ${response.status}`;
 
         try {
-            // Try to parse JSON error response
             const errorData = await response.json();
             errorMessage = errorData.message || errorData.error || errorMessage;
         } catch {
-            // If JSON parsing fails, try to get text
             try {
                 const errorText = await response.text();
                 if (errorText && errorText.length < 200) {
@@ -170,7 +171,6 @@ export const authService = {
      * POST /mobile/auth/user/login
      */
     register: async (data: UserRegisterReq): Promise<TokenRes> => {
-        // Using login endpoint which acts as register when name is provided
         const loginData: UserLoginReq = {
             phone_number: data.phone_number,
             password: data.password,
@@ -267,9 +267,9 @@ export const courseService = {
      * GET /mobile/course
      */
     getAll: async (params?: CourseQueryParams): Promise<UserCourseMobileList> => {
-        const queryParams = { ...params, is_public: true };
+        const queryParams = params ? { ...params, is_public: true } : { is_public: true };
         const queryString = buildQueryString(queryParams);
-        return fetchAPI<UserCourseMobileList>(`/mobile/course${queryString}`);
+        return fetchAPI<UserCourseMobileList>(`/mobile/course${queryString}`, {}, false);
     },
 
     /**
@@ -277,7 +277,7 @@ export const courseService = {
      * GET /mobile/course/{id}
      */
     getById: async (id: string): Promise<UserCourseMobileRes> => {
-        return fetchAPI<UserCourseMobileRes>(`/mobile/course/${id}`);
+        return fetchAPI<UserCourseMobileRes>(`/mobile/course/${id}`, {}, false);
     },
 
     /**
@@ -333,7 +333,7 @@ export const subjectService = {
      */
     getAll: async (params?: SubjectQueryParams): Promise<SubjectList> => {
         const queryString = params ? buildQueryString(params) : '';
-        return fetchAPI<SubjectList>(`/mobile/subject${queryString}`);
+        return fetchAPI<SubjectList>(`/mobile/subject${queryString}`, {}, false);
     },
 
     /**
@@ -341,7 +341,7 @@ export const subjectService = {
      * GET /mobile/subject/{id}
      */
     getById: async (id: string): Promise<SubjectList> => {
-        return fetchAPI<SubjectList>(`/mobile/subject/${id}`);
+        return fetchAPI<SubjectList>(`/mobile/subject/${id}`, {}, false);
     },
 };
 
@@ -355,7 +355,7 @@ export const bannerService = {
      * GET /mobile/banner
      */
     getAll: async (): Promise<BannerMobileList> => {
-        return fetchAPI<BannerMobileList>('/mobile/banner');
+        return fetchAPI<BannerMobileList>('/mobile/banner', {}, false);
     },
 
     /**
@@ -363,7 +363,7 @@ export const bannerService = {
      * GET /mobile/banner/{id}
      */
     getById: async (id: string): Promise<BannerMobileRes> => {
-        return fetchAPI<BannerMobileRes>(`/mobile/banner/${id}`);
+        return fetchAPI<BannerMobileRes>(`/mobile/banner/${id}`, {}, false);
     },
 };
 
@@ -378,7 +378,7 @@ export const aboutService = {
      */
     getAll: async (title?: string): Promise<AboutMobileList> => {
         const queryString = title ? `?title=${encodeURIComponent(title)}` : '';
-        return fetchAPI<AboutMobileList>(`/mobile/about${queryString}`);
+        return fetchAPI<AboutMobileList>(`/mobile/about${queryString}`, {}, false);
     },
 
     /**
@@ -386,21 +386,7 @@ export const aboutService = {
      * GET /mobile/about/{id}
      */
     getById: async (id: string): Promise<AboutMobileRes> => {
-        return fetchAPI<AboutMobileRes>(`/mobile/about/${id}`);
-    },
-};
-
-// ============================================================================
-// FAQ Service
-// ============================================================================
-
-export const faqService = {
-    /**
-     * Get all about content
-     * GET /mobile/faq
-     */
-    getAll: async (): Promise<FAQList> => {
-        return fetchAPI<FAQList>('/mobile/faq');
+        return fetchAPI<AboutMobileRes>(`/mobile/about/${id}`, {}, false);
     },
 };
 
@@ -480,7 +466,7 @@ export const tariffService = {
      * GET /mobile/tariff
      */
     getAll: async (): Promise<TariffList> => {
-        return fetchAPI<TariffList>('/mobile/tariff');
+        return fetchAPI<TariffList>('/mobile/tariff', {}, false);
     },
 
     /**
@@ -488,7 +474,7 @@ export const tariffService = {
      * GET /mobile/tariff/{id}
      */
     getById: async (id: string): Promise<TariffRes> => {
-        return fetchAPI<TariffRes>(`/mobile/tariff/${id}`);
+        return fetchAPI<TariffRes>(`/mobile/tariff/${id}`, {}, false);
     },
 };
 
@@ -516,13 +502,13 @@ export const orderService = {
 export const contactService = {
     /**
      * Submit contact form
-     * POST /mobile/contact (assuming POST based on typical REST patterns)
+     * POST /mobile/contact
      */
     submit: async (data: ContactCreateBody): Promise<string> => {
         return fetchAPI<string>('/mobile/contact', {
             method: 'POST',
             body: JSON.stringify(data),
-        });
+        }, false);
     },
 };
 
@@ -537,7 +523,7 @@ export const appRouteService = {
      */
     getAll: async (key?: string): Promise<AppRouteList> => {
         const queryString = key ? `?key=${encodeURIComponent(key)}` : '';
-        return fetchAPI<AppRouteList>(`/mobile/app-route${queryString}`);
+        return fetchAPI<AppRouteList>(`/mobile/app-route${queryString}`, {}, false);
     },
 
     /**
@@ -545,6 +531,43 @@ export const appRouteService = {
      * GET /mobile/app-route/{id}
      */
     getById: async (id: string): Promise<AppRouteRes> => {
-        return fetchAPI<AppRouteRes>(`/mobile/app-route/${id}`);
+        return fetchAPI<AppRouteRes>(`/mobile/app-route/${id}`, {}, false);
+    },
+};
+
+// ============================================================================
+// FAQ Service (Added based on Swagger)
+// ============================================================================
+
+export interface FaqMobile {
+    id: string;
+    question: string;
+    answer: string;
+    order_num: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface FaqMobileList {
+    faqs: FaqMobile[];
+    count: number;
+}
+
+export const faqService = {
+    /**
+     * Get all FAQs
+     * GET /mobile/faq
+     */
+    getAll: async (question?: string): Promise<FaqMobileList> => {
+        const queryString = question ? `?question=${encodeURIComponent(question)}` : '';
+        return fetchAPI<FaqMobileList>(`/mobile/faq${queryString}`, {}, false);
+    },
+
+    /**
+     * Get FAQ by ID
+     * GET /mobile/faq/{id}
+     */
+    getById: async (id: string): Promise<FaqMobile> => {
+        return fetchAPI<FaqMobile>(`/mobile/faq/${id}`, {}, false);
     },
 };
