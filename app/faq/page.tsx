@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { fetchAPI } from '@/services/mobile-api'; // We don't have faqService yet, need to check if we can use generic or add it.
+import { fetchAPI, faqService } from '@/services/mobile-api';
 // Actually, looking back at my read chunks, I saw /mobile/faq. 
 // I need to add faqService to mobile-api.ts or just fetch here.
 // I'll add faqService to mobile-api.ts first? 
@@ -31,16 +31,8 @@ export default function FaqPage() {
     useEffect(() => {
         async function fetchFaqs() {
             try {
-                // Manually fetching using the same base URL logic
-                const token = localStorage.getItem('auth_token');
-                const headers: any = { 'Accept-Language': 'uz' }; // Default to uz
-                if (token) headers['Authorization'] = `Bearer ${token}`;
-
-                const res = await fetch('https://dev.axadjonovsardorbek.uz/mobile/faq', { headers });
-                if (res.ok) {
-                    const data = await res.json();
-                    setFaqs(data.faqs || []);
-                }
+                const data = await faqService.getAll();
+                setFaqs(data.faqs || []);
             } catch (error) {
                 console.error('Failed to fetch FAQs:', error);
             } finally {

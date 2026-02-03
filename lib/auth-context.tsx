@@ -29,11 +29,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 try {
                     const userData = await profileService.getProfile();
                     setUser(userData);
-                } catch (error) {
+                } catch (error: any) {
                     console.error('Failed to fetch user profile:', error);
-                    // Clear invalid token
+
+                    // Try refreshing token if 401 Unauthorized or generally failed
+                    if (error.message && (error.message.includes('401') || error.message.includes('Unauthorized'))) {
+                        try {
+                            const refreshToken = localStorage.getItem('refresh_token');
+                            if (refreshToken) {
+                                const response = await authService.refreshToken(refreshToken);
+                                if (response.access_token) {
+                                    localStorage.setItem('auth_token', response.access_token);
+                                    if (response.refresh_token) {
+                                        localStorage.setItem('refresh_token', response.refresh_token);
+                                    }
+                                    // Retry profile fetch
+                                    const userData = await profileService.getProfile();
+                                    setUser(userData);
+                                    return; // Success
+                                }
+                            }
+                        } catch (refreshError) {
+                            console.error('Token refresh failed:', refreshError);
+                        }
+                    }
+
+                    // If refresh failed or not 401, clear session
                     localStorage.removeItem('auth_token');
                     localStorage.removeItem('refresh_token');
+                    setUser(null);
                 }
             }
             setIsLoading(false);

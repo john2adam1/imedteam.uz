@@ -38,7 +38,7 @@ import {
 } from '@/types/mobile-api';
 
 // Get API base URL from environment
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://dev.axadjonovsardorbek.uz';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://dev.axadjonovsardorbek.uz/api';
 
 // ============================================================================
 // Helper Functions
@@ -111,7 +111,14 @@ export async function fetchAPI<T>(
         throw new Error(errorMessage);
     }
 
-    return response.json();
+    const data = await response.json();
+
+    // Check for logical errors in 200 responses
+    if (data && (data.error || (data.success === false && data.message))) {
+        throw new Error(data.message || data.error || 'Unknown API error');
+    }
+
+    return data;
 }
 
 /**
@@ -205,6 +212,17 @@ export const authService = {
     },
 
     /**
+     * Refresh access token
+     * POST /mobile/auth/refresh
+     */
+    refreshToken: async (refreshToken: string): Promise<TokenRes> => {
+        return fetchAPI<TokenRes>('/mobile/auth/refresh', {
+            method: 'POST',
+            body: JSON.stringify({ refresh_token: refreshToken }),
+        }, false);
+    },
+
+    /**
      * Logout user (client-side only)
      */
     logout: () => {
@@ -250,9 +268,10 @@ export const profileService = {
         if (data.language) formData.append('language', data.language);
         if (data.image) formData.append('image', data.image);
 
+        // Don't cast to any, fetch accepts FormData in body
         return fetchAPI<string>('/mobile/user/update/profile', {
             method: 'PUT',
-            body: formData as any,
+            body: formData,
         });
     },
 };
@@ -267,8 +286,8 @@ export const courseService = {
      * GET /mobile/course
      */
     getAll: async (params?: CourseQueryParams): Promise<UserCourseMobileList> => {
-        const queryParams = { ...params, is_public: true };
-        const queryString = buildQueryString(queryParams);
+        // Removed hardcoded is_public: true
+        const queryString = params ? buildQueryString(params) : '';
         return fetchAPI<UserCourseMobileList>(`/mobile/course${queryString}`);
     },
 
@@ -415,7 +434,7 @@ export const notificationService = {
      */
     getAll: async (params?: NotificationQueryParams): Promise<UserNotificationList> => {
         const queryString = params ? buildQueryString(params) : '';
-        return fetchAPI<UserNotificationList>(`/mobile/notification/user${queryString}`);
+        return fetchAPI<UserNotificationList>(`/mobile/notifications${queryString}`);
     },
 
     /**
