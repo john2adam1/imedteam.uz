@@ -6,6 +6,8 @@ import { useAuth } from '@/lib/auth-context';
 import LanguageSwitcher from './LanguageSwitcher';
 import NotificationBell from './NotificationBell';
 
+import { Trophy } from 'lucide-react';
+
 export default function Header() {
   const pathname = usePathname();
   const { isAuthenticated, user } = useAuth();
@@ -26,25 +28,26 @@ export default function Header() {
               Home
             </Link>
             <Link
-              href="/about"
-              className={`${pathname === '/about' ? 'text-blue-600 font-semibold' : 'text-gray-600 hover:text-blue-600'}`}
+              href="/courses"
+              className={`${pathname === '/courses' ? 'text-blue-600 font-semibold' : 'text-gray-600 hover:text-blue-600'}`}
             >
-              About
-            </Link>
-            <Link
-              href="/contact"
-              className={`${pathname === '/contact' ? 'text-blue-600 font-semibold' : 'text-gray-600 hover:text-blue-600'}`}
-            >
-              Contact
+              Courses
             </Link>
 
             {isAuthenticated ? (
               <>
                 <Link
-                  href="/leaderboard"
-                  className={`${pathname === '/leaderboard' ? 'text-blue-600 font-semibold' : 'text-gray-600 hover:text-blue-600'}`}
+                  href="/my-courses"
+                  className={`${pathname === '/my-courses' ? 'text-blue-600 font-semibold' : 'text-gray-600 hover:text-blue-600'}`}
                 >
-                  Leaderboard
+                  My Courses
+                </Link>
+                <Link
+                  href="/leaderboard"
+                  className="flex items-center text-gray-700 hover:text-blue-600 transition-colors"
+                  title="Leaderboard"
+                >
+                  <Trophy className="h-6 w-6" />
                 </Link>
                 <NotificationBell />
                 <Link

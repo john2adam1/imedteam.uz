@@ -1,13 +1,33 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import { aboutService } from '@/services/mobile-api';
+import { AboutMobile } from '@/types/mobile-api';
 
-export default async function AboutPage() {
-    let aboutContent = [];
+export default function AboutPage() {
+    const [aboutContent, setAboutContent] = useState<AboutMobile[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    try {
-        const response = await aboutService.getAll();
-        aboutContent = response.about || [];
-    } catch (error) {
-        console.error('Failed to fetch about content:', error);
+    useEffect(() => {
+        async function fetchAbout() {
+            try {
+                const response = await aboutService.getAll();
+                setAboutContent(response.about || []);
+            } catch (error) {
+                console.error('Failed to fetch about content:', error);
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchAbout();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center min-h-[50vh]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
+        );
     }
 
     return (
@@ -22,9 +42,12 @@ export default async function AboutPage() {
                                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">
                                     {item.title}
                                 </h2>
-                                <div className="prose max-w-none text-gray-600">
-                                    {item.content}
-                                </div>
+                                <div className="prose max-w-none text-gray-600" dangerouslySetInnerHTML={{ __html: item.content }} />
+                                {item.image_url && (
+                                    <div className="mt-6 rounded-lg overflow-hidden">
+                                        <img src={item.image_url} alt={item.title} className="w-full h-auto object-cover" />
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>
@@ -38,9 +61,7 @@ export default async function AboutPage() {
                             high-quality medical education to students and professionals.
                         </p>
                         <p className="text-gray-600">
-                            Our platform offers a wide range of courses, interactive lessons,
-                            and expert-led content to help you advance your medical knowledge
-                            and skills.
+                            Please contact administrator for more information.
                         </p>
                     </div>
                 )}

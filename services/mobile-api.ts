@@ -5,11 +5,13 @@ import {
     UserCheckReq,
     UserCheckRes,
     UserLoginReq,
+    UserRegisterReq,
     TokenRes,
     ChangePasswordBody,
     UserRes,
     UserCourseMobileList,
     UserCourseMobileRes,
+    ProfileUpdateBody,
     CourseQueryParams,
     SourceLessonMobileRes,
     SubjectList,
@@ -35,7 +37,7 @@ import {
 } from '@/types/mobile-api';
 
 // Get API base URL from environment
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://dev.axadjonovsardorbek.uz/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://dev.axadjonovsardorbek.uz';
 
 // ============================================================================
 // Helper Functions
@@ -60,15 +62,18 @@ function getCurrentLanguage(): Language {
 /**
  * Generic fetch wrapper for API calls
  */
-async function fetchAPI<T>(
+export async function fetchAPI<T>(
     endpoint: string,
     options: RequestInit = {},
     requiresAuth: boolean = true
 ): Promise<T> {
     const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
         'Accept-Language': getCurrentLanguage(),
     };
+
+    if (!(options.body instanceof FormData)) {
+        headers['Content-Type'] = 'application/json';
+    }
 
     // Add authentication token if required
     if (requiresAuth) {
@@ -84,8 +89,25 @@ async function fetchAPI<T>(
     });
 
     if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || `API call failed: ${response.status}`);
+        let errorMessage = `API call failed: ${response.status}`;
+
+        try {
+            // Try to parse JSON error response
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorData.error || errorMessage;
+        } catch {
+            // If JSON parsing fails, try to get text
+            try {
+                const errorText = await response.text();
+                if (errorText && errorText.length < 200) {
+                    errorMessage = errorText;
+                }
+            } catch {
+                // Use default error message
+            }
+        }
+
+        throw new Error(errorMessage);
     }
 
     return response.json();
@@ -143,6 +165,34 @@ export const authService = {
     },
 
     /**
+     * Register new user (via Login endpoint with name)
+     * POST /mobile/auth/user/login
+     */
+    register: async (data: UserRegisterReq): Promise<TokenRes> => {
+        // Using login endpoint which acts as register when name is provided
+        const loginData: UserLoginReq = {
+            phone_number: data.phone_number,
+            password: data.password,
+            name: data.full_name
+        };
+
+        const response = await fetchAPI<TokenRes>('/mobile/auth/user/login', {
+            method: 'POST',
+            body: JSON.stringify(loginData),
+        }, false);
+
+        // Store token in localStorage
+        if (typeof window !== 'undefined' && response.access_token) {
+            localStorage.setItem('auth_token', response.access_token);
+            if (response.refresh_token) {
+                localStorage.setItem('refresh_token', response.refresh_token);
+            }
+        }
+
+        return response;
+    },
+
+    /**
      * Change password
      * PUT /mobile/auth/password/change
      */
@@ -186,6 +236,24 @@ export const profileService = {
             method: 'DELETE',
         });
     },
+
+    /**
+     * Update user profile
+     * PUT /mobile/user/update/profile
+     */
+    updateProfile: async (data: ProfileUpdateBody): Promise<string> => {
+        const formData = new FormData();
+        if (data.name) formData.append('name', data.name);
+        if (data.phone_number) formData.append('phone_number', data.phone_number);
+        if (data.fcm_token) formData.append('fcm_token', data.fcm_token);
+        if (data.language) formData.append('language', data.language);
+        if (data.image) formData.append('image', data.image);
+
+        return fetchAPI<string>('/mobile/user/update/profile', {
+            method: 'PUT',
+            body: formData as any,
+        });
+    },
 };
 
 // ============================================================================
@@ -198,7 +266,8 @@ export const courseService = {
      * GET /mobile/course
      */
     getAll: async (params?: CourseQueryParams): Promise<UserCourseMobileList> => {
-        const queryString = params ? buildQueryString(params) : '';
+        const queryParams = { ...params, is_public: true };
+        const queryString = buildQueryString(queryParams);
         return fetchAPI<UserCourseMobileList>(`/mobile/course${queryString}`);
     },
 
@@ -208,6 +277,15 @@ export const courseService = {
      */
     getById: async (id: string): Promise<UserCourseMobileRes> => {
         return fetchAPI<UserCourseMobileRes>(`/mobile/course/${id}`);
+    },
+
+    /**
+     * Get user courses (with permission)
+     * GET /mobile/course/permission
+     */
+    getUserCourses: async (params?: CourseQueryParams): Promise<UserCourseMobileList> => {
+        const queryString = params ? buildQueryString(params) : '';
+        return fetchAPI<UserCourseMobileList>(`/mobile/course/permission${queryString}`);
     },
 
     /**

@@ -2,13 +2,14 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authService, profileService } from '@/services/mobile-api';
-import { UserRes, UserLoginReq, UserCheckReq } from '@/types/mobile-api';
+import { UserRes, UserLoginReq, UserCheckReq, UserRegisterReq } from '@/types/mobile-api';
 
 interface AuthContextType {
     user: UserRes | null;
     isAuthenticated: boolean;
     isLoading: boolean;
     login: (credentials: UserLoginReq) => Promise<void>;
+    register: (data: UserRegisterReq) => Promise<void>;
     checkUser: (data: UserCheckReq) => Promise<boolean>;
     logout: () => void;
     refreshUser: () => Promise<void>;
@@ -63,6 +64,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    const register = async (data: UserRegisterReq) => {
+        try {
+            await authService.register(data);
+            // Fetch user profile after successful registration
+            const userData = await profileService.getProfile();
+            setUser(userData);
+        } catch (error) {
+            console.error('Registration failed:', error);
+            throw error;
+        }
+    };
+
     const logout = () => {
         authService.logout();
         setUser(null);
@@ -83,6 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: !!user,
         isLoading,
         login,
+        register,
         checkUser,
         logout,
         refreshUser,

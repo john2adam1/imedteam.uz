@@ -17,6 +17,13 @@ export interface UserCheckRes {
 export interface UserLoginReq {
   phone_number: string;
   password: string;
+  name?: string;
+}
+
+export interface UserRegisterReq {
+  phone_number: string;
+  full_name: string;
+  password: string;
 }
 
 export interface TokenRes {
@@ -40,6 +47,14 @@ export interface UserRes {
   email?: string;
   created_at: string;
   updated_at: string;
+}
+
+export interface ProfileUpdateBody {
+  name?: string;
+  phone_number?: string;
+  fcm_token?: string;
+  language?: string;
+  image?: File;
 }
 
 // ============================================================================
