@@ -65,7 +65,7 @@ export default function CoursesSection() {
                                 </summary>
                                 <div className="pt-4 text-slate-700 text-sm grid md:grid-cols-2 gap-3 border-t border-slate-100 mt-3 animation-fade-in">
                                     {subjectCourses.map(course => (
-                                        <Link href={`/courses/${course.id}`} key={course.id} className="flex items-center gap-2 p-2 hover:bg-slate-50 rounded-lg transition group/course">
+                                        <Link href={`/app/courses/${course.id}`} key={course.id} className="flex items-center gap-2 p-2 hover:bg-slate-50 rounded-lg transition group/course">
                                             <span className="w-2 h-2 rounded-full bg-primary-400 group-hover/course:bg-primary-600 transition"></span>
                                             <span className="font-medium">{course.name}</span>
                                             {/* <span className="text-xs text-slate-400 ml-auto">Duration?</span> */}

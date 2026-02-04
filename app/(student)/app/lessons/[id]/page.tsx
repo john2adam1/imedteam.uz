@@ -46,7 +46,7 @@ function LessonContent({ params }: { params: { id: string } }) {
             await lessonService.endLesson(lesson.id);
 
             // Navigate back to course
-            router.push(`/courses/${lesson.course_id}`);
+            router.push(`/app/courses/${lesson.course_id}`);
         } catch (err) {
             console.error('Failed to end lesson:', err);
         }
@@ -132,7 +132,7 @@ function LessonContent({ params }: { params: { id: string } }) {
                 {/* Complete Lesson Button */}
                 <div className="flex justify-between items-center">
                     <button
-                        onClick={() => router.push(`/courses/${lesson.course_id}`)}
+                        onClick={() => router.push(`/app/courses/${lesson.course_id}`)}
                         className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                         Back to Course

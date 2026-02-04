@@ -58,7 +58,7 @@ export default function CourseDetailPage() {
 
     return (
         <div className="container mx-auto px-4 py-12">
-            <Link href="/courses" className="text-gray-500 hover:text-blue-600 mb-6 inline-block transition-colors">
+            <Link href="/app/courses" className="text-gray-500 hover:text-blue-600 mb-6 inline-block transition-colors">
                 &larr; Back to Courses
             </Link>
 
@@ -100,7 +100,7 @@ export default function CourseDetailPage() {
                             .map((lesson) => (
                                 <Link
                                     key={lesson.id}
-                                    href={`/lessons/${lesson.id}`}
+                                    href={`/app/lessons/${lesson.id}`}
                                     className="block p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:shadow-md transition-all group"
                                 >
                                     <div className="flex items-center justify-between">
