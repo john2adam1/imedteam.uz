@@ -78,7 +78,7 @@ export default function MyCoursesPage() {
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {courses.map((course) => (
-                        <Link key={course.id} href={`/app/course/${course.id}`} className="block">
+                        <Link key={course.id} href={`/app/courses/${course.id}`} className="block">
                             <div className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden h-full flex flex-col border border-gray-200">
                                 <div className="relative h-48 bg-gray-200">
                                     {course.image_url ? (

@@ -89,7 +89,7 @@ export default function UserHome() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {courses.map((course) => (
-                        <Link key={course.id} href={`/app/course/${course.id}`} className="group">
+                        <Link key={course.id} href={`/app/courses/${course.id}`} className="group">
                             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-xl transition-all h-full flex flex-col group-hover:-translate-y-1">
                                 <div className="aspect-video relative bg-slate-200">
                                     <img
