@@ -4,9 +4,8 @@ import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { authService, activityService, profileService } from '@/services/mobile-api';
 import { ActivityStatsResponse } from '@/types/mobile-api';
-import ProtectedRoute from '@/components/ProtectedRoute';
 
-function ProfileContent() {
+export default function ProfilePage() {
     const { user, logout, refreshUser } = useAuth();
     const [activityStats, setActivityStats] = useState<ActivityStatsResponse | null>(null);
 
@@ -54,22 +53,26 @@ function ProfileContent() {
         setMessage('');
 
         if (newPassword !== confirmPassword) {
-            setError('New passwords do not match');
+            setError('Yangi parollar mos kelmadi');
             return;
         }
 
         try {
+            setLoading(true);
             await authService.changePassword({
                 old_password: oldPassword,
                 new_password: newPassword,
+                confirm_password: confirmPassword,
             });
-            setMessage('Password changed successfully');
+            setMessage('Parol muvaffaqiyatli o‘zgartirildi');
             setOldPassword('');
             setNewPassword('');
             setConfirmPassword('');
             setShowPasswordForm(false);
         } catch (err: any) {
-            setError(err.message || 'Failed to change password');
+            setError(err.message || 'Parolni o‘zgartirishda xatolik yuz berdi');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -87,10 +90,10 @@ function ProfileContent() {
             });
 
             await refreshUser();
-            setMessage('Profile updated successfully');
+            setMessage('Profil muvaffaqiyatli yangilandi');
             setShowEditProfileForm(false);
         } catch (err: any) {
-            setError(err.message || 'Failed to update profile');
+            setError(err.message || 'Profilni yangilashda xatolik yuz berdi');
         } finally {
             setLoading(false);
         }
@@ -101,9 +104,8 @@ function ProfileContent() {
         try {
             await profileService.deleteProfile();
             logout();
-            window.location.href = '/login';
         } catch (err: any) {
-            setError(err.message || 'Failed to delete account');
+            setError(err.message || 'Hisobni o‘chirishda xatolik yuz berdi');
             setLoading(false);
             setShowDeleteConfirm(false);
         }
@@ -112,265 +114,236 @@ function ProfileContent() {
     const formatTime = (seconds: number) => {
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
-        return `${hours}h ${minutes}m`;
+        return `${hours}s ${minutes}d`;
     };
 
     return (
-        <div className="container mx-auto px-4 py-12">
-            <div className="max-w-4xl mx-auto">
-                <h1 className="text-3xl font-bold text-gray-800 mb-8">My Profile</h1>
+        <div className="max-w-4xl mx-auto space-y-10 pb-20">
+            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Shaxsiy profil</h1>
 
-                {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
-                        {error}
-                    </div>
-                )}
-                {message && (
-                    <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-6">
-                        {message}
-                    </div>
-                )}
+            {error && (
+                <div className="bg-red-50 border border-red-100 text-red-700 px-6 py-4 rounded-2xl animate-fade-in">
+                    {error}
+                </div>
+            )}
+            {message && (
+                <div className="bg-green-50 border border-green-100 text-green-700 px-6 py-4 rounded-2xl animate-fade-in">
+                    {message}
+                </div>
+            )}
 
-                {/* User Info / Edit Form */}
-                <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-semibold text-gray-800">Personal Information</h2>
-                        {!showEditProfileForm && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {/* Left Column: Avatar & Basic Info */}
+                <div className="md:col-span-1 space-y-6">
+                    <div className="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm text-center">
+                        <div className="relative inline-block mb-6">
+                            <div className="w-32 h-32 rounded-full bg-primary-50 flex items-center justify-center text-4xl font-black text-primary-600 border-4 border-white shadow-xl overflow-hidden capitalize">
+                                {user?.image_url ? (
+                                    <img src={user.image_url} alt={user.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    user?.name?.charAt(0) || 'U'
+                                )}
+                            </div>
                             <button
                                 onClick={() => setShowEditProfileForm(true)}
-                                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                className="absolute bottom-1 right-1 w-10 h-10 bg-white shadow-lg rounded-full flex items-center justify-center text-slate-400 hover:text-primary-600 transition-colors border border-slate-50"
                             >
-                                Edit Profile
+                                ✎
                             </button>
-                        )}
-                    </div>
-
-                    {!showEditProfileForm ? (
-                        <div className="space-y-3">
-                            <div className="flex items-center">
-                                <div className="h-16 w-16 rounded-full bg-gray-200 overflow-hidden mr-4">
-                                    {/* We don't have user.image_url in generic UserRes type yet, assuming generic avatar */}
-                                    {/* If API returns image, we should add it to type. For now showing placeholder or user initials */}
-                                    <div className="w-full h-full flex items-center justify-center bg-blue-100 text-blue-600 font-bold text-xl">
-                                        {user?.name?.charAt(0) || 'U'}
-                                    </div>
-                                </div>
-                                <div>
-
-                                </div>
-                            </div>
-                            {user?.name && (
-                                <div>
-                                    <span className="text-gray-600 block text-xs uppercase tracking-wide">Name</span>
-                                    <span className="font-medium text-lg text-gray-900">{user.name}</span>
-                                </div>
-                            )}
-                            <div>
-                                <span className="text-gray-600 block text-xs uppercase tracking-wide">Phone</span>
-                                <span className="font-medium text-lg text-gray-900">{user?.phone_number}</span>
-                            </div>
                         </div>
-                    ) : (
-                        <form onSubmit={handleUpdateProfile} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Full Name
-                                </label>
-                                <input
-                                    type="text"
-                                    value={editName}
-                                    onChange={(e) => setEditName(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Phone Number
-                                </label>
-                                <input
-                                    type="tel"
-                                    value={editPhone}
-                                    onChange={(e) => setEditPhone(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Profile Image
-                                </label>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    ref={fileInputRef}
-                                    onChange={(e) => {
-                                        if (e.target.files && e.target.files[0]) {
-                                            setEditImage(e.target.files[0]);
-                                        }
-                                    }}
-                                    className="w-full"
-                                />
-                            </div>
-                            <div className="flex gap-3 pt-2">
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-                                >
-                                    {loading ? 'Saving...' : 'Save Changes'}
-                                </button>
-                                <button
-                                    type="button"
-                                    disabled={loading}
-                                    onClick={() => {
-                                        setShowEditProfileForm(false);
-                                        setEditName(user?.name || '');
-                                        setEditPhone(user?.phone_number || '');
-                                        setEditImage(null);
-                                        if (fileInputRef.current) fileInputRef.current.value = '';
-                                    }}
-                                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </form>
-                    )}
-                </div>
+                        <h2 className="text-xl font-black text-slate-800 mb-1">{user?.name}</h2>
+                        <p className="text-sm text-slate-400 font-medium">{user?.phone_number}</p>
 
-                {/* Activity Stats */}
-                {activityStats && (
-                    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                        <h2 className="text-xl font-semibold text-gray-800 mb-4">Learning Statistics</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="bg-blue-50 rounded-lg p-4">
-                                <p className="text-blue-600 text-sm font-semibold">Total Time</p>
-                                <p className="text-2xl font-bold text-gray-800">
-                                    {formatTime(activityStats.total_time)}
-                                </p>
-                            </div>
-                            <div className="bg-green-50 rounded-lg p-4">
-                                <p className="text-green-600 text-sm font-semibold">Lessons Completed</p>
-                                <p className="text-2xl font-bold text-gray-800">{activityStats.total_lessons}</p>
-                            </div>
-                            <div className="bg-purple-50 rounded-lg p-4">
-                                <p className="text-purple-600 text-sm font-semibold">Courses</p>
-                                <p className="text-2xl font-bold text-gray-800">{activityStats.total_courses}</p>
-                            </div>
+                        <div className="mt-8 pt-8 border-t border-slate-50">
+                            <button
+                                onClick={() => logout()}
+                                className="w-full py-3 px-4 bg-slate-50 text-slate-600 rounded-2xl font-bold hover:bg-red-50 hover:text-red-600 transition-all active:scale-95"
+                            >
+                                Chiqish
+                            </button>
                         </div>
                     </div>
-                )}
 
-                {/* Change Password */}
-                <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Security</h2>
-
-                    {!showPasswordForm ? (
+                    {/* Security Quick Link */}
+                    <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
+                        <h3 className="font-bold text-slate-800 mb-4 text-sm uppercase tracking-widest">Xavfsizlik</h3>
                         <button
                             onClick={() => setShowPasswordForm(true)}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                            className="w-full py-3 px-4 border border-slate-100 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors text-left flex justify-between items-center"
                         >
-                            Change Password
+                            <span>Parolni o‘zgartirish</span>
+                            <span className="text-slate-300">→</span>
                         </button>
-                    ) : (
-                        <form onSubmit={handleChangePassword} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Current Password
-                                </label>
-                                <input
-                                    type="password"
-                                    value={oldPassword}
-                                    onChange={(e) => setOldPassword(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    New Password
-                                </label>
-                                <input
-                                    type="password"
-                                    value={newPassword}
-                                    onChange={(e) => setNewPassword(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Confirm New Password
-                                </label>
-                                <input
-                                    type="password"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    required
-                                />
-                            </div>
-                            <div className="flex gap-3">
-                                <button
-                                    type="submit"
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                                >
-                                    Save Password
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setShowPasswordForm(false);
-                                        setOldPassword('');
-                                        setNewPassword('');
-                                        setConfirmPassword('');
-                                    }}
-                                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </form>
-                    )}
+                    </div>
                 </div>
 
-                {/* Account Actions (Logout / Delete) */}
-                <div className="bg-white rounded-lg shadow-md p-6 border-t border-gray-200">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Account Actions</h2>
-                    <div className="flex flex-wrap gap-4">
-                        <button
-                            onClick={() => {
-                                logout();
-                                window.location.href = '/login';
-                            }}
-                            className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                        >
-                            Log Out
-                        </button>
+                {/* Right Column: Dynamic Forms & Stats */}
+                <div className="md:col-span-2 space-y-8">
+                    {/* Activity Stats */}
+                    {activityStats && (
+                        <div className="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm">
+                            <h3 className="text-lg font-black text-slate-800 mb-6">O'quv ko'rsatkichlari</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="p-6 bg-blue-50 rounded-3xl">
+                                    <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">Umumiy faollik</p>
+                                    <p className="text-2xl font-black text-blue-700">{activityStats.total} ball</p>
+                                </div>
+                                <div className="p-6 bg-green-50 rounded-3xl">
+                                    <p className="text-[10px] font-bold text-green-400 uppercase tracking-widest mb-1">Davomiylik</p>
+                                    <p className="text-2xl font-black text-green-700">{formatTime(activityStats.total)}</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Edit Profile Form */}
+                    {showEditProfileForm && (
+                        <div className="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm animate-fade-in">
+                            <h3 className="text-lg font-black text-slate-800 mb-6">Profilni tahrirlash</h3>
+                            <form onSubmit={handleUpdateProfile} className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Ism-familiya</label>
+                                        <input
+                                            type="text"
+                                            value={editName}
+                                            onChange={(e) => setEditName(e.target.value)}
+                                            className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-primary-500 font-medium"
+                                            placeholder="Ismingizni kiriting"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Telefon raqam</label>
+                                        <input
+                                            type="tel"
+                                            value={editPhone}
+                                            onChange={(e) => setEditPhone(e.target.value)}
+                                            className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-primary-500 font-medium"
+                                            placeholder="+998 00 000 00 00"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Rasm (ixtiyoriy)</label>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        ref={fileInputRef}
+                                        onChange={(e) => {
+                                            if (e.target.files && e.target.files[0]) {
+                                                setEditImage(e.target.files[0]);
+                                            }
+                                        }}
+                                        className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+                                    />
+                                </div>
+                                <div className="flex gap-4 pt-4">
+                                    <button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="flex-1 py-4 bg-primary-600 text-white rounded-2xl font-bold shadow-lg shadow-primary-100 hover:bg-primary-700 transition-all disabled:opacity-50"
+                                    >
+                                        {loading ? 'Saqlanmoqda...' : 'Saqlash'}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowEditProfileForm(false)}
+                                        className="px-8 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition-all"
+                                    >
+                                        Bekor qilish
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    )}
+
+                    {/* Password Form */}
+                    {showPasswordForm && (
+                        <div className="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm animate-fade-in">
+                            <h3 className="text-lg font-black text-slate-800 mb-6">Parolni o'zgartirish</h3>
+                            <form onSubmit={handleChangePassword} className="space-y-6">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Eski parol</label>
+                                    <input
+                                        type="password"
+                                        value={oldPassword}
+                                        onChange={(e) => setOldPassword(e.target.value)}
+                                        className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-primary-500 font-medium"
+                                        required
+                                    />
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Yangi parol</label>
+                                        <input
+                                            type="password"
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
+                                            className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-primary-500 font-medium"
+                                            required
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Parolni tasdiqlang</label>
+                                        <input
+                                            type="password"
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-primary-500 font-medium"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex gap-4 pt-4">
+                                    <button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="flex-1 py-4 bg-primary-600 text-white rounded-2xl font-bold shadow-lg shadow-primary-100 hover:bg-primary-700 transition-all"
+                                    >
+                                        {loading ? 'Saqlanmoqda...' : 'Parolni saqlash'}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPasswordForm(false)}
+                                        className="px-8 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition-all"
+                                    >
+                                        Bekor qilish
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    )}
+
+                    {/* Danger Zone */}
+                    <div className="p-8 bg-red-50/50 rounded-[2.5rem] border border-red-100/50">
+                        <h3 className="text-lg font-black text-red-800 mb-2">Xavfli hudud</h3>
+                        <p className="text-sm text-red-600/70 mb-6">Hisobingizni o'chirib tashlash barcha ma'lumotlaringiz va sotib olingan kurslaringizni yo'qolishiga olib keladi.</p>
 
                         {!showDeleteConfirm ? (
                             <button
                                 onClick={() => setShowDeleteConfirm(true)}
-                                className="px-4 py-2 bg-red-100 text-red-700 border border-red-200 rounded-lg hover:bg-red-200 transition-colors"
+                                className="px-6 py-3 bg-white text-red-600 border border-red-100 rounded-2xl text-sm font-bold hover:bg-red-600 hover:text-white transition-all shadow-sm"
                             >
-                                Delete Account
+                                Hisobni o‘chirish
                             </button>
                         ) : (
-                            <div className="flex items-center gap-3 animate-fade-in bg-red-50 p-3 rounded-lg border border-red-200">
-                                <span className="text-sm text-red-700 font-medium">Are you sure? This cannot be undone.</span>
-                                <button
-                                    onClick={handleDeleteAccount}
-                                    disabled={loading}
-                                    className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition-colors disabled:opacity-50"
-                                >
-                                    {loading ? 'Deleting...' : 'Confirm Delete'}
-                                </button>
-                                <button
-                                    onClick={() => setShowDeleteConfirm(false)}
-                                    disabled={loading}
-                                    className="px-3 py-1 bg-white text-gray-600 text-sm border border-gray-300 rounded hover:bg-gray-50 transition-colors"
-                                >
-                                    Cancel
-                                </button>
+                            <div className="flex flex-col md:flex-row items-center gap-4 bg-white p-4 rounded-2xl border border-red-200 shadow-xl shadow-red-100/50">
+                                <span className="text-sm text-red-800 font-bold">Haqiqatdan ham o'chirmoqchimisiz?</span>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={handleDeleteAccount}
+                                        disabled={loading}
+                                        className="px-4 py-2 bg-red-600 text-white text-xs rounded-xl font-bold hover:bg-red-700 transition-colors"
+                                    >
+                                        Ha, tasdiqlayman
+                                    </button>
+                                    <button
+                                        onClick={() => setShowDeleteConfirm(false)}
+                                        className="px-4 py-2 bg-slate-100 text-slate-600 text-xs rounded-xl font-bold hover:bg-slate-200 transition-colors"
+                                    >
+                                        Bekor qilish
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -380,10 +353,3 @@ function ProfileContent() {
     );
 }
 
-export default function ProfilePage() {
-    return (
-        <ProtectedRoute>
-            <ProfileContent />
-        </ProtectedRoute>
-    );
-}

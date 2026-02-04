@@ -1,10 +1,10 @@
 'use client';
 
+import React, { useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import Header from '@/components/Header'; // We'll refine this later for student app
-import Footer from '@/components/Footer';
+import Sidebar from '@/components/student/Sidebar';
+import BottomNav from '@/components/student/BottomNav';
 
 export default function StudentLayout({
     children,
@@ -29,12 +29,19 @@ export default function StudentLayout({
     }
 
     return (
-        <div className="min-h-screen flex flex-col bg-slate-50">
-            <Header />
-            <main className="flex-grow container mx-auto px-4 py-8">
-                {children}
-            </main>
-            <Footer />
+        <div className="min-h-screen flex bg-slate-50">
+            {/* Sidebar for Desktop */}
+            <Sidebar />
+
+            {/* Main Content Area */}
+            <div className="flex-1 flex flex-col min-h-screen pb-24 lg:pb-0 relative overflow-x-hidden">
+                <main className="flex-grow p-4 md:p-8 lg:p-10 max-w-7xl mx-auto w-full">
+                    {children}
+                </main>
+            </div>
+
+            {/* Bottom Nav for Mobile */}
+            <BottomNav />
         </div>
     );
 }

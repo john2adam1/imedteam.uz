@@ -1,114 +1,70 @@
-# EduPlatform - Educational Platform
+# iMed Team - Educational Platform
 
-A simple, clean, API-ready educational platform built with Next.js (App Router) and TypeScript.
+A premium, API-driven medical education platform built with Next.js (App Router), Tailwind CSS, and TypeScript.
 
-## Features
+## Core Features
 
-- **Home Page**: Banner, categories, and course listings
-- **Category Pages**: Browse courses by category
-- **Course Detail**: View course modules and lessons
-- **Lesson Page**: Watch videos, download PDFs, and access test materials
-- **Notifications**: View and manage notifications
-- **Login**: Simple phone number-based authentication (no OTP)
+- **Student Application**: Personalized learning dashboard, course catalog, lesson player with video & materials, and learning statistics.
+- **Admin Panel**: Comprehensive management of banners, courses, subjects, and users.
+- **Landing Site**: High-converting landing pages for course promotion.
+- **Unified Auth**: Phone-number based authentication with separate flows for students and administrators.
+- **Real-time Notifications**: System-wide notifications for student updates.
 
 ## Project Structure
 
 ```
-imed-app/
-├── app/                    # Next.js App Router pages
-│   ├── category/[slug]/   # Category detail page
-│   ├── course/[slug]/     # Course detail and lesson pages
-│   ├── notifications/    # Notifications page
-│   ├── login/             # Login page
-│   ├── layout.tsx         # Root layout
-│   ├── page.tsx           # Home page
-│   └── globals.css        # Global styles
-├── components/            # Reusable React components
-│   ├── Banner.tsx
-│   ├── CategoryCard.tsx
-│   ├── CourseCard.tsx
-│   ├── Footer.tsx
-│   ├── Header.tsx
-│   └── ModuleList.tsx
-├── services/             # API service layer
-│   └── api.ts            # All API calls (currently using mock data)
-├── types/                # TypeScript interfaces
-│   └── index.ts
-├── mock/                 # Mock data
-│   └── data.ts
-└── public/               # Static assets
-```
-
-## Data Structure
-
-```
-Category
-  └── Course (free or paid)
-      └── Module
-          └── Lesson (free or paid)
-              ├── Video
-              ├── PDF
-              └── Test PDF
+imedteam/
+├── app/
+│   ├── (landing)/      # Public marketing pages
+│   ├── (auth)/         # Centralized login & registration
+│   ├── (student)/app/  # Student portal (courses, lessons, leaderboard, profile)
+│   └── (admin)/admin/  # Administrator dashboard
+├── components/
+│   ├── student/        # UI components specifically for students
+│   ├── admin/          # UI components for the admin panel
+│   ├── landing/        # Sections for the marketing pages
+│   ├── common/         # Shared utilities like Toast providers
+│   └── ui/             # Primitive UI components (buttons, cards, etc.)
+├── services/           # API Service Layer
+│   ├── mobile-api.ts   # Client for the /mobile endpoints (Student App)
+│   └── admin-api.ts    # Client for the /web endpoints (Admin Panel)
+├── types/              # TypeScript Type Definitions
+│   ├── mobile-api.ts   # Student App types compliant with Swagger
+│   └── admin.ts        # Admin Panel types
+└── lib/                # Shared utilities & context providers
+    ├── auth-context.ts # Global authentication state management
+    └── api-client.ts   # Base fetch wrapper for consistent API calls
 ```
 
 ## Getting Started
 
-1. Install dependencies:
-```bash
-npm install
-```
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-2. Run the development server:
-```bash
-npm run dev
-```
+2. **Set Environment Variables**:
+   Create a `.env.local` file:
+   ```env
+   NEXT_PUBLIC_API_URL=https://dev.axadjonovsardorbek.uz/api
+   ```
 
-3. Open [http://localhost:3000](http://localhost:3000) in your browser.
+3. **Run the development server**:
+   ```bash
+   npm run dev
+   ```
 
-## API Integration
+## Development Standards
 
-The project is structured to easily integrate with a real API:
-
-1. **Update `services/api.ts`**: Replace mock data calls with actual API endpoints
-2. **Set API URL**: Update `API_BASE_URL` in `services/api.ts` or use environment variables
-3. **Add Authentication**: Implement token storage and include in API headers
-4. **Error Handling**: Add proper error handling for API failures
-
-### Example API Integration
-
-In `services/api.ts`, replace:
-```typescript
-// Current (mock)
-return mockCourses;
-
-// With actual API call
-const response = await fetch(`${API_BASE_URL}/courses`);
-if (!response.ok) throw new Error('Failed to fetch courses');
-return response.json();
-```
-
-## Key Design Decisions
-
-- **Separation of Concerns**: Components don't fetch data directly; all API calls go through services
-- **Type Safety**: Full TypeScript coverage with interfaces in `/types`
-- **Minimal Design**: Clean, simple UI that's easy to customize
-- **Mock Data**: Ready-to-use mock data for development
-- **API-Ready**: Service layer prepared for easy API integration
-
-## Future Enhancements
-
-- Add video player component for lesson videos
-- Implement user authentication and session management
-- Add course enrollment functionality
-- Implement payment processing
-- Add search functionality
-- Add user dashboard
-- Add course progress tracking
+- **API Compliance**: All services must strictly follow the Swagger documentation.
+- **Premium Styling**: Use the defined design system (Tailwind CSS) with a focus on modern, vibrant aesthetics.
+- **Type Safety**: Ensure all API responses are correctly typed in `types/mobile-api.ts` or `types/admin.ts`.
+- **Client/Server Balance**: Use `'use client'` strategically for interactive components while leveraging Server Components for metadata and initial loads.
 
 ## Tech Stack
 
-- **Next.js 14** (App Router)
-- **TypeScript**
-- **Tailwind CSS**
-- **React 18**
-
+- **Framework**: Next.js 14 (App Router)
+- **Styling**: Tailwind CSS, Lucide React (Icons)
+- **State Management**: React Context, Cookies
+- **Language**: TypeScript
+- **Notifications**: React Hot Toast

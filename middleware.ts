@@ -11,7 +11,7 @@ export function middleware(request: NextRequest) {
     // Protect /app (student) routes
     if (pathname.startsWith('/app')) {
         if (!token) {
-            // Redirect to login if no token
+            // Redirect to student login
             const url = new URL('/auth/login', request.url);
             return NextResponse.redirect(url);
         }
@@ -19,9 +19,14 @@ export function middleware(request: NextRequest) {
 
     // Protect /admin routes
     if (pathname.startsWith('/admin')) {
+        // We allow access TO the /admin/login page even without a token
+        if (pathname === '/admin/login') {
+            return NextResponse.next();
+        }
+
         if (!token || !isAdmin) {
-            // Redirect to login (or a specific admin login) if no admin token
-            const url = new URL('/auth/login', request.url);
+            // Redirect specifically to admin login
+            const url = new URL('/admin/login', request.url);
             return NextResponse.redirect(url);
         }
     }

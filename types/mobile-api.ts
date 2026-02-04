@@ -11,7 +11,6 @@ export interface UserCheckReq {
 
 export interface UserCheckRes {
   has_account: boolean;
-  message: string;
 }
 
 export interface UserLoginReq {
@@ -28,12 +27,15 @@ export interface UserRegisterReq {
 
 export interface TokenRes {
   access_token: string;
-  refresh_token: string;
+  refresh_token?: string;
+  id?: string;
+  role?: string;
 }
 
 export interface ChangePasswordBody {
   old_password: string;
   new_password: string;
+  confirm_password: string;
 }
 
 // ============================================================================
@@ -43,8 +45,10 @@ export interface ChangePasswordBody {
 export interface UserRes {
   id: string;
   phone_number: string;
-  name?: string;
-  email?: string;
+  name: string;
+  fcm_token?: string;
+  image_url?: string;
+  language?: string;
   created_at: string;
   updated_at: string;
 }
@@ -61,65 +65,113 @@ export interface ProfileUpdateBody {
 // Course Types
 // ============================================================================
 
-export interface UserCourseMobile {
+export interface CourseMobileRes {
   id: string;
   name: string;
   description: string;
   image_url?: string;
-  subject_id: string;
-  subject_name?: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
+  is_public: boolean;
+  order_num: number;
+  teacher_id?: string;
+  teacher_name?: string;
 }
 
-export interface UserCourseMobileList {
-  courses: UserCourseMobile[];
+export interface CourseMobileList {
+  courses: CourseMobileRes[];
   count: number;
 }
 
-export interface UserCourseMobileRes {
+export interface MobileCourseRes {
   id: string;
   name: string;
   description: string;
   image_url?: string;
-  subject_id: string;
-  subject_name?: string;
-  is_active: boolean;
-  lessons?: SourceLessonMobile[];
-  created_at: string;
-  updated_at: string;
+  documents: number;
+  duration: number;
+  has_access: boolean;
+  lessons: number;
+  tests: number;
+  modules: MobileCourseModuleRes[];
+  price?: CoursePriceOption[];
+  teacher_id?: string;
+  teacher_name?: string;
+}
+
+export interface MobileCourseModuleRes {
+  id: string;
+  course_id: string;
+  name: string;
+  order_num: number;
+  lessons: MobileCourseLessonRes[];
+}
+
+export interface MobileCourseLessonRes {
+  id: string;
+  module_id: string;
+  name: string;
+  order_num: number;
+  is_completed: boolean;
+  is_public: boolean;
+}
+
+export interface CoursePriceOption {
+  tariff_id: string;
+  duration: number;
+  price: number;
 }
 
 // ============================================================================
-// Lesson Types
+// Lesson API Detail (SourceLessonMobile)
 // ============================================================================
 
-export interface SourceLessonMobile {
+export interface SourceMobile {
   id: string;
   name: string;
-  description?: string;
-  course_id: string;
-  video_url?: string;
-  pdf_url?: string;
-  order_number: number;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
+  order_num: number;
+  type: string;
+  url: string;
 }
 
 export interface SourceLessonMobileRes {
   id: string;
   name: string;
-  description?: string;
+  order_num: number;
+  duration: number;
+  is_completed: boolean;
+  type: string;
+  videos: SourceMobile[];
+  documents: SourceMobile[];
+  tests: SourceMobile[];
+}
+
+
+// ============================================================================
+// User Course Permission Types
+// ============================================================================
+
+export interface UserCourseMobileRes {
+  id: string;
   course_id: string;
-  course_name?: string;
-  video_url?: string;
-  pdf_url?: string;
-  order_number: number;
+  course_name: string;
+  course_image_url?: string;
+  user_id: string;
+  user_name: string;
+  tariff_id: string;
+  tariff_name: string;
+  duration: number;
+  percentage: number;
+  total_lessons: number;
+  completed_lessons: number;
   is_active: boolean;
+  started_at: string;
+  ended_at: string;
   created_at: string;
   updated_at: string;
+}
+
+export interface UserCourseMobileList {
+  user_courses: UserCourseMobileRes[];
+  count: number;
 }
 
 // ============================================================================
@@ -151,8 +203,7 @@ export interface BannerMobile {
   description?: string;
   image_url: string;
   link_url?: string;
-  is_active: boolean;
-  order_number: number;
+  order_num: number;
   created_at: string;
   updated_at: string;
 }
@@ -168,8 +219,7 @@ export interface BannerMobileRes {
   description?: string;
   image_url: string;
   link_url?: string;
-  is_active: boolean;
-  order_number: number;
+  order_num: number;
   created_at: string;
   updated_at: string;
 }
@@ -209,8 +259,7 @@ export interface FAQMobile {
   id: string;
   question: string;
   answer: string;
-  order_number: number;
-  is_active: boolean;
+  order_num: number;
   created_at: string;
   updated_at: string;
 }
@@ -238,45 +287,36 @@ export interface UserNotificationList {
   count: number;
 }
 
-// ============================================================================
-// Activity Types
-// ============================================================================
-
 export interface UserActivityCreateBody {
-  course_id: string;
-  lesson_id: string;
-  duration: number; // in seconds
+  activity: number;
+}
+
+export interface ActivityStatItem {
+  date: string;
+  value: number;
 }
 
 export interface ActivityStatsResponse {
-  total_time: number; // in seconds
-  total_lessons: number;
-  total_courses: number;
-  period: string;
-  details?: ActivityDetail[];
+  user_id: string;
+  type: string;
+  total: number;
+  items: ActivityStatItem[];
 }
-
-export interface ActivityDetail {
-  date: string;
-  time: number; // in seconds
-  lessons_completed: number;
-}
-
-// ============================================================================
-// Rating/Leaderboard Types
-// ============================================================================
 
 export interface RatingUser {
   user_id: string;
-  full_name: string;
-  total_time: number; // in seconds
+  name: string;
+  image_url?: string;
   rank: number;
+  activity: number;
+  is_me?: boolean;
 }
 
 export interface RatingResponse {
+  type: string;
+  limit: number;
   items: RatingUser[];
   me?: RatingUser;
-  period: string;
 }
 
 // ============================================================================
