@@ -28,7 +28,13 @@ export default function LoginPage() {
         password: password,
       });
 
-      router.push('/');
+      // Redirect based on role
+      const isAdminFlag = localStorage.getItem('is_admin') === 'true';
+      if (isAdminFlag) {
+        router.push('/admin');
+      } else {
+        router.push('/app');
+      }
     } catch (err: any) {
       const errorMessage = err.message || '';
       if (errorMessage.toLowerCase().includes('not found') ||
@@ -71,7 +77,7 @@ export default function LoginPage() {
         password: password,
       });
 
-      router.push('/');
+      router.push('/app');
     } catch (err: any) {
       console.error('Registration error:', err);
       const errorMessage = err.message || '';

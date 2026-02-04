@@ -21,7 +21,7 @@ export interface SubjectCreateDTO {
   name: MultilanguageText;
 }
 
-export interface SubjectUpdateDTO extends Partial<SubjectCreateDTO> {}
+export interface SubjectUpdateDTO extends Partial<SubjectCreateDTO> { }
 
 export interface Subject extends SubjectCreateDTO {
   id: string;
@@ -41,7 +41,7 @@ export interface CourseCreateDTO {
   description: MultilanguageText;
 }
 
-export interface CourseUpdateDTO extends Partial<CourseCreateDTO> {}
+export interface CourseUpdateDTO extends Partial<CourseCreateDTO> { }
 
 export interface Course extends CourseCreateDTO {
   id: string;
@@ -56,7 +56,7 @@ export interface ModuleCreateDTO {
   name: MultilanguageText;
 }
 
-export interface ModuleUpdateDTO extends Partial<ModuleCreateDTO> {}
+export interface ModuleUpdateDTO extends Partial<ModuleCreateDTO> { }
 
 export interface Module extends ModuleCreateDTO {
   id: string;
@@ -75,7 +75,7 @@ export interface LessonCreateDTO {
   name: MultilanguageText;
 }
 
-export interface LessonUpdateDTO extends Partial<LessonCreateDTO> {}
+export interface LessonUpdateDTO extends Partial<LessonCreateDTO> { }
 
 export interface Lesson extends LessonCreateDTO {
   id: string;
@@ -94,7 +94,7 @@ export interface SourceCreateDTO {
   url: MultilanguageUrl;
 }
 
-export interface SourceUpdateDTO extends Partial<SourceCreateDTO> {}
+export interface SourceUpdateDTO extends Partial<SourceCreateDTO> { }
 
 export interface Source extends SourceCreateDTO {
   id: string;
@@ -111,7 +111,7 @@ export interface BannerCreateDTO {
   order_num: number;
 }
 
-export interface BannerUpdateDTO extends Partial<BannerCreateDTO> {}
+export interface BannerUpdateDTO extends Partial<BannerCreateDTO> { }
 
 export interface Banner extends BannerCreateDTO {
   id: string;
@@ -124,5 +124,17 @@ export interface Teacher {
   id: string;
   name: string;
   email?: string;
+}
+
+// Authentication DTOs
+export interface AdminLoginReq {
+  phone_number: string;
+  password: string;
+}
+
+export interface AdminLoginRes {
+  access_token: string;
+  refresh_token?: string;
+  role: string;
 }
 

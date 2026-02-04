@@ -19,15 +19,18 @@ import {
   BannerCreateDTO,
   BannerUpdateDTO,
   Teacher,
+  AdminLoginReq,
+  AdminLoginRes,
 } from '@/types/admin';
+import { getCookie, setCookie, removeCookie } from '@/lib/cookies';
 
 // Base API URL
 // Assuming the Admin API is at /api/admin/*
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://dev.axadjonovsardorbek.uz') + '/api/admin';
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://dev.axadjonovsardorbek.uz') + '/api/web';
 
 function getAuthToken(): string | null {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem('auth_token');
+  return getCookie('auth_token') || localStorage.getItem('auth_token');
 }
 
 // Generic fetch wrapper for API calls
@@ -219,5 +222,31 @@ export const teacherAdminService = {
   getAll: async (): Promise<Teacher[]> => {
     return fetchAPI<Teacher[]>('/teachers');
   },
+};
+
+// Admin Auth Services
+export const adminAuthService = {
+  login: async (credentials: AdminLoginReq): Promise<AdminLoginRes> => {
+    const response = await fetchAPI<AdminLoginRes>('/auth/admin/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+    });
+
+    if (response.access_token) {
+      setCookie('auth_token', response.access_token);
+      setCookie('is_admin', 'true');
+      localStorage.setItem('auth_token', response.access_token);
+      localStorage.setItem('is_admin', 'true');
+    }
+
+    return response;
+  },
+
+  logout: () => {
+    removeCookie('auth_token');
+    removeCookie('is_admin');
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('is_admin');
+  }
 };
 

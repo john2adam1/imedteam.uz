@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import { AuthProvider } from '@/lib/auth-context';
 import { LanguageProvider } from '@/lib/language-context';
 
@@ -17,18 +15,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen flex flex-col">
+      <body className="min-h-screen flex flex-col font-sans">
         <AuthProvider>
           <LanguageProvider>
-            <Header />
-            <main className="flex-grow">
-              {children}
-            </main>
-            <Footer />
+            {children}
           </LanguageProvider>
         </AuthProvider>
       </body>
     </html>
   );
 }
-

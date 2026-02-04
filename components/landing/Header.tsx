@@ -43,7 +43,7 @@ export default function Header() {
                         </nav>
 
                         <div className="flex items-center gap-3">
-                            <Link href="/login" className="hidden md:inline-flex px-4 py-2 rounded-lg bg-primary-600 text-white text-sm font-semibold hover:bg-primary-700 transition">
+                            <Link href="/auth/login" className="hidden md:inline-flex px-4 py-2 rounded-lg bg-primary-600 text-white text-sm font-semibold hover:bg-primary-700 transition">
                                 Kirish
                             </Link>
                             <button
@@ -67,7 +67,7 @@ export default function Header() {
                         <a href="#team" className="py-2 font-medium text-slate-700 hover:text-primary-700" onClick={() => setMobileMenuOpen(false)}>Jamoa</a>
                         <a href="#blog" className="py-2 font-medium text-slate-700 hover:text-primary-700" onClick={() => setMobileMenuOpen(false)}>Yangiliklar</a>
                         <a href="#contact" className="py-2 font-medium text-slate-700 hover:text-primary-700" onClick={() => setMobileMenuOpen(false)}>Aloqa</a>
-                        <Link href="/login" className="py-2 font-medium text-primary-600 hover:text-primary-800" onClick={() => setMobileMenuOpen(false)}>
+                        <Link href="/auth/login" className="py-2 font-medium text-primary-600 hover:text-primary-800" onClick={() => setMobileMenuOpen(false)}>
                             Kirish / Ro'yxatdan o'tish
                         </Link>
                     </div>

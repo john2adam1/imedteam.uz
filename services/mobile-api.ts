@@ -36,6 +36,7 @@ import {
     AppRouteRes,
     Language,
 } from '@/types/mobile-api';
+import { getCookie, setCookie, removeCookie } from '@/lib/cookies';
 
 // Get API base URL from environment
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://dev.axadjonovsardorbek.uz/api';
@@ -45,11 +46,11 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://dev.axadjonovsa
 // ============================================================================
 
 /**
- * Get authentication token from localStorage
+ * Get authentication token from localStorage or cookies
  */
 function getAuthToken(): string | null {
     if (typeof window === 'undefined') return null;
-    return localStorage.getItem('auth_token');
+    return getCookie('auth_token') || localStorage.getItem('auth_token');
 }
 
 /**
@@ -161,9 +162,12 @@ export const authService = {
             body: JSON.stringify(data),
         }, false);
 
-        // Store token in localStorage
+        // Store token in localStorage and cookies
         if (typeof window !== 'undefined' && response.access_token) {
+            setCookie('auth_token', response.access_token);
+            setCookie('is_admin', 'false');
             localStorage.setItem('auth_token', response.access_token);
+            localStorage.setItem('is_admin', 'false');
             if (response.refresh_token) {
                 localStorage.setItem('refresh_token', response.refresh_token);
             }
@@ -189,9 +193,12 @@ export const authService = {
             body: JSON.stringify(loginData),
         }, false);
 
-        // Store token in localStorage
+        // Store token in localStorage and cookies
         if (typeof window !== 'undefined' && response.access_token) {
+            setCookie('auth_token', response.access_token);
+            setCookie('is_admin', 'false');
             localStorage.setItem('auth_token', response.access_token);
+            localStorage.setItem('is_admin', 'false');
             if (response.refresh_token) {
                 localStorage.setItem('refresh_token', response.refresh_token);
             }
@@ -227,8 +234,11 @@ export const authService = {
      */
     logout: () => {
         if (typeof window !== 'undefined') {
+            removeCookie('auth_token');
+            removeCookie('is_admin');
             localStorage.removeItem('auth_token');
             localStorage.removeItem('refresh_token');
+            localStorage.removeItem('is_admin');
         }
     },
 };

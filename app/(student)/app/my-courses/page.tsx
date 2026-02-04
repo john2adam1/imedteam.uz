@@ -51,7 +51,7 @@ export default function MyCoursesPage() {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh]">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">Please log in content</h2>
-                <Link href="/login" className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                <Link href="/auth/login" className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                     Login
                 </Link>
             </div>
@@ -70,7 +70,7 @@ export default function MyCoursesPage() {
                     <h3 className="mt-2 text-sm font-medium text-gray-900">No courses yet</h3>
                     <p className="mt-1 text-sm text-gray-500">Get started by exploring our available courses.</p>
                     <div className="mt-6">
-                        <Link href="/courses" className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                        <Link href="/app/courses" className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
                             Browse Courses
                         </Link>
                     </div>
@@ -78,7 +78,7 @@ export default function MyCoursesPage() {
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {courses.map((course) => (
-                        <Link key={course.id} href={`/courses/${course.id}`} className="block">
+                        <Link key={course.id} href={`/app/course/${course.id}`} className="block">
                             <div className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden h-full flex flex-col border border-gray-200">
                                 <div className="relative h-48 bg-gray-200">
                                     {course.image_url ? (
