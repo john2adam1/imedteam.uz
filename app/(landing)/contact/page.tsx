@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { contactService } from '@/services/mobile-api';
+import { contactService } from '@/services';
 
 export default function ContactPage() {
     const [name, setName] = useState('');

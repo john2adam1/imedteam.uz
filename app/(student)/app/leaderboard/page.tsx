@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ratingService } from '@/services/mobile-api';
+import { ratingService } from '@/services';
 import { RatingResponse } from '@/types/mobile-api';
 
 export default function LeaderboardPage() {

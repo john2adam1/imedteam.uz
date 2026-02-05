@@ -35,6 +35,7 @@ export default function LoginPage() {
         router.push('/app');
       }
     } catch (err: any) {
+      console.error('Login error:', err);
       setError(err.message || 'Kirishda xatolik yuz berdi.');
     } finally {
       setIsLoading(false);
@@ -66,6 +67,7 @@ export default function LoginPage() {
 
       router.push('/app');
     } catch (err: any) {
+      console.error('Registration error:', err);
       setError(err.message || 'Ro‘yxatdan o‘tishda xatolik yuz berdi.');
     } finally {
       setIsLoading(false);

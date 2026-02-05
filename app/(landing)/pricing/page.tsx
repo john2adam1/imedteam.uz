@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { tariffService, orderService } from '@/services/mobile-api';
+import { tariffService, orderService } from '@/services';
 import { TariffRes } from '@/types/mobile-api';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';

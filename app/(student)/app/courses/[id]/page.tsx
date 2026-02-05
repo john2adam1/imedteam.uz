@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { courseService } from '@/services/mobile-api';
+import { courseService } from '@/services';
 import { MobileCourseRes } from '@/types/mobile-api';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -21,7 +21,7 @@ export default function CourseDetailPage() {
         async function fetchCourse() {
             try {
                 setLoading(true);
-                const data = await courseService.getById(id);
+                const data = await courseService.getCourseById(id);
                 setCourse(data);
             } catch (err: any) {
                 console.error('Failed to fetch course:', err);

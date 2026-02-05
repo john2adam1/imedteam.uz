@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { authService, activityService, profileService } from '@/services/mobile-api';
+import { authService, activityService, profileService } from '@/services';
 import { ActivityStatsResponse } from '@/types/mobile-api';
 
 export default function ProfilePage() {

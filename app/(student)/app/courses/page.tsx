@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { courseService } from '@/services/mobile-api';
+import { courseService } from '@/services';
 import { CourseMobileRes, UserCourseMobileRes } from '@/types/mobile-api';
 import Link from 'next/link';
 
@@ -18,7 +18,7 @@ export default function CoursesPage() {
             setError('');
             try {
                 if (activeTab === 'all') {
-                    const data = await courseService.getAll();
+                    const data = await courseService.getCourses();
                     setAllCourses(data.courses || []);
                 } else {
                     const data = await courseService.getUserCourses();

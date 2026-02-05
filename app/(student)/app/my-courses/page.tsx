@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { courseService } from '@/services/mobile-api';
+import { courseService } from '@/services';
 import { UserCourseMobileRes } from '@/types/mobile-api';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';

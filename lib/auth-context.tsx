@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { authService, profileService } from '@/services/mobile-api';
+import { authService, profileService } from '@/services';
 import { adminAuthService } from '@/services/admin-api';
 import { UserRes, UserLoginReq, UserCheckReq, UserRegisterReq } from '@/types/mobile-api';
 import { AdminLoginReq } from '@/types/admin';
@@ -37,7 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 try {
                     // For now, we use mobile profile service to get user info
                     // If isAdmin is true, we might need a different profile fetch if they are different entities
-                    const userData = await profileService.getProfile();
+                    const userData = await profileService.getUserProfile();
                     setUser(userData);
                     setIsAdmin(adminFlag);
                 } catch (error: any) {
@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
             await authService.login(credentials);
             // Fetch user profile after successful login
-            const userData = await profileService.getProfile();
+            const userData = await profileService.getUserProfile();
             setUser(userData);
         } catch (error) {
             console.error('Login failed:', error);
@@ -76,9 +76,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const register = async (data: UserRegisterReq) => {
         try {
-            await authService.register(data);
+            // Use login endpoint with name for registration
+            await authService.login({
+                phone_number: data.phone_number,
+                password: data.password,
+                name: data.full_name,
+            });
             // Fetch user profile after successful registration
-            const userData = await profileService.getProfile();
+            const userData = await profileService.getUserProfile();
             setUser(userData);
         } catch (error) {
             console.error('Registration failed:', error);
@@ -93,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             // After admin login, we can't necessarily use mobile profile service
             // but for simplicity if the person is same:
             try {
-                const userData = await profileService.getProfile();
+                const userData = await profileService.getUserProfile();
                 setUser(userData);
             } catch {
                 setUser({ id: 'admin', name: 'Admin User' } as any);
@@ -113,7 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const refreshUser = async () => {
         try {
-            const userData = await profileService.getProfile();
+            const userData = await profileService.getUserProfile();
             setUser(userData);
         } catch (error) {
             console.error('Failed to refresh user:', error);

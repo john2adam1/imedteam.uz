@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { notificationService } from '@/services/mobile-api';
+import { notificationService } from '@/services';
 import { UserNotification } from '@/types/mobile-api';
 
 export default function NotificationsPage() {
@@ -17,7 +17,7 @@ export default function NotificationsPage() {
     try {
       setIsLoading(true);
       const params = filter === 'unread' ? { is_read: false } as any : undefined;
-      const response = await notificationService.getAll(params);
+      const response = await notificationService.getNotifications(params);
       setNotifications(response.notifications || []);
     } catch (error) {
       console.error('Failed to fetch notifications:', error);

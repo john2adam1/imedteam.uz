@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { lessonService, activityService } from '@/services/mobile-api';
+import { lessonService, activityService } from '@/services';
 import { SourceLessonMobileRes } from '@/types/mobile-api';
 import { useRouter, useParams } from 'next/navigation';
 
@@ -23,7 +23,7 @@ export default function LessonPage() {
     const fetchLesson = async () => {
         try {
             setIsLoading(true);
-            const data = await lessonService.getById(id);
+            const data = await lessonService.getLessonById(id);
             setLesson(data);
         } catch (err: any) {
             setError(err.message || 'Dars ma’lumotlarini yuklashda xatolik yuz berdi');

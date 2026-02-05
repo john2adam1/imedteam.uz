@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { fetchAPI, faqService } from '@/services/mobile-api';
+import { faqService } from '@/services';
 // Actually, looking back at my read chunks, I saw /mobile/faq. 
 // I need to add faqService to mobile-api.ts or just fetch here.
 // I'll add faqService to mobile-api.ts first? 

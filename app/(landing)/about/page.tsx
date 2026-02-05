@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { aboutService } from '@/services/mobile-api';
+import { aboutService } from '@/services';
 import { AboutMobile } from '@/types/mobile-api';
 
 export default function AboutPage() {
