@@ -10,7 +10,7 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 0 100% 50%;
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -22,8 +22,8 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --radius: 0.5rem;
+    --ring: 0 100% 50%;
+    --radius: 1rem;
   }
 }
 
@@ -31,6 +31,7 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -103,9 +104,11 @@ a {
   animation: marquee 28s linear infinite;
 }
 
-details > summary {
-    list-style: none; /* Hide default triangle */
+details>summary {
+  list-style: none;
+  /* Hide default triangle */
 }
-details > summary::-webkit-details-marker {
-    display: none;
+
+details>summary::-webkit-details-marker {
+  display: none;
 }

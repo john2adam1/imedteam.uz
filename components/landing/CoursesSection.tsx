@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { courseService, subjectService } from '@/services/mobile-api';
-import { UserCourseMobile, Subject } from '@/types/mobile-api';
+import { CourseMobileRes, Subject } from '@/types/mobile-api';
 import Link from 'next/link';
+import { Grid } from 'lucide-react';
 
 export default function CoursesSection() {
     const [subjects, setSubjects] = useState<Subject[]>([]);
-    const [courses, setCourses] = useState<UserCourseMobile[]>([]);
+    const [courses, setCourses] = useState<CourseMobileRes[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -28,9 +29,11 @@ export default function CoursesSection() {
         fetchData();
     }, []);
 
-    // Group courses by subject
+    // Group courses by subject - searching for subject in name or using any available field
+    // If the API doesn't return subject_id directly in the list, we might need to handle it differently
+    // For now, let's use a looser type to avoid TS errors on subject_id
     const getCoursesBySubject = (subjectId: string) => {
-        return courses.filter(course => course.subject_id === subjectId);
+        return courses.filter((course: any) => course.subject_id === subjectId);
     };
 
     if (loading) {
@@ -38,41 +41,78 @@ export default function CoursesSection() {
     }
 
     return (
-        <section id="courses" className="py-16">
-            <div className="max-w-4xl mx-auto px-4">
-                <div className="reveal text-center max-w-2xl mx-auto">
-                    <h2 className="text-3xl font-extrabold">Kurs yo‘nalishlari</h2>
-                    <p className="text-slate-600 mt-2">Klinik, Fundamental va Preklinik fanlar bo‘yicha modullar.</p>
+        <section id="courses" className="py-24 bg-slate-50 relative overflow-hidden">
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl -z-10"></div>
+
+            <div className="max-w-7xl mx-auto px-6">
+                <div className="reveal text-center max-w-3xl mx-auto mb-16">
+                    <h2 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">
+                        Kurs yo‘nalishlari
+                    </h2>
+                    <p className="text-slate-500 mt-6 text-lg font-medium leading-relaxed">
+                        Klinik, Fundamental va Preklinik fanlar bo‘yicha eng sara modullar to’plami.
+                        Professional shifokorlar bilan birga o’rganing.
+                    </p>
                 </div>
 
-                <div className="mt-8 grid gap-4">
-                    {subjects.length === 0 && (
-                        <div className="text-center text-slate-500">Hozircha kurslar mavjud emas.</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {subjects.length === 0 && !loading && (
+                        <div className="col-span-full py-20 text-center bg-white rounded-[2rem] border border-slate-100 italic text-slate-400">
+                            Hozircha kurslar mavjud emas.
+                        </div>
                     )}
 
-                    {subjects.map((subject) => {
+                    {subjects.map((subject, idx) => {
                         const subjectCourses = getCoursesBySubject(subject.id);
-                        if (subjectCourses.length === 0) return null; // Hide empty subjects or show them? Old site showed categories. Let's hide empty to keep it clean, or show.
+                        if (subjectCourses.length === 0) return null;
 
                         return (
-                            <details key={subject.id} className="reveal group rounded-xl border border-slate-200 bg-white p-4 open:shadow-soft transition-all duration-300">
-                                <summary className="flex cursor-pointer items-center justify-between gap-4 select-none">
-                                    <div className="flex items-center gap-3">
-                                        {/* Optional: <img src={subject.image_url} alt="" className="w-8 h-8 rounded object-cover" /> */}
-                                        <span className="font-semibold text-lg text-slate-800">{subject.name}</span>
-                                    </div>
-                                    <span className="text-slate-500 group-open:rotate-45 transition transform duration-300 text-2xl">+</span>
-                                </summary>
-                                <div className="pt-4 text-slate-700 text-sm grid md:grid-cols-2 gap-3 border-t border-slate-100 mt-3 animation-fade-in">
-                                    {subjectCourses.map(course => (
-                                        <Link href={`/courses/${course.id}`} key={course.id} className="flex items-center gap-2 p-2 hover:bg-slate-50 rounded-lg transition group/course">
-                                            <span className="w-2 h-2 rounded-full bg-primary-400 group-hover/course:bg-primary-600 transition"></span>
-                                            <span className="font-medium">{course.name}</span>
-                                            {/* <span className="text-xs text-slate-400 ml-auto">Duration?</span> */}
+                            <div
+                                key={subject.id}
+                                className="reveal group bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-100 hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 hover:-translate-y-2 flex flex-col"
+                                style={{ transitionDelay: `${idx * 100}ms` }}
+                            >
+                                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-colors duration-500">
+                                    <Grid className="w-8 h-8" />
+                                </div>
+
+                                <h3 className="text-2xl font-black text-slate-900 mb-4 group-hover:text-primary transition-colors">
+                                    {subject.name}
+                                </h3>
+
+                                <p className="text-slate-500 text-sm font-medium mb-8 flex-1">
+                                    Ushbu yo‘nalishda {subjectCourses.length} ta professional kurslar mavjud.
+                                </p>
+
+                                <div className="space-y-3">
+                                    {subjectCourses.slice(0, 3).map(course => (
+                                        <Link
+                                            href={`/app/courses/${course.id}`}
+                                            key={course.id}
+                                            className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 group-hover:bg-white border border-transparent group-hover:border-slate-100 transition-all hover:border-primary/20 hover:text-primary"
+                                        >
+                                            <div className="w-2 h-2 rounded-full bg-primary/40 group-hover:bg-primary"></div>
+                                            <span className="font-bold text-sm truncate">{course.name}</span>
                                         </Link>
                                     ))}
+                                    {subjectCourses.length > 3 && (
+                                        <Link
+                                            href="/app/courses"
+                                            className="block text-center pt-2 text-sm font-bold text-slate-400 hover:text-primary transition-colors"
+                                        >
+                                            Yana {subjectCourses.length - 3} ta kurs...
+                                        </Link>
+                                    )}
                                 </div>
-                            </details>
+
+                                <Link
+                                    href="/app/courses"
+                                    className="mt-8 py-4 px-6 rounded-2xl bg-slate-900 text-white font-bold text-center group-hover:bg-primary transition-all shadow-lg shadow-slate-900/10 active:scale-95 flex items-center justify-center gap-2"
+                                >
+                                    Ko‘rish
+                                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                                </Link>
+                            </div>
                         );
                     })}
                 </div>

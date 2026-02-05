@@ -45,29 +45,57 @@ export default function Team() {
     ];
 
     return (
-        <section id="team" className="py-16">
-            <div className="max-w-7xl mx-auto px-4">
-                <div className="reveal text-center max-w-2xl mx-auto">
-                    <h2 className="text-3xl font-extrabold">“iMed Team” jamoasi</h2>
-                    <p className="text-slate-600 mt-2">
+        <section id="team" className="py-24 bg-slate-50 relative">
+            <div className="max-w-7xl mx-auto px-6">
+                <div className="reveal text-center max-w-3xl mx-auto mb-20">
+                    <h2 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+                        “iMed Team” jamoasi
+                    </h2>
+                    <p className="text-slate-500 mt-6 text-lg font-medium leading-relaxed">
                         Bizda shifokorlik va ustozlik mahoratiga ega bo’lgan, yetarli tajribaga ega bo’lgan TOP ustoz shifokorlar dars o’tishadi!
-                        Jamoada 30 dan ziyod shifokorlar faoliyat yuritib kelishadi.
                     </p>
                 </div>
-                <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                     {teamMembers.map((member, idx) => (
-                        <div key={idx} className="reveal rounded-2xl border border-slate-100 bg-white p-6 shadow-soft text-center group hover:shadow-card transition duration-300">
-                            <div className="mx-auto w-20 h-20 rounded-full bg-slate-100 grid place-items-center shadow-sm overflow-hidden mb-4">
-                                {/* Use next/image? Or plain img. Plain img for simplicity with external URLs or raw paths */}
-                                <img src={member.img} alt={member.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=' + member.name }} />
+                        <div
+                            key={idx}
+                            className="reveal group bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-100 hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 hover:-translate-y-2 text-center"
+                            style={{ transitionDelay: `${idx * 100}ms` }}
+                        >
+                            <div className="relative mx-auto w-24 h-24 mb-6">
+                                <div className="absolute inset-0 bg-primary rounded-full rotate-6 group-hover:rotate-12 transition-transform duration-500"></div>
+                                <div className="absolute inset-0 bg-white rounded-full overflow-hidden border-4 border-white shadow-lg">
+                                    <img
+                                        src={member.img}
+                                        alt={member.name}
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                        onError={(e) => { (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(member.name) + '&background=f43f5e&color=fff' }}
+                                    />
+                                </div>
                             </div>
-                            <div className="mt-4 font-extrabold text-slate-900 group-hover:text-primary-700 transition">{member.name}</div>
-                            <div className="text-sm text-slate-500 font-medium">{member.role}</div>
-                            <div className="mt-3 text-xs text-slate-600 line-clamp-4 leading-relaxed">
+
+                            <h3 className="text-xl font-black text-slate-900 mb-2 group-hover:text-primary transition-colors">
+                                {member.name}
+                            </h3>
+
+                            <p className="text-primary text-xs font-black uppercase tracking-widest mb-4">
+                                {member.role}
+                            </p>
+
+                            <p className="text-slate-500 text-sm font-medium leading-relaxed line-clamp-4">
                                 {member.desc}
-                            </div>
+                            </p>
                         </div>
                     ))}
+
+                    <div className="reveal group rounded-[2.5rem] p-8 border-4 border-dashed border-slate-200 flex flex-col items-center justify-center text-center hover:border-primary/20 hover:bg-white transition-all duration-500">
+                        <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-6 group-hover:bg-primary group-hover:text-white transition-all">
+                            <span className="text-3xl font-black">+</span>
+                        </div>
+                        <h3 className="text-lg font-black text-slate-900 mb-2">30+ Ustozlar</h3>
+                        <p className="text-slate-500 text-sm font-medium">Jamoamizda yana o'nlab professional shifokorlar faoliyat yuritishadi.</p>
+                    </div>
                 </div>
             </div>
         </section>

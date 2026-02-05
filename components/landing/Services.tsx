@@ -1,76 +1,76 @@
 export default function Services() {
     return (
-        <section id="services" className="py-16 bg-gradient-to-b from-primary-50 to-primary-50/40">
-            <div className="max-w-7xl mx-auto px-4">
-                <div className="reveal text-center max-w-2xl mx-auto">
-                    <h2 className="text-3xl font-extrabold">iMed Team haqida!</h2>
-                    <div className="text-slate-600 mt-2 space-y-4 leading-relaxed">
-                        <p>
-                            “iMed Team” tibbiy platformasi 2021-yildan buyon o‘z faoliyatlarini olib bormoqda. Shu kungacha
-                            biz 6000 dan ziyod bo‘lgan talaba va shifokorlarni o‘qitib keldik. Bizning talabalar turli xil
-                            davlat va xususiy shifoxonalarda malakali mutaxassis bo‘lib ishlab kelishmoqda.
-                        </p>
+        <section id="services" className="py-24 bg-white relative">
+            <div className="max-w-7xl mx-auto px-6">
+                <div className="reveal grid lg:grid-cols-2 gap-20 items-center">
+                    <div>
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-primary/10 text-primary text-sm font-bold mb-8">
+                            Nega bizni tanlashadi?
+                        </div>
+                        <h2 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+                            iMed Team — <br />
+                            <span className="text-primary">Tibbiyotni rivojlantirish </span>
+                            yorqin kelajak garovidir!
+                        </h2>
 
-                        <p>
-                            Shuningdek, ularning turli xalqaro hamda milliy olimpiadalarda faxrli o‘rinlarni egallab
-                            kelayotganlari diqqatga sazovordir.
-                        </p>
+                        <div className="text-slate-600 mt-8 space-y-6 text-lg font-medium leading-relaxed">
+                            <p>
+                                2021-yildan buyon 6000 dan ziyod talaba va shifokorlarni o‘qitib kelayotgan professional platformamizga qo'shiling.
+                            </p>
+                            <p>
+                                Bizning kurslarimiz xalqaro standartlar asosida tuzilgan va O‘zbekiston tibbiyot muhitiga mukammal moslashtirilgan.
+                            </p>
+                        </div>
 
-                        <p>
-                            Bizning kurslarimizdagi barcha manbalar xalqaro darajadagi ma’lumotlar asosiga tuzilgan va
-                            O’zbekiston muhitiga moslashtirilgan. Kurs davomida nafaqat bilim, balki ustoz shifokorlar
-                            tomonidan amaliy tayyor instrumentlar va shablonlarni qo‘lga kiritasiz.
-                        </p>
-
-                        <p>
-                            Kurs davomida O’zbekiston va qo‘shni davlatlardan yig‘ilgan shifokor va talabalar bilan{' '}
-                            <strong>networking</strong> qilish imkoniyati ham mavjud bo‘ladi!
-                        </p>
-
-                        <h3 className="font-semibold text-primary-700 mt-6">Shiorimiz:</h3>
-                        <ul className="list-disc list-inside space-y-2 text-left inline-block">
-                            <li>Talaba va shifokorlarni zamonaviy va isbotli tibbiyot bilan to‘laqonli tanishtirish</li>
-                            <li>Nazariy va amaliy bilimlarni birgalikda uyg‘unlashtira olish</li>
-                            <li>Har bir bemorga o‘z yaqini sifatida individual yondashuvni o‘rgatish</li>
-                            <li>
-                                Bir so‘z bilan aytganda: O’zbekiston tibbiyotini yangi darajaga olib chiqish — bu bizning
-                                eng ustuvor vazifamiz!
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div className="mt-10 grid md:grid-cols-2 gap-6">
-                    <div className="reveal rounded-2xl border border-slate-100 bg-white p-6 shadow-soft">
-                        <div className="text-3xl">🎯</div>
-                        <div className="mt-3 font-extrabold text-xl">Feedback</div>
-                        <p className="text-slate-600 mt-2 text-sm">
-                            Online/offline kurslarimizda o’qigan ayrim talaba va shifokorlarni fikrini o’qib ko’ring😊
-                        </p>
-                        <a
-                            href="https://t.me/imedteam_feedback"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="mt-4 inline-flex px-3 py-2 rounded-lg border border-slate-200 hover:border-primary-500 text-slate-700 hover:text-primary-700 text-sm"
-                        >
-                            Feedbacklarni o’qish
-                        </a>
+                        <div className="mt-12 space-y-4">
+                            {[
+                                "Talabalarni zamonaviy va isbotli tibbiyot bilan tanishtirish",
+                                "Nazariy va amaliy bilimlarni uyg‘unlashtirish",
+                                "Har bir bemorga individual yondashuvni o‘rgatish"
+                            ].map((item, i) => (
+                                <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold text-slate-800">
+                                    <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0">
+                                        ✓
+                                    </div>
+                                    {item}
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
-                    <div className="reveal rounded-2xl border border-slate-100 bg-white p-6 shadow-soft">
-                        <div className="text-3xl">🤝</div>
-                        <div className="mt-3 font-extrabold text-xl">Konsalting</div>
-                        <p className="text-slate-600 mt-2 text-sm">
-                            Jamoa bilan loyihani tahlil qilish, roadmap va dizayn/texnik qarorlar.
-                        </p>
-                        <a
-                            href="https://t.me/iMed_team"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="mt-4 inline-flex px-3 py-2 rounded-lg border border-slate-200 hover:border-primary-500 text-slate-700 hover:text-primary-700 text-sm"
-                        >
-                            Bog‘lanish
-                        </a>
+                    <div className="grid gap-8">
+                        <div className="reveal bg-slate-900 rounded-[2.5rem] p-10 text-white shadow-2xl shadow-slate-900/20 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/40 transition-colors"></div>
+                            <div className="text-5xl mb-6 transform group-hover:scale-110 transition-transform">🎯</div>
+                            <h3 className="text-3xl font-black mb-4">Feedback</h3>
+                            <p className="text-white/70 font-medium mb-8">
+                                Bizning kurslarimizda o’qigan minglab talabalarning samimiy fikrlari bilan tanishing.
+                            </p>
+                            <a
+                                href="https://t.me/imedteam_feedback"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex py-4 px-8 rounded-2xl bg-primary hover:bg-white hover:text-primary font-black transition-all active:scale-95"
+                            >
+                                Fikrlarni o’qish
+                            </a>
+                        </div>
+
+                        <div className="reveal bg-white rounded-[2.5rem] p-10 border-2 border-slate-100 shadow-xl shadow-slate-200/50 group">
+                            <div className="text-5xl mb-6 transform group-hover:scale-110 transition-transform">🤝</div>
+                            <h3 className="text-3xl font-black text-slate-900 mb-4 group-hover:text-primary transition-colors">Konsalting</h3>
+                            <p className="text-slate-500 font-medium mb-8">
+                                Professional jamoamiz bilan loyiha tahlili, roadmap va texnik qarorlar qabul qiling.
+                            </p>
+                            <a
+                                href="https://t.me/iMed_team"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex py-4 px-8 rounded-2xl bg-slate-100 hover:bg-primary hover:text-white text-slate-900 font-black transition-all active:scale-95"
+                            >
+                                Bog‘lanish
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
