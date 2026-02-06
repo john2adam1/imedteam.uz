@@ -118,79 +118,67 @@ export default function ProfilePage() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto space-y-10 pb-20">
-            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Shaxsiy profil</h1>
+        <div className="max-w-7xl mx-auto p-6">
+            <h1 className="text-3xl font-bold text-gray-900 mb-8">Shaxsiy profil</h1>
 
             {error && (
-                <div className="bg-red-50 border border-red-100 text-red-700 px-6 py-4 rounded-2xl animate-fade-in">
+                <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm">
                     {error}
                 </div>
             )}
             {message && (
-                <div className="bg-green-50 border border-green-100 text-green-700 px-6 py-4 rounded-2xl animate-fade-in">
+                <div className="mb-6 p-4 bg-green-50 border border-green-100 rounded-xl text-green-600 text-sm">
                     {message}
                 </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Left Column: Avatar & Basic Info */}
-                <div className="md:col-span-1 space-y-6">
-                    <div className="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm text-center">
-                        <div className="relative inline-block mb-6">
-                            <div className="w-32 h-32 rounded-full bg-primary-50 flex items-center justify-center text-4xl font-black text-primary-600 border-4 border-white shadow-xl overflow-hidden capitalize">
-                                {user?.image_url ? (
-                                    <img src={user.image_url} alt={user.name} className="w-full h-full object-cover" />
-                                ) : (
-                                    user?.name?.charAt(0) || 'U'
-                                )}
-                            </div>
-                            <button
-                                onClick={() => setShowEditProfileForm(true)}
-                                className="absolute bottom-1 right-1 w-10 h-10 bg-white shadow-lg rounded-full flex items-center justify-center text-slate-400 hover:text-primary-600 transition-colors border border-slate-50"
-                            >
-                                ✎
-                            </button>
+                <div className="lg:col-span-1 border border-gray-200 bg-white p-6 rounded-2xl h-fit shadow-sm">
+                    <div className="text-center mb-6">
+                        <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4 overflow-hidden text-3xl font-bold text-gray-400 border border-gray-100">
+                            {user?.image_url ? (
+                                <img src={user.image_url} alt={user.name} className="w-full h-full object-cover" />
+                            ) : (
+                                user?.name?.charAt(0) || 'U'
+                            )}
                         </div>
-                        <h2 className="text-xl font-black text-slate-800 mb-1">{user?.name}</h2>
-                        <p className="text-sm text-slate-400 font-medium">{user?.phone_number}</p>
-
-                        <div className="mt-8 pt-8 border-t border-slate-50">
-                            <button
-                                onClick={() => logout()}
-                                className="w-full py-3 px-4 bg-slate-50 text-slate-600 rounded-2xl font-bold hover:bg-red-50 hover:text-red-600 transition-all active:scale-95"
-                            >
-                                Chiqish
-                            </button>
-                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-1">{user?.name}</h3>
+                        <p className="text-gray-500 mb-6">{user?.phone_number}</p>
+                        <button
+                            onClick={() => setShowEditProfileForm(true)}
+                            className="w-full py-2.5 bg-primary-50 text-primary-600 rounded-xl font-medium hover:bg-primary-100 transition-colors"
+                        >
+                            Edit Profile
+                        </button>
                     </div>
 
-                    {/* Security Quick Link */}
-                    <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm">
-                        <h3 className="font-bold text-slate-800 mb-4 text-sm uppercase tracking-widest">Xavfsizlik</h3>
+
+                    <div className="mt-6 pt-6 border-t border-gray-100">
+                        <h4 className="text-sm font-semibold text-gray-900 mb-3">Security</h4>
                         <button
                             onClick={() => setShowPasswordForm(true)}
-                            className="w-full py-3 px-4 border border-slate-100 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors text-left flex justify-between items-center"
+                            className="w-full py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors shadow-sm"
                         >
-                            <span>Parolni o‘zgartirish</span>
-                            <span className="text-slate-300">→</span>
+                            Change Password
                         </button>
                     </div>
                 </div>
 
                 {/* Right Column: Dynamic Forms & Stats */}
-                <div className="md:col-span-2 space-y-8">
+                <div className="lg:col-span-2 space-y-6">
                     {/* Activity Stats */}
                     {activityStats && (
-                        <div className="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm">
-                            <h3 className="text-lg font-black text-slate-800 mb-6">O'quv ko'rsatkichlari</h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="p-6 bg-blue-50 rounded-3xl">
-                                    <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">Umumiy faollik</p>
-                                    <p className="text-2xl font-black text-blue-700">{activityStats.total} ball</p>
+                        <div className="border border-gray-200 bg-white p-6 rounded-2xl shadow-sm">
+                            <h3 className="text-lg font-bold text-gray-900 mb-4">Success Stats</h3>
+                            <div className="flex gap-4">
+                                <div className="flex-1 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                                    <p className="text-xs text-blue-600 font-medium uppercase tracking-wider">Total Points</p>
+                                    <p className="text-3xl font-bold text-blue-900 mt-1">{activityStats.total} ball</p>
                                 </div>
-                                <div className="p-6 bg-green-50 rounded-3xl">
-                                    <p className="text-[10px] font-bold text-green-400 uppercase tracking-widest mb-1">Davomiylik</p>
-                                    <p className="text-2xl font-black text-green-700">{formatTime(activityStats.total)}</p>
+                                <div className="flex-1 p-4 bg-green-50 rounded-xl border border-green-100">
+                                    <p className="text-xs text-green-600 font-medium uppercase tracking-wider">Time Spent</p>
+                                    <p className="text-3xl font-bold text-green-900 mt-1">{formatTime(activityStats.total)}</p>
                                 </div>
                             </div>
                         </div>
@@ -198,33 +186,29 @@ export default function ProfilePage() {
 
                     {/* Edit Profile Form */}
                     {showEditProfileForm && (
-                        <div className="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm animate-fade-in">
-                            <h3 className="text-lg font-black text-slate-800 mb-6">Profilni tahrirlash</h3>
-                            <form onSubmit={handleUpdateProfile} className="space-y-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Ism-familiya</label>
-                                        <input
-                                            type="text"
-                                            value={editName}
-                                            onChange={(e) => setEditName(e.target.value)}
-                                            className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-primary-500 font-medium"
-                                            placeholder="Ismingizni kiriting"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Telefon raqam</label>
-                                        <input
-                                            type="tel"
-                                            value={editPhone}
-                                            onChange={(e) => setEditPhone(e.target.value)}
-                                            className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-primary-500 font-medium"
-                                            placeholder="+998 00 000 00 00"
-                                        />
-                                    </div>
+                        <div className="border border-gray-200 bg-white p-6 rounded-2xl shadow-sm">
+                            <h3 className="text-lg font-bold text-gray-900 mb-4">Edit Profile</h3>
+                            <form onSubmit={handleUpdateProfile} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Name</label>
+                                    <input
+                                        type="text"
+                                        value={editName}
+                                        onChange={(e) => setEditName(e.target.value)}
+                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 outline-none transition-all"
+                                    />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Rasm (ixtiyoriy)</label>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Phone</label>
+                                    <input
+                                        type="tel"
+                                        value={editPhone}
+                                        onChange={(e) => setEditPhone(e.target.value)}
+                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 outline-none transition-all"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Avatar</label>
                                     <input
                                         type="file"
                                         accept="image/*"
@@ -234,23 +218,23 @@ export default function ProfilePage() {
                                                 setEditImage(e.target.files[0]);
                                             }
                                         }}
-                                        className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+                                        className="w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 transition-all cursor-pointer"
                                     />
                                 </div>
-                                <div className="flex gap-4 pt-4">
+                                <div className="flex gap-3 pt-2">
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="flex-1 py-4 bg-primary-600 text-white rounded-2xl font-bold shadow-lg shadow-primary-100 hover:bg-primary-700 transition-all disabled:opacity-50"
+                                        className="px-6 py-2.5 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors disabled:opacity-70 shadow-sm shadow-primary-600/30"
                                     >
-                                        {loading ? 'Saqlanmoqda...' : 'Saqlash'}
+                                        {loading ? 'Saving...' : 'Save'}
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setShowEditProfileForm(false)}
-                                        className="px-8 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition-all"
+                                        className="px-6 py-2.5 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
                                     >
-                                        Bekor qilish
+                                        Cancel
                                     </button>
                                 </div>
                             </form>
@@ -259,55 +243,53 @@ export default function ProfilePage() {
 
                     {/* Password Form */}
                     {showPasswordForm && (
-                        <div className="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm animate-fade-in">
-                            <h3 className="text-lg font-black text-slate-800 mb-6">Parolni o'zgartirish</h3>
-                            <form onSubmit={handleChangePassword} className="space-y-6">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Eski parol</label>
+                        <div className="border border-gray-200 bg-white p-6 rounded-2xl shadow-sm">
+                            <h3 className="text-lg font-bold text-gray-900 mb-4">Change Password</h3>
+                            <form onSubmit={handleChangePassword} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Old Password</label>
                                     <input
                                         type="password"
                                         value={oldPassword}
                                         onChange={(e) => setOldPassword(e.target.value)}
-                                        className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-primary-500 font-medium"
                                         required
+                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 outline-none transition-all"
                                     />
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Yangi parol</label>
-                                        <input
-                                            type="password"
-                                            value={newPassword}
-                                            onChange={(e) => setNewPassword(e.target.value)}
-                                            className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-primary-500 font-medium"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Parolni tasdiqlang</label>
-                                        <input
-                                            type="password"
-                                            value={confirmPassword}
-                                            onChange={(e) => setConfirmPassword(e.target.value)}
-                                            className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-primary-500 font-medium"
-                                            required
-                                        />
-                                    </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">New Password</label>
+                                    <input
+                                        type="password"
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        required
+                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 outline-none transition-all"
+                                    />
                                 </div>
-                                <div className="flex gap-4 pt-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Confirm Password</label>
+                                    <input
+                                        type="password"
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        required
+                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 outline-none transition-all"
+                                    />
+                                </div>
+                                <div className="flex gap-3 pt-2">
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="flex-1 py-4 bg-primary-600 text-white rounded-2xl font-bold shadow-lg shadow-primary-100 hover:bg-primary-700 transition-all"
+                                        className="px-6 py-2.5 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors disabled:opacity-70 shadow-sm shadow-primary-600/30"
                                     >
-                                        {loading ? 'Saqlanmoqda...' : 'Parolni saqlash'}
+                                        {loading ? 'Saving...' : 'Update Password'}
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setShowPasswordForm(false)}
-                                        className="px-8 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition-all"
+                                        className="px-6 py-2.5 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
                                     >
-                                        Bekor qilish
+                                        Cancel
                                     </button>
                                 </div>
                             </form>
@@ -315,33 +297,33 @@ export default function ProfilePage() {
                     )}
 
                     {/* Danger Zone */}
-                    <div className="p-8 bg-red-50/50 rounded-[2.5rem] border border-red-100/50">
-                        <h3 className="text-lg font-black text-red-800 mb-2">Xavfli hudud</h3>
-                        <p className="text-sm text-red-600/70 mb-6">Hisobingizni o'chirib tashlash barcha ma'lumotlaringiz va sotib olingan kurslaringizni yo'qolishiga olib keladi.</p>
+                    <div className="border border-red-100 bg-red-50 p-6 rounded-2xl">
+                        <h3 className="text-lg font-bold text-red-700 mb-2">Danger Zone</h3>
+                        <p className="text-red-600 text-sm mb-4">Deleting your account is permanent and cannot be undone.</p>
 
                         {!showDeleteConfirm ? (
                             <button
                                 onClick={() => setShowDeleteConfirm(true)}
-                                className="px-6 py-3 bg-white text-red-600 border border-red-100 rounded-2xl text-sm font-bold hover:bg-red-600 hover:text-white transition-all shadow-sm"
+                                className="px-6 py-2.5 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-colors shadow-sm shadow-red-600/20"
                             >
-                                Hisobni o‘chirish
+                                Delete Account
                             </button>
                         ) : (
-                            <div className="flex flex-col md:flex-row items-center gap-4 bg-white p-4 rounded-2xl border border-red-200 shadow-xl shadow-red-100/50">
-                                <span className="text-sm text-red-800 font-bold">Haqiqatdan ham o'chirmoqchimisiz?</span>
-                                <div className="flex gap-2">
+                            <div className="p-4 border border-red-200 bg-white rounded-xl">
+                                <p className="mb-4 text-gray-900 font-medium">Are you sure you want to delete your account?</p>
+                                <div className="flex gap-3">
                                     <button
                                         onClick={handleDeleteAccount}
                                         disabled={loading}
-                                        className="px-4 py-2 bg-red-600 text-white text-xs rounded-xl font-bold hover:bg-red-700 transition-colors"
+                                        className="px-6 py-2.5 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-colors disabled:opacity-70 shadow-sm shadow-red-600/20"
                                     >
-                                        Ha, tasdiqlayman
+                                        Yes, Delete
                                     </button>
                                     <button
                                         onClick={() => setShowDeleteConfirm(false)}
-                                        className="px-4 py-2 bg-slate-100 text-slate-600 text-xs rounded-xl font-bold hover:bg-slate-200 transition-colors"
+                                        className="px-6 py-2.5 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
                                     >
-                                        Bekor qilish
+                                        Cancel
                                     </button>
                                 </div>
                             </div>

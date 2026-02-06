@@ -57,43 +57,42 @@ export default function CourseDetailPage() {
     }
 
     return (
-        <div className="space-y-10 pb-20">
-            <Link href="/app/courses" className="inline-flex items-center gap-2 text-slate-500 hover:text-primary-600 font-bold transition-all">
-                <span>&larr;</span> <span>Kurslarga qaytish</span>
+        <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
+            <Link href="/app/courses" style={{ marginBottom: '20px', display: 'inline-block' }}>
+                &larr; Kurslarga qaytish
             </Link>
 
             {/* Course Header */}
-            <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
-                <div className="grid grid-cols-1 lg:grid-cols-2">
-                    <div className="relative aspect-video lg:aspect-square bg-slate-100">
+            <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '20px', marginBottom: '30px' }}>
+                <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+                    <div style={{ flex: '1 1 300px' }}>
                         <img
                             src={course.image_url || '/course-placeholder.jpg'}
                             alt={course.name}
-                            className="w-full h-full object-cover"
+                            style={{ width: '100%', borderRadius: '8px' }}
                         />
-                        <div className="absolute top-6 left-6">
-                            <span className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest backdrop-blur-md ${course.has_access ? 'bg-green-600/90 text-white' : 'bg-primary-600/90 text-white'}`}>
-                                {course.has_access ? 'Sizda ruxsat bor' : 'Ruxsat yo‘q'}
-                            </span>
-                        </div>
                     </div>
-                    <div className="p-8 lg:p-12 flex flex-col justify-center">
-                        <h1 className="text-3xl md:text-4xl font-black text-slate-800 mb-6 leading-tight">{course.name}</h1>
-                        <p className="text-slate-500 text-lg mb-8 leading-relaxed italic">{course.description}</p>
+                    <div style={{ flex: '1 1 300px' }}>
+                        <h1>{course.name}</h1>
+                        <p style={{ fontStyle: 'italic', color: '#666' }}>{course.description}</p>
 
-                        <div className="grid grid-cols-2 gap-4 mb-8">
-                            <div className="p-4 bg-slate-50 rounded-2xl">
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Darslar</p>
-                                <p className="text-xl font-black text-slate-800">{course.lessons}</p>
+                        <div style={{ display: 'flex', gap: '20px', margin: '20px 0' }}>
+                            <div>
+                                <p style={{ fontSize: '10px', margin: 0 }}>Darslar</p>
+                                <p style={{ fontSize: '20px', fontWeight: 'bold', margin: 0 }}>{course.lessons}</p>
                             </div>
-                            <div className="p-4 bg-slate-50 rounded-2xl">
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Muddati</p>
-                                <p className="text-xl font-black text-slate-800">{course.duration} kun</p>
+                            <div>
+                                <p style={{ fontSize: '10px', margin: 0 }}>Muddati</p>
+                                <p style={{ fontSize: '20px', fontWeight: 'bold', margin: 0 }}>{course.duration} kun</p>
                             </div>
+                        </div>
+
+                        <div style={{ padding: '10px', backgroundColor: course.has_access ? '#d4edda' : '#f8d7da', borderRadius: '4px', marginBottom: '20px' }}>
+                            {course.has_access ? 'Sizda ruxsat bor ✅' : 'Ruxsat yo‘q 🔒'}
                         </div>
 
                         {!course.has_access && (
-                            <Link href="/app/tariffs" className="w-full py-4 bg-primary-600 text-white text-center rounded-2xl font-bold shadow-lg shadow-primary-200 hover:bg-primary-700 hover:-translate-y-1 transition-all">
+                            <Link href="/app/tariffs" style={{ display: 'block', padding: '10px', backgroundColor: '#007bff', color: 'white', textAlign: 'center', textDecoration: 'none', borderRadius: '4px' }}>
                                 Kursni sotib olish
                             </Link>
                         )}
@@ -102,41 +101,34 @@ export default function CourseDetailPage() {
             </div>
 
             {/* Modules & Lessons List */}
-            <div className="space-y-6">
-                <h2 className="text-2xl font-black text-slate-800">Kurs rejasi</h2>
+            <div>
+                <h2>Kurs rejasi</h2>
 
                 {course.modules && course.modules.length > 0 ? (
-                    <div className="grid gap-6">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                         {course.modules
                             .sort((a, b) => a.order_num - b.order_num)
                             .map((module) => (
-                                <div key={module.id} className="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                                    <div className="px-6 py-4 bg-slate-50 border-b border-slate-100">
-                                        <h3 className="font-black text-slate-800">{module.name}</h3>
+                                <div key={module.id} style={{ border: '1px solid #ccc', borderRadius: '8px', overflow: 'hidden' }}>
+                                    <div style={{ padding: '10px', backgroundColor: '#eee', borderBottom: '1px solid #ccc' }}>
+                                        <h3 style={{ margin: 0 }}>{module.name}</h3>
                                     </div>
-                                    <div className="divide-y divide-slate-50">
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
                                         {module.lessons
                                             .sort((a, b) => a.order_num - b.order_num)
                                             .map((lesson) => (
-                                                <div key={lesson.id} className="flex items-center justify-between p-6 hover:bg-slate-50 transition-colors group">
-                                                    <div className="flex-1">
-                                                        <h4 className="font-bold text-slate-800 group-hover:text-primary-600 transition-colors">
-                                                            {lesson.order_num}. {lesson.name}
-                                                        </h4>
-                                                    </div>
+                                                <div key={lesson.id} style={{ padding: '15px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <span>{lesson.order_num}. {lesson.name}</span>
                                                     <div>
                                                         {course.has_access || lesson.is_public ? (
                                                             <Link
                                                                 href={`/app/lessons/${lesson.id}`}
-                                                                className="px-6 py-2 bg-primary-50 text-primary-600 rounded-xl text-sm font-bold shadow-sm hover:bg-primary-600 hover:text-white transition-all active:scale-95"
+                                                                style={{ padding: '5px 15px', backgroundColor: '#007bff', color: 'white', textDecoration: 'none', borderRadius: '4px', fontSize: '12px' }}
                                                             >
                                                                 {lesson.is_completed ? 'Ko‘rilgan' : 'Boshlash'}
                                                             </Link>
                                                         ) : (
-                                                            <div className="flex items-center gap-2 text-slate-300 opacity-60">
-                                                                <span className="text-xs font-bold uppercase tracking-widest">Yopiq</span>
-                                                                <span>🔒</span>
-                                                            </div>
+                                                            <span style={{ color: '#ccc', fontSize: '12px' }}>🔒 Yopiq</span>
                                                         )}
                                                     </div>
                                                 </div>
@@ -146,12 +138,9 @@ export default function CourseDetailPage() {
                             ))}
                     </div>
                 ) : (
-                    <div className="bg-slate-50 rounded-3xl p-12 text-center border border-slate-100">
-                        <p className="text-slate-400">Tez kunda yangi darslar yuklanadi.</p>
-                    </div>
+                    <p style={{ textAlign: 'center', color: '#999' }}>Tez kunda yangi darslar yuklanadi.</p>
                 )}
             </div>
         </div>
     );
 }
-

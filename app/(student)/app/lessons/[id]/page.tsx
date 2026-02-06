@@ -81,108 +81,81 @@ export default function LessonPage() {
     }
 
     return (
-        <div className="max-w-5xl mx-auto space-y-10 pb-20">
+        <div style={{ padding: '20px' }}>
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <div>
-                    <button onClick={() => router.back()} className="text-slate-400 hover:text-primary-600 font-bold mb-4 transition-colors flex items-center gap-2">
-                        <span>&larr;</span> <span>Orqaga</span>
-                    </button>
-                    <h1 className="text-3xl font-black text-slate-800 leading-tight">{lesson.name}</h1>
+                    <button onClick={() => router.back()} style={{ marginBottom: '10px' }}>&larr; Orqaga</button>
+                    <h1>{lesson.name}</h1>
                 </div>
-                <div className="flex items-center gap-4">
-                    <div className="px-4 py-2 bg-slate-100 rounded-xl text-xs font-bold text-slate-500 uppercase tracking-widest">
-                        Dars #{lesson.order_num}
-                    </div>
+                <div style={{ padding: '5px 10px', backgroundColor: '#eee', borderRadius: '4px', fontSize: '12px' }}>
+                    Dars #{lesson.order_num}
                 </div>
             </div>
 
-            {/* Content Sections */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                <div className="lg:col-span-2 space-y-10">
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '30px' }}>
+                <div style={{ flex: '2 1 500px' }}>
                     {/* Video Player Section */}
                     {lesson.videos && lesson.videos.length > 0 && (
-                        <div className="space-y-6">
-                            <h2 className="text-xl font-black text-slate-800">Videolar</h2>
-                            <div className="grid gap-6">
-                                {lesson.videos.map((v) => (
-                                    <div key={v.id} className="bg-black rounded-3xl overflow-hidden shadow-2xl aspect-video">
-                                        <iframe
-                                            src={v.url}
-                                            className="w-full h-full"
-                                            allowFullScreen
-                                        />
-                                    </div>
-                                ))}
-                            </div>
+                        <div style={{ marginBottom: '30px' }}>
+                            <h3>Videolar</h3>
+                            {lesson.videos.map((v) => (
+                                <div key={v.id} style={{ marginBottom: '20px', backgroundColor: 'black', aspectRatio: '16/9' }}>
+                                    <iframe
+                                        src={v.url}
+                                        style={{ width: '100%', height: '100%', border: 'none' }}
+                                        allowFullScreen
+                                    />
+                                </div>
+                            ))}
                         </div>
                     )}
 
                     {/* Completion Action */}
-                    <div className="bg-gradient-to-br from-primary-600 to-indigo-700 rounded-[2.5rem] p-10 text-white shadow-xl shadow-primary-200">
-                        <h3 className="text-2xl font-black mb-4">Darsni yakunladingizmi?</h3>
-                        <p className="opacity-80 mb-8 max-w-md">Agar darsni ko‘rib bo‘lgan bo‘lsangiz, tugmani bosing. Bu sizning balingiz va reytingingizga ta’sir qiladi.</p>
+                    <div style={{ padding: '30px', backgroundColor: '#007bff', color: 'white', borderRadius: '8px', textAlign: 'center' }}>
+                        <h3>Darsni yakunladingizmi?</h3>
+                        <p>Agar darsni ko‘rib bo‘lgan bo‘lsangiz, tugmani bosing.</p>
                         <button
                             onClick={handleEndLesson}
-                            className="px-10 py-4 bg-white text-primary-600 rounded-2xl font-bold hover:scale-105 active:scale-95 transition-all shadow-lg"
+                            style={{ padding: '10px 30px', backgroundColor: 'white', color: '#007bff', border: 'none', fontWeight: 'bold' }}
                         >
                             Tugatish
                         </button>
                     </div>
                 </div>
 
-                <div className="space-y-10">
+                <div style={{ flex: '1 1 250px' }}>
                     {/* Documents */}
-                    <div className="bg-white rounded-[2rem] border border-slate-100 p-8 shadow-sm">
-                        <h3 className="text-lg font-black text-slate-800 mb-6">Materiallar</h3>
+                    <div style={{ border: '1px solid #ccc', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
+                        <h3>Materiallar</h3>
                         {lesson.documents && lesson.documents.length > 0 ? (
-                            <div className="grid gap-4">
+                            <ul style={{ listStyle: 'none', padding: 0 }}>
                                 {lesson.documents.map((doc) => (
-                                    <a
-                                        key={doc.id}
-                                        href={doc.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl hover:bg-primary-50 hover:text-primary-600 transition-all border border-transparent hover:border-primary-100 group"
-                                    >
-                                        <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-xl shadow-sm group-hover:bg-primary-600 group-hover:text-white transition-colors">
-                                            📄
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="font-bold text-sm truncate">{doc.name}</p>
-                                            <p className="text-[10px] text-slate-400 uppercase tracking-widest">Yuklab olish</p>
-                                        </div>
-                                    </a>
+                                    <li key={doc.id} style={{ marginBottom: '10px' }}>
+                                        <a href={doc.url} target="_blank" rel="noopener noreferrer" style={{ display: 'block', padding: '10px', backgroundColor: '#f8f9fa', border: '1px solid #ccc', textDecoration: 'none', color: 'black' }}>
+                                            📄 {doc.name}
+                                        </a>
+                                    </li>
                                 ))}
-                            </div>
+                            </ul>
                         ) : (
-                            <p className="text-slate-400 text-sm italic">Qo‘shimcha materiallar yo‘q.</p>
+                            <p style={{ color: '#999', fontStyle: 'italic' }}>Qo‘shimcha materiallar yo‘q.</p>
                         )}
                     </div>
 
                     {/* Tests */}
                     {lesson.tests && lesson.tests.length > 0 && (
-                        <div className="bg-white rounded-[2rem] border border-slate-100 p-8 shadow-sm">
-                            <h3 className="text-lg font-black text-slate-800 mb-6">Testlar</h3>
-                            <div className="grid gap-4">
+                        <div style={{ border: '1px solid #ccc', padding: '20px', borderRadius: '8px' }}>
+                            <h3>Testlar</h3>
+                            <ul style={{ listStyle: 'none', padding: 0 }}>
                                 {lesson.tests.map((test) => (
-                                    <a
-                                        key={test.id}
-                                        href={test.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center gap-4 p-4 bg-indigo-50 rounded-2xl hover:bg-indigo-600 hover:text-white transition-all group"
-                                    >
-                                        <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-xl shadow-sm text-indigo-600">
-                                            📝
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="font-bold text-sm truncate">{test.name}</p>
-                                            <p className="text-[10px] opacity-60 uppercase tracking-widest">Testni boshlash</p>
-                                        </div>
-                                    </a>
+                                    <li key={test.id} style={{ marginBottom: '10px' }}>
+                                        <a href={test.url} target="_blank" rel="noopener noreferrer" style={{ display: 'block', padding: '10px', backgroundColor: '#e9ecef', border: '1px solid #ccc', textDecoration: 'none', color: 'black' }}>
+                                            📝 {test.name}
+                                        </a>
+                                    </li>
                                 ))}
-                            </div>
+                            </ul>
                         </div>
                     )}
                 </div>

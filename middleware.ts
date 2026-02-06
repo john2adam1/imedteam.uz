@@ -6,7 +6,6 @@ export function middleware(request: NextRequest) {
 
     // Get token from cookies
     const token = request.cookies.get('auth_token')?.value;
-    const isAdmin = request.cookies.get('is_admin')?.value === 'true';
 
     // Protect /app (student) routes
     if (pathname.startsWith('/app')) {
@@ -17,24 +16,10 @@ export function middleware(request: NextRequest) {
         }
     }
 
-    // Protect /admin routes
-    if (pathname.startsWith('/admin')) {
-        // We allow access TO the /admin/login page even without a token
-        if (pathname === '/admin/login') {
-            return NextResponse.next();
-        }
-
-        if (!token || !isAdmin) {
-            // Redirect specifically to admin login
-            const url = new URL('/admin/login', request.url);
-            return NextResponse.redirect(url);
-        }
-    }
-
     return NextResponse.next();
 }
 
 // Specify which routes this middleware should run on
 export const config = {
-    matcher: ['/app/:path*', '/admin/:path*'],
+    matcher: ['/app/:path*'],
 };

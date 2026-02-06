@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { bannerService, courseService, subjectService, notificationService } from '@/services/mobile-api';
+import { bannerService, courseService, subjectService, notificationService } from '@/services';
 import { BannerMobile, CourseMobileRes, Subject, UserNotification } from '@/types/mobile-api';
 import Link from 'next/link';
 
@@ -19,15 +19,23 @@ export default function UserHome() {
                 setLoading(true);
                 setError(null);
                 const [bannerData, courseData, subjectData, notificationData] = await Promise.all([
-                    bannerService.getAll(),
-                    courseService.getAll(),
+                    bannerService.getBanners(),
+                    courseService.getCourses(),
                     subjectService.getAll(),
-                    notificationService.getAll({ limit: 3 } as any)
+                    notificationService.getNotifications({ limit: 3 } as any)
                 ]);
-                setBanners(bannerData.banners || []);
-                setCourses((courseData.courses || []).slice(0, 6));
-                setSubjects(subjectData.subjects || []);
-                setNotifications(notificationData.notifications || []);
+
+                // Helper to extract array from various potential formats
+                const getArray = (data: any, key: string) => {
+                    if (Array.isArray(data)) return data;
+                    if (data && typeof data === 'object') return data[key] || data.items || [];
+                    return [];
+                };
+
+                setBanners(getArray(bannerData, 'banners'));
+                setCourses(getArray(courseData, 'courses').slice(0, 6));
+                setSubjects(getArray(subjectData, 'subjects'));
+                setNotifications(getArray(notificationData, 'notifications'));
             } catch (error: any) {
                 console.error('Failed to load dashboard data:', error);
                 setError(error.message || 'Ma’lumotlarni yuklashda xatolik yuz berdi');
@@ -61,23 +69,21 @@ export default function UserHome() {
     }
 
     return (
-        <div className="space-y-10 pb-10">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '40px', paddingBottom: '40px' }}>
             {/* Banners */}
             {banners.length > 0 && (
                 <section>
-                    <div className="grid gap-6">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                         {banners.map((banner) => (
-                            <div key={banner.id} className="relative rounded-3xl overflow-hidden aspect-[21/9] md:aspect-[3/1] bg-slate-200 group">
+                            <div key={banner.id} style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', backgroundColor: '#eee' }}>
                                 <img
                                     src={banner.image_url}
                                     alt={banner.title}
-                                    className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-700"
+                                    style={{ width: '100%', display: 'block' }}
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-8">
-                                    <div className="text-white max-w-xl">
-                                        <h3 className="text-2xl md:text-3xl font-bold mb-2">{banner.title}</h3>
-                                        <p className="text-white/80 line-clamp-2">{banner.description}</p>
-                                    </div>
+                                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '20px', background: 'rgba(0,0,0,0.6)', color: 'white' }}>
+                                    <h3 style={{ margin: '0 0 5px 0' }}>{banner.title}</h3>
+                                    <p style={{ margin: 0, fontSize: '14px' }}>{banner.description}</p>
                                 </div>
                             </div>
                         ))}
@@ -88,13 +94,11 @@ export default function UserHome() {
             {/* Subjects/Categories */}
             {subjects.length > 0 && (
                 <section>
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-slate-800">Yo‘nalishlar</h2>
-                    </div>
-                    <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                    <h2 style={{ marginBottom: '15px' }}>Yo‘nalishlar</h2>
+                    <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '10px' }}>
                         {subjects.map((subject) => (
-                            <button key={subject.id} className="flex-shrink-0 px-8 py-4 bg-white rounded-2xl shadow-sm border border-slate-100 hover:border-primary-500 hover:shadow-md transition-all active:scale-95">
-                                <span className="font-semibold text-slate-700">{subject.name}</span>
+                            <button key={subject.id} style={{ whiteSpace: 'nowrap', padding: '10px 20px', border: '1px solid #ccc', backgroundColor: 'white', cursor: 'pointer' }}>
+                                {subject.name}
                             </button>
                         ))}
                     </div>
@@ -104,19 +108,17 @@ export default function UserHome() {
             {/* Notifications Preview */}
             {notifications.length > 0 && (
                 <section>
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-slate-800">Bildirishnomalar</h2>
-                        <Link href="/app/notifications" className="text-primary-600 font-semibold hover:text-primary-700 transition">
-                            Hammasi
-                        </Link>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                        <h2>Bildirishnomalar</h2>
+                        <Link href="/app/notifications">Hammasi</Link>
                     </div>
-                    <div className="grid gap-4">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         {notifications.map((notif) => (
-                            <Link key={notif.id} href="/app/notifications" className="flex items-start gap-4 p-4 bg-white rounded-2xl border border-slate-100 hover:shadow-md transition-all">
-                                <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${notif.is_read ? 'bg-slate-200' : 'bg-primary-600 animate-pulse'}`} />
+                            <Link key={notif.id} href="/app/notifications" style={{ textDecoration: 'none', color: 'black', display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', border: '1px solid #eee', borderRadius: '4px' }}>
+                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: notif.is_read ? '#ccc' : '#007bff' }} />
                                 <div>
-                                    <h4 className={`font-bold text-slate-800 ${notif.is_read ? 'font-medium' : ''}`}>{notif.title}</h4>
-                                    <p className="text-sm text-slate-500 line-clamp-1">{notif.message}</p>
+                                    <h4 style={{ margin: 0 }}>{notif.title}</h4>
+                                    <p style={{ margin: 0, fontSize: '12px', color: '#666' }}>{notif.message}</p>
                                 </div>
                             </Link>
                         ))}
@@ -126,47 +128,32 @@ export default function UserHome() {
 
             {/* Popular Courses */}
             <section>
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-slate-800">Ommabop kurslar</h2>
-                    <Link href="/app/courses" className="text-primary-600 font-semibold hover:text-primary-700 transition">
-                        Barchasini ko‘rish
-                    </Link>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                    <h2>Ommabop kurslar</h2>
+                    <Link href="/app/courses">Barchasini ko‘rish</Link>
                 </div>
 
                 {courses.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' }}>
                         {courses.map((course) => (
-                            <Link key={course.id} href={`/app/courses/${course.id}`} className="group">
-                                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-xl transition-all h-full flex flex-col group-hover:-translate-y-1">
-                                    <div className="aspect-video relative bg-slate-200">
+                            <Link key={course.id} href={`/app/courses/${course.id}`} style={{ textDecoration: 'none', color: 'black' }}>
+                                <div style={{ border: '1px solid #ccc', borderRadius: '8px', overflow: 'hidden' }}>
+                                    <div style={{ position: 'relative' }}>
                                         <img
                                             src={course.image_url || '/course-placeholder.jpg'}
                                             alt={course.name}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            style={{ width: '100%', display: 'block' }}
                                         />
-                                        <div className="absolute top-4 left-4">
-                                            <span className="text-[10px] font-bold tracking-wider uppercase text-white bg-primary-600/90 backdrop-blur px-2 py-1 rounded-md">
-                                                {course.teacher_name || 'Kurs'}
-                                            </span>
-                                        </div>
+                                        <span style={{ position: 'absolute', top: '10px', left: '10px', backgroundColor: 'rgba(0,123,255,0.8)', color: 'white', padding: '2px 8px', fontSize: '10px', borderRadius: '4px' }}>
+                                            {course.teacher_name || 'Kurs'}
+                                        </span>
                                     </div>
-                                    <div className="p-6 flex-1 flex flex-col">
-                                        <h3 className="text-lg font-bold text-slate-800 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">
-                                            {course.name}
-                                        </h3>
-                                        <p className="text-sm text-slate-500 line-clamp-2 mb-6 flex-1">
-                                            {course.description}
-                                        </p>
-                                        <div className="flex items-center justify-between pt-4 border-t border-slate-50 mt-auto">
-                                            <div className="flex flex-col">
-                                                <span className="text-xs text-slate-400 font-medium uppercase tracking-wider">Holati</span>
-                                                <span className="font-bold text-slate-900">
-                                                    {course.is_public ? 'Ochiq' : 'Yopiq'}
-                                                </span>
-                                            </div>
-                                            <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-slate-50 text-slate-400 group-hover:bg-primary-600 group-hover:text-white transition-colors">
-                                                →
-                                            </span>
+                                    <div style={{ padding: '15px' }}>
+                                        <h3 style={{ margin: '0 0 10px 0', fontSize: '16px' }}>{course.name}</h3>
+                                        <p style={{ margin: '0 0 15px 0', fontSize: '12px', color: '#666' }}>{course.description}</p>
+                                        <div style={{ borderTop: '1px solid #eee', paddingTop: '10px', display: 'flex', justifyContent: 'space-between' }}>
+                                            <span style={{ fontSize: '12px' }}>Holati: <b>{course.is_public ? 'Ochiq' : 'Yopiq'}</b></span>
+                                            <span>&rarr;</span>
                                         </div>
                                     </div>
                                 </div>
@@ -174,8 +161,8 @@ export default function UserHome() {
                         ))}
                     </div>
                 ) : (
-                    <div className="bg-slate-50 rounded-2xl p-12 text-center">
-                        <p className="text-slate-500">Hozircha kurslar mavjud emas.</p>
+                    <div style={{ padding: '40px', textAlign: 'center', border: '1px solid #ccc', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+                        <p>Hozircha kurslar mavjud emas.</p>
                     </div>
                 )}
             </section>

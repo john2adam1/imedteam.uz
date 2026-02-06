@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/student/Sidebar';
-import BottomNav from '@/components/student/BottomNav';
+
 
 export default function StudentLayout({
     children,
@@ -29,19 +29,17 @@ export default function StudentLayout({
     }
 
     return (
-        <div className="min-h-screen flex bg-slate-50">
+        <div style={{ display: 'flex', minHeight: '100vh' }}>
             {/* Sidebar for Desktop */}
             <Sidebar />
 
             {/* Main Content Area */}
-            <div className="flex-1 flex flex-col min-h-screen pb-24 lg:pb-0 relative overflow-x-hidden">
-                <main className="flex-grow p-4 md:p-8 lg:p-10 max-w-7xl mx-auto w-full">
+            <div style={{ flex: 1, padding: '20px' }}>
+                <main>
                     {children}
                 </main>
             </div>
 
-            {/* Bottom Nav for Mobile */}
-            <BottomNav />
         </div>
     );
 }

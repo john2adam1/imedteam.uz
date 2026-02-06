@@ -57,64 +57,60 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Bildirishnomalar</h1>
-        <div className="flex p-1 bg-slate-100 rounded-xl">
-          <button
-            onClick={() => setFilter('all')}
-            className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${filter === 'all'
-              ? 'bg-white text-primary-600 shadow-sm'
-              : 'text-slate-500 hover:text-slate-700'
-              }`}
-          >
-            Hammasi
-          </button>
-          <button
-            onClick={() => setFilter('unread')}
-            className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${filter === 'unread'
-              ? 'bg-white text-primary-600 shadow-sm'
-              : 'text-slate-500 hover:text-slate-700'
-              }`}
-          >
-            O'qilmagan
-          </button>
-        </div>
+    <div style={{ padding: '20px' }}>
+      <h1>Bildirishnomalar</h1>
+
+      <div style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
+        <button
+          onClick={() => setFilter('all')}
+          style={{
+            padding: '8px 16px',
+            backgroundColor: filter === 'all' ? '#007bff' : '#f8f9fa',
+            color: filter === 'all' ? 'white' : 'black',
+            border: '1px solid #ccc',
+            cursor: 'pointer'
+          }}
+        >
+          Hammasi
+        </button>
+        <button
+          onClick={() => setFilter('unread')}
+          style={{
+            padding: '8px 16px',
+            backgroundColor: filter === 'unread' ? '#007bff' : '#f8f9fa',
+            color: filter === 'unread' ? 'white' : 'black',
+            border: '1px solid #ccc',
+            cursor: 'pointer'
+          }}
+        >
+          O'qilmagan
+        </button>
       </div>
 
       {notifications.length === 0 ? (
-        <div className="bg-slate-50 rounded-[2.5rem] p-16 text-center border-2 border-dashed border-slate-200">
-          <p className="text-slate-400 font-medium italic">
-            {filter === 'unread' ? 'O\'qilmagan bildirishnomalar yo\'q' : 'Hozircha bildirishnomalar yo\'q'}
-          </p>
+        <div style={{ padding: '40px', textAlign: 'center', border: '1px dashed #ccc' }}>
+          <p>{filter === 'unread' ? "O'qilmagan bildirishnomalar yo'q" : "Hozircha bildirishnomalar yo'q"}</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {notifications.map((notification) => (
             <div
               key={notification.id}
-              className={`bg-white rounded-3xl p-6 shadow-sm border transition-all hover:shadow-md ${!notification.is_read ? 'border-primary-100 bg-primary-50/10' : 'border-slate-100'}`}
+              style={{
+                padding: '15px',
+                border: '1px solid #ccc',
+                borderRadius: '8px',
+                backgroundColor: !notification.is_read ? '#f0f7ff' : 'white'
+              }}
             >
-              <div className="flex justify-between items-start gap-4 mb-2">
-                <h3 className={`text-lg font-bold text-slate-800 ${!notification.is_read ? 'text-primary-900' : ''}`}>
-                  {notification.title}
-                </h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <h3 style={{ margin: '0 0 10px 0' }}>{notification.title}</h3>
                 {!notification.is_read && (
-                  <button
-                    onClick={() => handleMarkAsRead(notification.id)}
-                    className="flex-shrink-0 text-[10px] font-black uppercase tracking-widest text-primary-600 hover:text-primary-700 transition-colors bg-white px-3 py-1 rounded-lg border border-primary-100 shadow-sm"
-                  >
-                    O'qildi
-                  </button>
+                  <button onClick={() => handleMarkAsRead(notification.id)}>Mark as Read</button>
                 )}
               </div>
-              <p className="text-slate-600 text-sm mb-4 leading-relaxed">{notification.message}</p>
-              <div className="flex items-center gap-2 text-slate-400">
-                <span className="text-[10px] font-bold uppercase tracking-widest">{formatDate(notification.created_at)}</span>
-                {!notification.is_read && (
-                  <span className="w-2 h-2 rounded-full bg-primary-600 animate-pulse"></span>
-                )}
-              </div>
+              <p style={{ margin: '0 0 10px 0' }}>{notification.message}</p>
+              <span style={{ fontSize: '10px', color: '#999' }}>{formatDate(notification.created_at)}</span>
             </div>
           ))}
         </div>

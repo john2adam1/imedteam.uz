@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { courseService, subjectService } from '@/services/mobile-api';
+import { courseService, subjectService } from '@/services';
 import { CourseMobileRes, Subject } from '@/types/mobile-api';
 import Link from 'next/link';
 import { Grid } from 'lucide-react';
@@ -16,10 +16,22 @@ export default function CoursesSection() {
             try {
                 const [subjectsData, coursesData] = await Promise.all([
                     subjectService.getAll().catch(() => ({ subjects: [], count: 0 })),
-                    courseService.getAll().catch(() => ({ courses: [], count: 0 })),
+                    courseService.getCourses().catch(() => ({ courses: [], count: 0 })),
                 ]);
-                setSubjects(subjectsData.subjects || []);
-                setCourses(coursesData.courses || []);
+
+                // Handle subjects data
+                if (Array.isArray(subjectsData)) {
+                    setSubjects(subjectsData);
+                } else if (subjectsData && typeof subjectsData === 'object') {
+                    setSubjects((subjectsData as any).subjects || (subjectsData as any).items || []);
+                }
+
+                // Handle courses data
+                if (Array.isArray(coursesData)) {
+                    setCourses(coursesData);
+                } else if (coursesData && typeof coursesData === 'object') {
+                    setCourses((coursesData as any).courses || (coursesData as any).items || []);
+                }
             } catch (error) {
                 console.error('Failed to load course data', error);
             } finally {
