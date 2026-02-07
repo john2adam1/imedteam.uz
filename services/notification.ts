@@ -10,7 +10,13 @@ export const notificationService = {
      */
     getNotifications: async (params?: NotificationQueryParams): Promise<UserNotificationList> => {
         const queryString = params ? buildQueryString(params) : '';
-        return apiClient<UserNotificationList>(`/notification/user${queryString}`);
+        const response = await apiClient<any>(`/notification/user${queryString}`);
+
+        // API returns {data: [], total: number} but we need {notifications: [], count: number}
+        return {
+            notifications: response.data || [],
+            count: response.total || 0
+        };
     },
 
     /**

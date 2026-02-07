@@ -10,7 +10,13 @@ export const courseService = {
      */
     getCourses: async (params?: CourseQueryParams): Promise<CourseMobileList> => {
         const queryString = params ? buildQueryString(params) : '';
-        return apiClient<CourseMobileList>(`/course${queryString}`);
+        const response = await apiClient<any>(`/course${queryString}`);
+
+        // API returns {data: [], total: number} but we need {courses: [], count: number}
+        return {
+            courses: response.data || [],
+            count: response.total || 0
+        };
     },
 
     /**
@@ -25,7 +31,13 @@ export const courseService = {
      */
     getUserCourses: async (params?: any): Promise<UserCourseMobileList> => {
         const queryString = params ? buildQueryString(params) : '';
-        return apiClient<UserCourseMobileList>(`/course/permission${queryString}`);
+        const response = await apiClient<any>(`/course/permission${queryString}`);
+
+        // API returns {data: [], total: number} but we need {user_courses: [], count: number}
+        return {
+            user_courses: response.data || [],
+            count: response.total || 0
+        };
     },
 
     /**

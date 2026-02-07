@@ -9,7 +9,13 @@ export const bannerService = {
      * Get all banners
      */
     getBanners: async (): Promise<BannerMobileList> => {
-        return apiClient<BannerMobileList>('/banner');
+        const response = await apiClient<any>('/banner');
+
+        // API returns {data: [], total: number} but we need {banners: [], count: number}
+        return {
+            banners: response.data || [],
+            count: response.total || 0
+        };
     },
 
     /**
