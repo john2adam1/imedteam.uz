@@ -9,7 +9,13 @@ export const subjectService = {
      */
     getAll: async (params?: any): Promise<any> => {
         const queryString = params ? buildQueryString(params) : '';
-        return apiClient(`/subject${queryString}`);
+        const response = await apiClient<any>(`/subject${queryString}`);
+
+        // API returns {data: [], total: number} but we need {subjects: [], count: number}
+        return {
+            subjects: response.data || [],
+            count: response.total || 0
+        };
     },
 
     /**

@@ -21,7 +21,6 @@ export default function Header() {
             </div>
 
             {/* Header */}
-            return (
             <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-slate-100">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="h-20 flex items-center justify-between">
