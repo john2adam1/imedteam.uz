@@ -25,7 +25,7 @@ export default function CourseDetailPage() {
                 setCourse(data);
             } catch (err: any) {
                 console.error('Failed to fetch course:', err);
-                setError(err.message || 'Kurs ma’lumotlarini yuklashda xatolik yuz berdi');
+                setError(err.message || 'Kurs malumotlarini yuklashda xatolik yuz berdi');
             } finally {
                 setLoading(false);
             }
@@ -56,6 +56,10 @@ export default function CourseDetailPage() {
         );
     }
 
+    // ✅ CRITICAL FIX: Robust check for free course
+    const isFree = !!course.is_public;
+    const hasAccess = !!(course.has_access || isFree);
+
     return (
         <div className="max-w-4xl mx-auto px-6 py-10">
             {/* Back Link */}
@@ -72,15 +76,24 @@ export default function CourseDetailPage() {
                 <div className="flex flex-col md:flex-row">
                     <div className="md:w-2/5 aspect-[4/3] md:aspect-auto">
                         <img
-                            src={course.image_url || '/course-placeholder.jpg'}
+                            src={course.image_url || 'https://via.placeholder.com/800x600/800000/FFFFFF?text=IMED+KURS'}
                             alt={course.name}
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/800x600/800000/FFFFFF?text=IMED+KURS';
+                            }}
                         />
                     </div>
                     <div className="md:w-3/5 p-8 lg:p-10 flex flex-col justify-center">
                         <div className="flex items-center gap-2 mb-4">
-                            <span className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest rounded-full">
-                                {course.has_access ? 'Sotib olingan' : (course.is_public ? 'BEPUL KURS' : 'Kurs')}
+                            {/* ✅ FIX: Show proper badge based on course type */}
+                            <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full ${isFree
+                                ? 'bg-emerald-50 text-emerald-600'
+                                : course.has_access
+                                    ? 'bg-primary/10 text-primary'
+                                    : 'bg-slate-50 text-slate-600'
+                                }`}>
+                                {isFree ? '🎁 BEPUL KURS' : course.has_access ? 'Sotib olingan' : 'Pullik kurs'}
                             </span>
                         </div>
                         <h1 className="text-3xl font-black text-gray-900 mb-4 leading-tight">
@@ -101,7 +114,8 @@ export default function CourseDetailPage() {
                             </div>
                         </div>
 
-                        {!course.has_access && !course.is_public ? (
+                        {/* ✅ FIX: Show purchase button ONLY for paid courses without access */}
+                        {!hasAccess ? (
                             <Link
                                 href={`/app/tariffs?courseId=${id}`}
                                 className="w-full py-5 bg-primary text-white rounded-2xl font-black text-center shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-[0.98] tracking-widest uppercase text-sm"
@@ -109,9 +123,12 @@ export default function CourseDetailPage() {
                                 Kursni sotib olish
                             </Link>
                         ) : (
-                            <div className="flex items-center gap-3 py-4 px-6 bg-emerald-50 text-emerald-600 rounded-2xl font-bold border border-emerald-100/50">
-                                <span className="text-xl">✅</span>
-                                Kirish huquqi mavjud
+                            <div className={`flex items-center gap-3 py-4 px-6 rounded-2xl font-bold border ${isFree
+                                ? 'bg-emerald-50 text-emerald-600 border-emerald-100/50'
+                                : 'bg-primary/5 text-primary border-primary/10'
+                                }`}>
+                                <span className="text-xl">{isFree ? '🎁' : '✅'}</span>
+                                {isFree ? 'Bepul – darhol boshlang' : 'Kirish huquqi mavjud'}
                             </div>
                         )}
                     </div>
@@ -140,35 +157,40 @@ export default function CourseDetailPage() {
                                     <div className="divide-y divide-gray-50">
                                         {module.lessons
                                             .sort((a, b) => a.order_num - b.order_num)
-                                            .map((lesson) => (
-                                                <div key={lesson.id} className="p-5 flex items-center justify-between transition-colors hover:bg-slate-50/50 group">
-                                                    <div className="flex items-center gap-4">
-                                                        <span className="text-xs font-black text-gray-300 group-hover:text-primary/40 transition-colors">
-                                                            {lesson.order_num < 10 ? `0${lesson.order_num}` : lesson.order_num}
-                                                        </span>
-                                                        <span className="font-bold text-gray-700 group-hover:text-gray-900 transition-colors">
-                                                            {lesson.name}
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        {course.has_access || course.is_public || lesson.is_public ? (
-                                                            <Link
-                                                                href={`/app/lessons/${lesson.id}`}
-                                                                className={`px-5 py-2 rounded-xl border-2 transition-all font-bold text-xs uppercase tracking-widest ${lesson.is_completed
-                                                                    ? 'bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-100'
-                                                                    : 'bg-primary/5 text-primary border-primary/10 hover:bg-primary hover:text-white hover:border-primary'
-                                                                    }`}
-                                                            >
-                                                                {lesson.is_completed ? 'Ko‘rilgan' : 'Boshlash'}
-                                                            </Link>
-                                                        ) : (
-                                                            <span className="flex items-center gap-2 text-[10px] font-black text-gray-300 uppercase tracking-widest">
-                                                                🔒 Yopiq
+                                            .map((lesson) => {
+                                                // ✅ FIX: Lesson is ALWAYS accessible if course is free
+                                                const lessonAccessible = !!(hasAccess || lesson.is_public || isFree);
+
+                                                return (
+                                                    <div key={lesson.id} className="p-5 flex items-center justify-between transition-colors hover:bg-slate-50/50 group">
+                                                        <div className="flex items-center gap-4">
+                                                            <span className="text-xs font-black text-gray-300 group-hover:text-primary/40 transition-colors">
+                                                                {lesson.order_num < 10 ? `0${lesson.order_num}` : lesson.order_num}
                                                             </span>
-                                                        )}
+                                                            <span className="font-bold text-gray-700 group-hover:text-gray-900 transition-colors">
+                                                                {lesson.name}
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            {lessonAccessible ? (
+                                                                <Link
+                                                                    href={`/app/lessons/${lesson.id}`}
+                                                                    className={`px-5 py-2 rounded-xl border-2 transition-all font-bold text-xs uppercase tracking-widest ${lesson.is_completed
+                                                                        ? 'bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-100'
+                                                                        : 'bg-primary/5 text-primary border-primary/10 hover:bg-primary hover:text-white hover:border-primary'
+                                                                        }`}
+                                                                >
+                                                                    {lesson.is_completed ? 'Korilgan' : 'Boshlash'}
+                                                                </Link>
+                                                            ) : (
+                                                                <span className="flex items-center gap-2 text-[10px] font-black text-gray-300 uppercase tracking-widest">
+                                                                    🔒 Yopiq
+                                                                </span>
+                                                            )}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            ))}
+                                                );
+                                            })}
                                     </div>
                                 </div>
                             ))}

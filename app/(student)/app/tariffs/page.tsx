@@ -25,6 +25,12 @@ function TariffsContent() {
                 setTariffs(tariffData);
                 if (courseData) {
                     setSelectedCourse(courseData);
+
+                    // ✅ CRITICAL GUARD: If course is free, redirect immediately
+                    if (!!courseData.is_public) {
+                        router.replace(`/app/courses/${courseId}`);
+                        return;
+                    }
                 }
             } catch (error) {
                 console.error('Failed to load data:', error);
@@ -34,7 +40,7 @@ function TariffsContent() {
         };
 
         loadData();
-    }, [courseId]);
+    }, [courseId, router]);
 
     const getPriceForTariff = (tariffId: string, defaultPrice: number) => {
         if (!selectedCourse?.price) return defaultPrice;
@@ -44,7 +50,7 @@ function TariffsContent() {
 
     const formatPrice = (price: any) => {
         const numPrice = Number(price);
-        if (isNaN(numPrice)) return 'Noma’lum';
+        if (isNaN(numPrice)) return 'Nomalum';
 
         return new Intl.NumberFormat('uz-UZ', {
             style: 'currency',
@@ -53,10 +59,12 @@ function TariffsContent() {
         }).format(numPrice);
     };
 
-    // Filter tariffs that actually have a price for this course if courseId is present
+    // ✅ FIX: Filter tariffs that actually have a price for this course
+    // Also exclude if course is free (already redirected above, but double-check)
     const displayedTariffs = tariffs?.tariffs?.filter((tariff: any) => {
         if (!courseId) return true; // Show all if no specific course selected
         if (!selectedCourse?.price) return false;
+        if (!!selectedCourse?.is_public) return false; // ✅ No tariffs for free courses
 
         // Find if this specific course has a price for this tariff
         const coursePrice = selectedCourse.price.find(p => p.tariff_id === tariff.id);
@@ -71,12 +79,19 @@ function TariffsContent() {
             return;
         }
 
+        // ✅ ABSOLUTE GUARD: DO NOT create order for free courses
+        if (!!selectedCourse?.is_public) {
+            console.warn('Blocked order creation for public course');
+            router.push(`/app/courses/${courseId}`);
+            return;
+        }
+
         try {
             setPurchasingId(tariffId);
             const response = await orderService.create({
                 tariff_id: tariffId,
-                course_id: courseId, // Adding course_id in case it's needed
-                payment_method: 'payme' // Default payment method
+                course_id: courseId,
+                payment_method: 'payme'
             }) as any;
 
             console.log('Order created:', response);
@@ -84,15 +99,14 @@ function TariffsContent() {
             if (response.url) {
                 window.location.assign(response.url);
             } else if (response.order_id) {
-                // If no payment URL, maybe show success and redirect to user courses
                 alert('Buyurtma muvaffaqiyatli yaratildi');
                 router.push('/app/courses');
             } else {
-                throw new Error('To‘lov havolasi topilmadi');
+                throw new Error('Tolov havolasi topilmadi');
             }
         } catch (error: any) {
             console.error('Purchase failed:', error);
-            alert(error.message || 'To‘lovni amalga oshirishda xatolik yuz berdi');
+            alert(error.message || 'Tolovni amalga oshirishda xatolik yuz berdi');
         } finally {
             setPurchasingId(null);
         }
@@ -105,6 +119,27 @@ function TariffsContent() {
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
                     <p className="mt-4 text-gray-600">Yuklanmoqda...</p>
                 </div>
+            </div>
+        );
+    }
+
+    // ✅ ABSOLUTE GUARD: If somehow we're here with a free course, block UI
+    if (!!selectedCourse?.is_public) {
+        return (
+            <div className="max-w-2xl mx-auto p-10 text-center">
+                <div className="bg-emerald-50 border border-emerald-100 rounded-3xl p-10 mb-8">
+                    <div className="text-5xl mb-4">🎁</div>
+                    <h2 className="text-2xl font-black text-emerald-900 mb-2">Bu kurs bepul!</h2>
+                    <p className="text-emerald-700 font-medium">
+                        Bu kurs hamma uchun bepul. Sotib olish kerak emas, darhol boshlang!
+                    </p>
+                </div>
+                <button
+                    onClick={() => router.push(`/app/courses/${courseId}`)}
+                    className="px-10 py-5 bg-primary text-white rounded-2xl font-black shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-95"
+                >
+                    Kursga qaytish
+                </button>
             </div>
         );
     }

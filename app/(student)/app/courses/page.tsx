@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { courseService, subjectService } from '@/services';
 import { useRouter } from 'next/navigation';
-import { Search, Filter, Sun } from 'lucide-react';
+import { Search, Filter, Sun, Play } from 'lucide-react';
 
 export default function CoursesPage() {
     const [activeTab, setActiveTab] = useState<'all' | 'my'>('all');
@@ -60,8 +60,8 @@ export default function CoursesPage() {
         if (activeTab === 'my') return myCourses;
 
         if (selectedSubject === 'free') {
-            // Show only public courses
-            return allCourses.filter(course => course.is_public === true);
+            // ✅ FIX: Show only public/free courses
+            return allCourses.filter(course => !!course.is_public);
         }
 
         // Show all courses (already filtered by subject_id in API call if needed)
@@ -74,6 +74,9 @@ export default function CoursesPage() {
     const getSubjectCourseCount = (subjectId: string) => {
         return allCourses.filter(course => course.subject_id === subjectId).length;
     };
+
+    // ✅ Helper function to check if course is free
+    const isCourseFreeFn = (course: any) => !!course.is_public;
 
     return (
         <div className="max-w-7xl mx-auto p-6 lg:p-10">
@@ -234,98 +237,117 @@ export default function CoursesPage() {
                             ) : (
                                 /* Course Grid */
                                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
-                                    {displayedCourses.map((course) => (
-                                        <div
-                                            key={course.id || course.course_id}
-                                            className="group bg-white border border-gray-100 rounded-[2rem] p-5 shadow-soft hover:shadow-card transition-all duration-300 flex flex-col h-full hover:-translate-y-1.5 cursor-pointer"
-                                            onClick={() => router.push(`/app/courses/${course.course_id || course.id}`)}
-                                        >
-                                            <div className="aspect-[16/10] bg-slate-50 rounded-2xl mb-6 overflow-hidden relative ring-1 ring-gray-100">
-                                                {activeTab === 'my' ? (
-                                                    <div className="absolute inset-0 flex items-center justify-center">
-                                                        <div className="relative w-24 h-24">
-                                                            <svg className="w-full h-full transform -rotate-90">
-                                                                <circle
-                                                                    cx="48" cy="48" r="40"
-                                                                    stroke="currentColor" strokeWidth="8"
-                                                                    fill="transparent"
-                                                                    className="text-primary/10"
-                                                                />
-                                                                <circle
-                                                                    cx="48" cy="48" r="40"
-                                                                    stroke="currentColor" strokeWidth="8"
-                                                                    fill="transparent"
-                                                                    strokeDasharray={251.2}
-                                                                    strokeDashoffset={251.2 * (1 - (course.percentage || 0) / 100)}
-                                                                    className="text-primary transition-all duration-1000"
-                                                                />
-                                                            </svg>
-                                                            <div className="absolute inset-0 flex items-center justify-center font-black text-primary text-lg">
-                                                                {course.percentage || 0}%
+                                    {displayedCourses.map((course) => {
+                                        // ✅ FIX: Check if course is free
+                                        const isFree = isCourseFreeFn(course);
+
+                                        return (
+                                            <div
+                                                key={course.id || course.course_id}
+                                                className="group bg-white border border-gray-100 rounded-[2rem] p-5 shadow-soft hover:shadow-card transition-all duration-300 flex flex-col h-full hover:-translate-y-1.5 cursor-pointer"
+                                                onClick={() => router.push(`/app/courses/${course.course_id || course.id}`)}
+                                            >
+                                                <div className="aspect-[16/10] bg-slate-50 rounded-2xl mb-6 overflow-hidden relative ring-1 ring-gray-100">
+                                                    {activeTab === 'my' ? (
+                                                        <div className="absolute inset-0 flex items-center justify-center">
+                                                            <div className="relative w-24 h-24">
+                                                                <svg className="w-full h-full transform -rotate-90">
+                                                                    <circle
+                                                                        cx="48" cy="48" r="40"
+                                                                        stroke="currentColor" strokeWidth="8"
+                                                                        fill="transparent"
+                                                                        className="text-primary/10"
+                                                                    />
+                                                                    <circle
+                                                                        cx="48" cy="48" r="40"
+                                                                        stroke="currentColor" strokeWidth="8"
+                                                                        fill="transparent"
+                                                                        strokeDasharray={251.2}
+                                                                        strokeDashoffset={251.2 * (1 - (course.percentage || 0) / 100)}
+                                                                        className="text-primary transition-all duration-1000"
+                                                                    />
+                                                                </svg>
+                                                                <div className="absolute inset-0 flex items-center justify-center font-black text-primary text-lg">
+                                                                    {course.percentage || 0}%
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                ) : course.image_url ? (
-                                                    <img src={course.image_url} alt={course.name} className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500" />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-gray-200">
-                                                        <Sun size={48} className="opacity-10" />
-                                                    </div>
-                                                )}
+                                                    ) : course.image_url ? (
+                                                        <img
+                                                            src={course.image_url}
+                                                            alt={course.name}
+                                                            className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
+                                                            onError={(e) => {
+                                                                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x250/800000/FFFFFF?text=KURS';
+                                                            }}
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-gray-200">
+                                                            <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-card group-hover:scale-110 transition-transform duration-500">
+                                                                <Play size={32} className="text-primary/20" fill="currentColor" />
+                                                            </div>
+                                                        </div>
+                                                    )}
 
-                                                {course.is_public && activeTab === 'all' && (
-                                                    <div className="absolute top-4 right-4 px-3 py-1.5 bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-emerald-500/20">
-                                                        BEPUL
-                                                    </div>
+                                                    {/* ✅ FIX: Show free badge for free courses */}
+                                                    {isFree && activeTab === 'all' && (
+                                                        <div className="absolute top-4 right-4 px-3 py-1.5 bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-emerald-500/20">
+                                                            🎁 BEPUL
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <h3 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2 leading-tight group-hover:text-primary transition-colors">
+                                                    {course.course_name || course.name}
+                                                </h3>
+
+                                                {activeTab === 'all' ? (
+                                                    <>
+                                                        <p className="text-sm text-gray-500 mb-6 line-clamp-2 flex-grow leading-relaxed font-medium">
+                                                            {course.description}
+                                                        </p>
+                                                        <div className="pt-6 border-t border-gray-50 mt-auto flex items-center justify-between">
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-black text-primary">
+                                                                    {course.teacher_name?.[0] || 'T'}
+                                                                </div>
+                                                                <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest whitespace-nowrap overflow-hidden text-ellipsis max-w-[100px]">
+                                                                    {course.teacher_name || 'Ustoz'}
+                                                                </span>
+                                                            </div>
+                                                            {/* ✅ FIX: Show different CTA for free vs paid courses */}
+                                                            <div className={`px-4 py-2 text-xs font-black rounded-xl transition-all ${isFree
+                                                                ? 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white'
+                                                                : 'bg-primary/5 text-primary group-hover:bg-primary group-hover:text-white'
+                                                                }`}>
+                                                                {isFree ? "KO'RISH" : 'BATAFSIL'}
+                                                            </div>
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <div className="space-y-4 mb-6 flex-grow">
+                                                            <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden ring-1 ring-white">
+                                                                <div
+                                                                    className="bg-primary h-full rounded-full transition-all duration-1000"
+                                                                    style={{ width: `${course.percentage || 0}%` }}
+                                                                />
+                                                            </div>
+                                                            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-400">
+                                                                <span>{course.completed_lessons || 0} DARS YAKUNLANDI</span>
+                                                                <span>{course.total_lessons || 0} JAMI</span>
+                                                            </div>
+                                                        </div>
+                                                        <button
+                                                            className="w-full py-4 bg-primary text-white rounded-2xl font-bold hover:bg-primary-600 transition-all shadow-md shadow-primary/20 active:scale-95"
+                                                        >
+                                                            DAVOM ETTIRISH
+                                                        </button>
+                                                    </>
                                                 )}
                                             </div>
-
-                                            <h3 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2 leading-tight group-hover:text-primary transition-colors">
-                                                {course.course_name || course.name}
-                                            </h3>
-
-                                            {activeTab === 'all' ? (
-                                                <>
-                                                    <p className="text-sm text-gray-500 mb-6 line-clamp-2 flex-grow leading-relaxed font-medium">
-                                                        {course.description}
-                                                    </p>
-                                                    <div className="pt-6 border-t border-gray-50 mt-auto flex items-center justify-between">
-                                                        <div className="flex items-center gap-2">
-                                                            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-black text-primary">
-                                                                {course.teacher_name?.[0] || 'T'}
-                                                            </div>
-                                                            <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest whitespace-nowrap overflow-hidden text-ellipsis max-w-[100px]">
-                                                                {course.teacher_name || 'Ustoz'}
-                                                            </span>
-                                                        </div>
-                                                        <div className="px-4 py-2 bg-primary/5 text-primary text-xs font-black rounded-xl group-hover:bg-primary group-hover:text-white transition-all">
-                                                            BATAFSIL
-                                                        </div>
-                                                    </div>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <div className="space-y-4 mb-6 flex-grow">
-                                                        <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden ring-1 ring-white">
-                                                            <div
-                                                                className="bg-primary h-full rounded-full transition-all duration-1000"
-                                                                style={{ width: `${course.percentage || 0}%` }}
-                                                            />
-                                                        </div>
-                                                        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-400">
-                                                            <span>{course.completed_lessons || 0} DARS YAKUNLANDI</span>
-                                                            <span>{course.total_lessons || 0} JAMI</span>
-                                                        </div>
-                                                    </div>
-                                                    <button
-                                                        className="w-full py-4 bg-primary text-white rounded-2xl font-bold hover:bg-primary-600 transition-all shadow-md shadow-primary/20 active:scale-95"
-                                                    >
-                                                        DAVOM ETTIRISH
-                                                    </button>
-                                                </>
-                                            )}
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             )}
                         </>

@@ -1,22 +1,22 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
     courseService,
     bannerService,
     notificationService,
-    profileService,
     activityService,
     ratingService
 } from '@/services';
 import { useRouter } from 'next/navigation';
 import { Bell, Sun, Trophy, BookOpen, Clock, ChevronRight, Play, AlertCircle } from 'lucide-react';
+import { useAuth } from '@/lib/auth-context';
 
 export default function AppHome() {
-    const [user, setUser] = useState<any>(null);
-    const [userCourses, setUserCourses] = useState<any>(null);
-    const [banners, setBanners] = useState<any>(null);
-    const [notifications, setNotifications] = useState<any>(null);
+    const { user: authUser } = useAuth();
+    const [userCourses, setUserCourses] = useState<{ user_courses: any[], count: number }>({ user_courses: [], count: 0 });
+    const [banners, setBanners] = useState<{ banners: any[], count: number }>({ banners: [], count: 0 });
+    const [notifications, setNotifications] = useState<{ notifications: any[], count: number }>({ notifications: [], count: 0 });
     const [activity, setActivity] = useState<any>(null);
     const [rating, setRating] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -30,7 +30,7 @@ export default function AppHome() {
             const fetchData = async (serviceMethod: () => Promise<any>, stateSetter: (data: any) => void, label: string) => {
                 try {
                     const data = await serviceMethod();
-                    stateSetter(data);
+                    if (data) stateSetter(data);
                 } catch (error) {
                     console.error(`Failed to load ${label}:`, error);
                 }
@@ -38,7 +38,6 @@ export default function AppHome() {
 
             // Using allSettled to ensure we try to load everything even if some fail
             await Promise.allSettled([
-                fetchData(() => profileService.getUserProfile(), setUser, 'profile'),
                 fetchData(() => courseService.getUserCourses(), setUserCourses, 'user courses'),
                 fetchData(() => bannerService.getBanners(), setBanners, 'banners'),
                 fetchData(() => notificationService.getNotifications(), setNotifications, 'notifications'),
@@ -51,6 +50,11 @@ export default function AppHome() {
 
         loadDashboardData();
     }, []);
+
+    // Memoize the hasUnread check
+    const hasUnread = useMemo(() => {
+        return notifications?.notifications?.some((n: any) => !n.is_read);
+    }, [notifications]);
 
     if (loading) {
         return (
@@ -67,7 +71,7 @@ export default function AppHome() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
                 <div className="animate-in fade-in slide-in-from-left duration-700">
                     <h1 className="text-4xl font-black text-gray-900 tracking-tight">
-                        {user?.name ? `Assalomu alaykum, ${user.name}!` : 'Xush kelibsiz!'}
+                        {authUser?.name ? `Assalomu alaykum, ${authUser.name}!` : 'Xush kelibsiz!'}
                     </h1>
                     <p className="text-lg text-gray-500 mt-2 font-medium italic">Bugun yangi bilimlar olish uchun ajoyib kun!</p>
                 </div>
@@ -80,7 +84,7 @@ export default function AppHome() {
                         className="p-4 rounded-[1.5rem] bg-white border border-gray-100 text-gray-400 hover:text-primary hover:border-primary/20 hover:shadow-premium transition-all relative active:scale-95 group"
                     >
                         <Bell size={22} className="group-hover:ring-offset-2 group-hover:ring-2 ring-primary/20 rounded-full transition-all" />
-                        {notifications?.notifications?.some((n: any) => !n.is_read) && (
+                        {hasUnread && (
                             <span className="absolute top-4 right-4 w-3 h-3 bg-primary rounded-full border-2 border-white animate-pulse" />
                         )}
                     </button>
@@ -88,7 +92,7 @@ export default function AppHome() {
             </div>
 
             {/* Banners Section - Prominent & Visual */}
-            {banners?.banners?.length > 0 && (
+            {(banners?.banners && banners.banners.length > 0) ? (
                 <div className="grid gap-8 overflow-hidden animate-in fade-in zoom-in duration-700">
                     {banners.banners.map((banner: any) => (
                         <div
@@ -96,12 +100,15 @@ export default function AppHome() {
                             className="relative min-h-[300px] rounded-[3rem] overflow-hidden group shadow-premium hover:shadow-2xl transition-all duration-700 cursor-pointer"
                             onClick={() => banner.link_url && window.open(banner.link_url, '_blank')}
                         >
-                            {/* Background Image */}
+                            {/* Background Image with Fallback */}
                             {banner.image_url ? (
                                 <img
                                     src={banner.image_url}
                                     alt={banner.title}
                                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
+                                    onError={(e) => {
+                                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/800x400/800000/FFFFFF?text=IMED+PLATFORMA';
+                                    }}
                                 />
                             ) : (
                                 <div className="absolute inset-0 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900" />
@@ -131,6 +138,9 @@ export default function AppHome() {
                         </div>
                     ))}
                 </div>
+            ) : (
+                /* Diagnostic Placeholder when no banners found but no error thrown */
+                <div className="hidden">No banners available in the data</div>
             )}
 
             {/* Statistics Dashboard */}
@@ -207,6 +217,9 @@ export default function AppHome() {
                                             src={course.course_image_url}
                                             alt={course.course_name}
                                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                            onError={(e) => {
+                                                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x250/800000/FFFFFF?text=KURS';
+                                            }}
                                         />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-gray-200">
@@ -218,7 +231,7 @@ export default function AppHome() {
 
                                     {/* Progress Circle Top Right */}
                                     <div className="absolute top-4 right-4 w-12 h-12 rounded-2xl bg-white/90 backdrop-blur-md shadow-card flex items-center justify-center border border-white/20">
-                                        <span className="text-xs font-black text-primary">{course.percentage || 0}%</span>
+                                        <span className="text-xs font-black text-primary">{Math.round(course.percentage || 0)}%</span>
                                     </div>
                                 </div>
 
