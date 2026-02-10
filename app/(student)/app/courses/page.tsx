@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { courseService, subjectService } from '@/services';
 import { useRouter } from 'next/navigation';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, Sun } from 'lucide-react';
 
 export default function CoursesPage() {
     const [activeTab, setActiveTab] = useState<'all' | 'my'>('all');
@@ -76,74 +76,76 @@ export default function CoursesPage() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto p-6">
-            <div className="flex flex-col lg:flex-row gap-6">
+        <div className="max-w-7xl mx-auto p-6 lg:p-10">
+            <div className="flex flex-col lg:flex-row gap-10">
                 {/* Sidebar - Subject Filters */}
-                <aside className="lg:w-64 flex-shrink-0">
-                    <div className="bg-white rounded-2xl border border-gray-200 p-4 sticky top-6">
-                        <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <Filter className="w-5 h-5" />
+                <aside className="lg:w-72 flex-shrink-0">
+                    <div className="bg-white rounded-3xl border border-gray-100 p-6 sticky top-6 shadow-soft">
+                        <h2 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-3">
+                            <Filter className="w-5 h-5 text-primary" />
                             Fanlar
                         </h2>
 
-                        {/* All Courses Option */}
-                        <button
-                            onClick={() => setSelectedSubject(null)}
-                            className={`w-full text-left px-4 py-2.5 rounded-xl mb-2 transition-all ${selectedSubject === null
-                                ? 'bg-primary-600 text-white shadow-sm'
-                                : 'text-gray-700 hover:bg-gray-50'
-                                }`}
-                        >
-                            <div className="flex items-center justify-between">
-                                <span className="font-medium">Barcha kurslar</span>
-                                <span className={`text-sm ${selectedSubject === null ? 'text-white/80' : 'text-gray-500'}`}>
-                                    {allCourses.length}
-                                </span>
+                        <div className="space-y-2">
+                            {/* All Courses Option */}
+                            <button
+                                onClick={() => setSelectedSubject(null)}
+                                className={`w-full text-left px-4 py-3 rounded-2xl transition-all duration-200 active:scale-[0.98] ${selectedSubject === null
+                                    ? 'bg-primary text-white shadow-md shadow-primary/20'
+                                    : 'text-gray-600 hover:bg-slate-50'
+                                    }`}
+                            >
+                                <div className="flex items-center justify-between">
+                                    <span className="font-bold">Barcha kurslar</span>
+                                    <span className={`text-xs px-2 py-0.5 rounded-full ${selectedSubject === null ? 'bg-white/20 text-white' : 'bg-slate-100 text-gray-400'}`}>
+                                        {allCourses.length}
+                                    </span>
+                                </div>
+                            </button>
+
+                            {/* Free Courses Option */}
+                            <button
+                                onClick={() => setSelectedSubject('free')}
+                                className={`w-full text-left px-4 py-3 rounded-2xl transition-all duration-200 active:scale-[0.98] ${selectedSubject === 'free'
+                                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+                                    : 'text-gray-600 hover:bg-emerald-50/50'
+                                    }`}
+                            >
+                                <div className="flex items-center justify-between">
+                                    <span className="font-bold text-sm">🎁 Bepul kurslar</span>
+                                    <span className={`text-xs px-2 py-0.5 rounded-full ${selectedSubject === 'free' ? 'bg-white/20 text-white' : 'bg-emerald-100/50 text-emerald-600'}`}>
+                                        {allCourses.filter(c => c.is_public === true).length}
+                                    </span>
+                                </div>
+                            </button>
+
+                            {/* Divider */}
+                            <div className="border-t border-gray-100 my-4"></div>
+
+                            {/* Subject List */}
+                            <div className="space-y-1 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
+                                {subjects.map((subject) => (
+                                    <button
+                                        key={subject.id}
+                                        onClick={() => setSelectedSubject(subject.id)}
+                                        className={`w-full text-left px-4 py-3 rounded-2xl transition-all duration-200 active:scale-[0.98] ${selectedSubject === subject.id
+                                            ? 'bg-primary text-white shadow-md shadow-primary/20'
+                                            : 'text-gray-600 hover:bg-slate-50 font-medium'
+                                            }`}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-sm line-clamp-1">{subject.name}</span>
+                                            <span className={`text-[10px] px-2 py-0.5 rounded-full ${selectedSubject === subject.id ? 'bg-white/20 text-white' : 'bg-slate-100 text-gray-400'}`}>
+                                                {getSubjectCourseCount(subject.id)}
+                                            </span>
+                                        </div>
+                                    </button>
+                                ))}
                             </div>
-                        </button>
-
-                        {/* Free Courses Option */}
-                        <button
-                            onClick={() => setSelectedSubject('free')}
-                            className={`w-full text-left px-4 py-2.5 rounded-xl mb-2 transition-all ${selectedSubject === 'free'
-                                ? 'bg-green-600 text-white shadow-sm'
-                                : 'text-gray-700 hover:bg-green-50'
-                                }`}
-                        >
-                            <div className="flex items-center justify-between">
-                                <span className="font-medium">🎁 Bepul kurslar</span>
-                                <span className={`text-sm ${selectedSubject === 'free' ? 'text-white/80' : 'text-gray-500'}`}>
-                                    {allCourses.filter(c => c.is_public === true).length}
-                                </span>
-                            </div>
-                        </button>
-
-                        {/* Divider */}
-                        <div className="border-t border-gray-200 my-2"></div>
-
-                        {/* Subject List */}
-                        <div className="space-y-1">
-                            {subjects.map((subject) => (
-                                <button
-                                    key={subject.id}
-                                    onClick={() => setSelectedSubject(subject.id)}
-                                    className={`w-full text-left px-4 py-2.5 rounded-xl transition-all ${selectedSubject === subject.id
-                                        ? 'bg-primary-600 text-white shadow-sm'
-                                        : 'text-gray-700 hover:bg-gray-50'
-                                        }`}
-                                >
-                                    <div className="flex items-center justify-between">
-                                        <span className="font-medium text-sm line-clamp-1">{subject.name}</span>
-                                        <span className={`text-xs ${selectedSubject === subject.id ? 'text-white/80' : 'text-gray-500'}`}>
-                                            {getSubjectCourseCount(subject.id)}
-                                        </span>
-                                    </div>
-                                </button>
-                            ))}
                         </div>
 
                         {subjects.length === 0 && !loading && (
-                            <p className="text-sm text-gray-500 text-center py-4">Fanlar topilmadi</p>
+                            <p className="text-sm text-gray-400 text-center py-6 italic">Fanlar topilmadi</p>
                         )}
                     </div>
                 </aside>
@@ -151,17 +153,17 @@ export default function CoursesPage() {
                 {/* Main Content */}
                 <main className="flex-1">
                     {/* Header with Tabs */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                        <h1 className="text-3xl font-bold text-gray-900">Kurslar</h1>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
+                        <h1 className="text-3xl font-black text-gray-900 tracking-tight">Kurslar</h1>
 
-                        <div className="flex p-1 bg-gray-100 rounded-xl w-fit">
+                        <div className="flex p-1.5 bg-slate-100/80 rounded-2xl w-fit">
                             <button
                                 onClick={() => {
                                     setActiveTab('all');
                                     setSelectedSubject(null);
                                 }}
-                                className={`px-6 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'all'
-                                    ? 'bg-white text-gray-900 shadow-sm'
+                                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'all'
+                                    ? 'bg-white text-gray-900 shadow-sm shadow-black/5'
                                     : 'text-gray-500 hover:text-gray-700'
                                     }`}
                             >
@@ -169,8 +171,8 @@ export default function CoursesPage() {
                             </button>
                             <button
                                 onClick={() => setActiveTab('my')}
-                                className={`px-6 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'my'
-                                    ? 'bg-white text-gray-900 shadow-sm'
+                                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'my'
+                                    ? 'bg-white text-gray-900 shadow-sm shadow-black/5'
                                     : 'text-gray-500 hover:text-gray-700'
                                     }`}
                             >
@@ -180,50 +182,50 @@ export default function CoursesPage() {
                     </div>
 
                     {error && (
-                        <div className="p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm mb-6">
-                            {error}
+                        <div className="p-5 bg-primary/5 border border-primary/10 rounded-2xl text-primary text-sm font-medium mb-8 flex items-center gap-3">
+                            <span className="text-xl">⚠️</span> {error}
                         </div>
                     )}
 
                     {/* Loading State */}
                     {loading ? (
-                        <div className="flex items-center justify-center py-12">
-                            <div className="text-center">
-                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-                                <p className="text-gray-600">Yuklanmoqda...</p>
-                            </div>
+                        <div className="flex flex-col items-center justify-center py-20">
+                            <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4"></div>
+                            <p className="text-gray-400 font-medium">Yuklanmoqda...</p>
                         </div>
                     ) : (
                         <>
                             {/* Course Count */}
-                            <h2 className="text-lg font-bold text-gray-900 mb-6">
+                            <h2 className="text-xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+                                <span className="w-1.5 h-6 bg-primary rounded-full"></span>
                                 {activeTab === 'all'
                                     ? selectedSubject === 'free'
                                         ? `🎁 Bepul kurslar (${displayedCourses.length})`
                                         : selectedSubject
                                             ? `${subjects.find(s => s.id === selectedSubject)?.name || 'Barcha kurslar'} (${displayedCourses.length})`
-                                            : `Barcha kurslar (${displayedCourses.length})`
-                                    : `Mening kurslarim (${displayedCourses.length})`
+                                            : `Jami kurslar (${displayedCourses.length})`
+                                    : `Siz o'qiyotgan kurslar (${displayedCourses.length})`
                                 }
                             </h2>
 
                             {/* Empty State */}
                             {displayedCourses.length === 0 ? (
-                                <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                                    <p className="text-gray-500">
+                                <div className="text-center py-20 bg-slate-50/50 rounded-[2.5rem] border-2 border-dashed border-gray-100 flex flex-col items-center">
+                                    <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center text-3xl mb-6 opacity-50 grayscale">📚</div>
+                                    <p className="text-gray-400 font-medium text-lg max-w-sm mb-8">
                                         {activeTab === 'my'
                                             ? "Siz hali hech qaysi kursga a'zo bo'lmagansiz"
                                             : selectedSubject === 'free'
                                                 ? "Hozircha bepul kurslar mavjud emas"
                                                 : selectedSubject
-                                                    ? "Bu fan bo'yicha kurslar topilmadi"
+                                                    ? "Ushbu yo'nalish bo'yicha hozircha kurslar mavjud emas"
                                                     : "Hozircha kurslar mavjud emas"
                                         }
                                     </p>
                                     {activeTab === 'my' && (
                                         <button
                                             onClick={() => setActiveTab('all')}
-                                            className="mt-4 text-primary-600 font-medium hover:underline"
+                                            className="px-8 py-4 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-95"
                                         >
                                             Kurslarni ko'rish
                                         </button>
@@ -231,72 +233,94 @@ export default function CoursesPage() {
                                 </div>
                             ) : (
                                 /* Course Grid */
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
                                     {displayedCourses.map((course) => (
                                         <div
                                             key={course.id || course.course_id}
-                                            className="bg-white border border-gray-200 rounded-2xl p-4 hover:shadow-md transition-shadow flex flex-col h-full"
+                                            className="group bg-white border border-gray-100 rounded-[2rem] p-5 shadow-soft hover:shadow-card transition-all duration-300 flex flex-col h-full hover:-translate-y-1.5 cursor-pointer"
+                                            onClick={() => router.push(`/app/courses/${course.course_id || course.id}`)}
                                         >
-                                            <div className="aspect-video bg-gray-100 rounded-xl mb-4 overflow-hidden relative">
+                                            <div className="aspect-[16/10] bg-slate-50 rounded-2xl mb-6 overflow-hidden relative ring-1 ring-gray-100">
                                                 {activeTab === 'my' ? (
-                                                    <div className="absolute inset-0 flex items-center justify-center text-primary-600 font-bold bg-primary-50">
-                                                        {course.percentage || 0}%
+                                                    <div className="absolute inset-0 flex items-center justify-center">
+                                                        <div className="relative w-24 h-24">
+                                                            <svg className="w-full h-full transform -rotate-90">
+                                                                <circle
+                                                                    cx="48" cy="48" r="40"
+                                                                    stroke="currentColor" strokeWidth="8"
+                                                                    fill="transparent"
+                                                                    className="text-primary/10"
+                                                                />
+                                                                <circle
+                                                                    cx="48" cy="48" r="40"
+                                                                    stroke="currentColor" strokeWidth="8"
+                                                                    fill="transparent"
+                                                                    strokeDasharray={251.2}
+                                                                    strokeDashoffset={251.2 * (1 - (course.percentage || 0) / 100)}
+                                                                    className="text-primary transition-all duration-1000"
+                                                                />
+                                                            </svg>
+                                                            <div className="absolute inset-0 flex items-center justify-center font-black text-primary text-lg">
+                                                                {course.percentage || 0}%
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 ) : course.image_url ? (
-                                                    <img src={course.image_url} alt={course.name} className="w-full h-full object-cover" />
+                                                    <img src={course.image_url} alt={course.name} className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500" />
                                                 ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-50">
-                                                        <span className="text-sm">Rasm yo'q</span>
+                                                    <div className="w-full h-full flex items-center justify-center text-gray-200">
+                                                        <Sun size={48} className="opacity-10" />
+                                                    </div>
+                                                )}
+
+                                                {course.is_public && activeTab === 'all' && (
+                                                    <div className="absolute top-4 right-4 px-3 py-1.5 bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-emerald-500/20">
+                                                        BEPUL
                                                     </div>
                                                 )}
                                             </div>
 
-                                            <h3 className="font-bold text-gray-900 mb-2 line-clamp-1">
+                                            <h3 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2 leading-tight group-hover:text-primary transition-colors">
                                                 {course.course_name || course.name}
                                             </h3>
 
                                             {activeTab === 'all' ? (
                                                 <>
-                                                    <p className="text-sm text-gray-500 mb-4 line-clamp-2 flex-grow">
+                                                    <p className="text-sm text-gray-500 mb-6 line-clamp-2 flex-grow leading-relaxed font-medium">
                                                         {course.description}
                                                     </p>
-                                                    <div className="pt-4 border-t border-gray-100 mt-auto">
-                                                        <div className="flex items-center justify-between mb-4">
-                                                            <div className="flex items-center gap-2">
-                                                                <div className="w-6 h-6 rounded-full bg-gray-100 overflow-hidden">
-                                                                    <div className="w-full h-full bg-gray-200" />
-                                                                </div>
-                                                                <span className="text-xs text-gray-600 font-medium">
-                                                                    {course.teacher_name}
-                                                                </span>
+                                                    <div className="pt-6 border-t border-gray-50 mt-auto flex items-center justify-between">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-black text-primary">
+                                                                {course.teacher_name?.[0] || 'T'}
                                                             </div>
+                                                            <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest whitespace-nowrap overflow-hidden text-ellipsis max-w-[100px]">
+                                                                {course.teacher_name || 'Ustoz'}
+                                                            </span>
                                                         </div>
-                                                        <button
-                                                            onClick={() => router.push(`/app/courses/${course.id}`)}
-                                                            className="w-full py-2.5 bg-primary-50 text-primary-600 rounded-xl font-medium hover:bg-primary-100 transition-colors"
-                                                        >
-                                                            Batafsil
-                                                        </button>
+                                                        <div className="px-4 py-2 bg-primary/5 text-primary text-xs font-black rounded-xl group-hover:bg-primary group-hover:text-white transition-all">
+                                                            BATAFSIL
+                                                        </div>
                                                     </div>
                                                 </>
                                             ) : (
                                                 <>
-                                                    <div className="space-y-3 mb-6 flex-grow">
-                                                        <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                                                    <div className="space-y-4 mb-6 flex-grow">
+                                                        <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden ring-1 ring-white">
                                                             <div
-                                                                className="bg-primary-500 h-full rounded-full transition-all duration-300"
+                                                                className="bg-primary h-full rounded-full transition-all duration-1000"
                                                                 style={{ width: `${course.percentage || 0}%` }}
                                                             />
                                                         </div>
-                                                        <p className="text-xs text-gray-500">
-                                                            {course.completed_lessons || 0} / {course.total_lessons || 0} darslar yakunlandi
-                                                        </p>
+                                                        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-400">
+                                                            <span>{course.completed_lessons || 0} DARS YAKUNLANDI</span>
+                                                            <span>{course.total_lessons || 0} JAMI</span>
+                                                        </div>
                                                     </div>
                                                     <button
-                                                        onClick={() => router.push(`/app/courses/${course.course_id || course.id}`)}
-                                                        className="w-full py-2.5 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors mt-auto shadow-sm shadow-primary-600/30"
+                                                        className="w-full py-4 bg-primary text-white rounded-2xl font-bold hover:bg-primary-600 transition-all shadow-md shadow-primary/20 active:scale-95"
                                                     >
-                                                        Davom ettirish
+                                                        DAVOM ETTIRISH
                                                     </button>
                                                 </>
                                             )}

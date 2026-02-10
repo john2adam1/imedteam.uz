@@ -9,7 +9,8 @@ export const activityService = {
      */
     getStats: async (params?: any): Promise<any> => {
         const queryString = params ? buildQueryString(params) : '';
-        return apiClient(`/user/activity${queryString}`);
+        const response = await apiClient<any>(`/user/activity${queryString}`);
+        return response.data || response;
     },
 
     /**

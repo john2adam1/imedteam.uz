@@ -18,49 +18,52 @@ export default function Sidebar() {
     const { logout } = useAuth();
 
     return (
-        <div style={{ width: '250px', borderRight: '1px solid #ccc', height: '100vh', padding: '20px' }}>
-            <div style={{ marginBottom: '30px' }}>
-                <h2 style={{ margin: 0 }}>iMed Team</h2>
+        <div className="w-80 bg-white border-r border-gray-100 flex flex-col h-screen sticky top-0 overflow-hidden shadow-[10px_0_30px_-15px_rgba(0,0,0,0.05)]">
+            {/* Logo Area */}
+            <div className="p-8 mb-4">
+                <Link href="/app" className="flex items-center gap-3 group">
+                    <div className="w-12 h-12 bg-primary rounded-[1rem] flex items-center justify-center text-white shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform">
+                        <BookOpen size={24} />
+                    </div>
+                    <h2 className="text-2xl font-black text-gray-900 tracking-tighter">
+                        iMed <span className="text-primary italic">Team</span>
+                    </h2>
+                </Link>
             </div>
 
-            <nav>
-                <ul style={{ listStyle: 'none', padding: 0 }}>
-                    {navItems.map((item) => {
-                        const isActive = pathname === item.href || (item.href !== '/app' && pathname.startsWith(item.href));
-                        return (
-                            <li key={item.name} style={{ marginBottom: '10px' }}>
-                                <Link
-                                    href={item.href}
-                                    style={{
-                                        textDecoration: 'none',
-                                        color: isActive ? '#007bff' : 'black',
-                                        fontWeight: isActive ? 'bold' : 'normal',
-                                        display: 'block',
-                                        padding: '10px',
-                                        border: isActive ? '1px solid #007bff' : '1px solid transparent',
-                                        borderRadius: '4px'
-                                    }}
-                                >
-                                    {item.name}
-                                </Link>
-                            </li>
-                        );
-                    })}
-                </ul>
+            {/* Navigation */}
+            <nav className="flex-1 px-4 space-y-2">
+                {navItems.map((item) => {
+                    const isActive = pathname === item.href || (item.href !== '/app' && pathname.startsWith(item.href));
+                    const Icon = item.icon;
+                    return (
+                        <Link
+                            key={item.name}
+                            href={item.href}
+                            className={`flex items-center gap-4 px-6 py-4 rounded-[1.5rem] font-bold transition-all duration-300 group
+                                ${isActive
+                                    ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]'
+                                    : 'text-gray-400 hover:bg-slate-50 hover:text-gray-900'
+                                }`}
+                        >
+                            <Icon size={22} className={isActive ? 'text-white' : 'text-gray-300 group-hover:text-primary transition-colors'} />
+                            <span className="tracking-tight">{item.name}</span>
+                            {isActive && (
+                                <div className="ml-auto w-1.5 h-1.5 bg-white rounded-full"></div>
+                            )}
+                        </Link>
+                    );
+                })}
             </nav>
 
-            <div style={{ marginTop: 'auto', paddingTop: '20px', borderTop: '1px solid #eee' }}>
+            {/* Bottom Actions */}
+            <div className="p-6 border-t border-slate-50 bg-slate-50/30">
                 <button
                     onClick={() => logout()}
-                    style={{
-                        width: '100%',
-                        padding: '10px',
-                        cursor: 'pointer',
-                        border: '1px solid #ccc',
-                        backgroundColor: '#f8f9fa'
-                    }}
+                    className="w-full flex items-center gap-4 px-6 py-4 rounded-[1.5rem] font-bold text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all group"
                 >
-                    Logout
+                    <LogOut size={22} className="group-hover:rotate-12 transition-transform" />
+                    <span className="tracking-tight">Chiqish</span>
                 </button>
             </div>
         </div>

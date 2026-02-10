@@ -57,78 +57,114 @@ export default function CourseDetailPage() {
     }
 
     return (
-        <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-            <Link href="/app/courses" style={{ marginBottom: '20px', display: 'inline-block' }}>
-                &larr; Kurslarga qaytish
+        <div className="max-w-4xl mx-auto px-6 py-10">
+            {/* Back Link */}
+            <Link
+                href="/app/courses"
+                className="inline-flex items-center gap-2 text-gray-500 font-bold hover:text-primary transition-all mb-8 group"
+            >
+                <span className="group-hover:-translate-x-1 transition-transform">←</span>
+                Kurslarga qaytish
             </Link>
 
-            {/* Course Header */}
-            <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '20px', marginBottom: '30px' }}>
-                <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-                    <div style={{ flex: '1 1 300px' }}>
+            {/* Course Header Card */}
+            <div className="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-soft mb-12">
+                <div className="flex flex-col md:flex-row">
+                    <div className="md:w-2/5 aspect-[4/3] md:aspect-auto">
                         <img
                             src={course.image_url || '/course-placeholder.jpg'}
                             alt={course.name}
-                            style={{ width: '100%', borderRadius: '8px' }}
+                            className="w-full h-full object-cover"
                         />
                     </div>
-                    <div style={{ flex: '1 1 300px' }}>
-                        <h1>{course.name}</h1>
-                        <p style={{ fontStyle: 'italic', color: '#666' }}>{course.description}</p>
+                    <div className="md:w-3/5 p-8 lg:p-10 flex flex-col justify-center">
+                        <div className="flex items-center gap-2 mb-4">
+                            <span className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest rounded-full">
+                                {course.has_access ? 'Sotib olingan' : (course.is_public ? 'BEPUL KURS' : 'Kurs')}
+                            </span>
+                        </div>
+                        <h1 className="text-3xl font-black text-gray-900 mb-4 leading-tight">
+                            {course.name}
+                        </h1>
+                        <p className="text-gray-500 font-medium italic mb-8 leading-relaxed">
+                            {course.description}
+                        </p>
 
-                        <div style={{ display: 'flex', gap: '20px', margin: '20px 0' }}>
-                            <div>
-                                <p style={{ fontSize: '10px', margin: 0 }}>Darslar</p>
-                                <p style={{ fontSize: '20px', fontWeight: 'bold', margin: 0 }}>{course.lessons}</p>
+                        <div className="grid grid-cols-2 gap-8 mb-10">
+                            <div className="flex flex-col">
+                                <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1">Darslar</span>
+                                <span className="text-2xl font-black text-gray-900">{course.lessons} ta</span>
                             </div>
-                            <div>
-                                <p style={{ fontSize: '10px', margin: 0 }}>Muddati</p>
-                                <p style={{ fontSize: '20px', fontWeight: 'bold', margin: 0 }}>{course.duration} kun</p>
+                            <div className="flex flex-col">
+                                <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1">Muddati</span>
+                                <span className="text-2xl font-black text-gray-900">{course.duration} kun</span>
                             </div>
                         </div>
 
-                        <div style={{ padding: '10px', backgroundColor: course.has_access ? '#d4edda' : '#f8d7da', borderRadius: '4px', marginBottom: '20px' }}>
-                            {course.has_access ? 'Sizda ruxsat bor ✅' : 'Ruxsat yo‘q 🔒'}
-                        </div>
-
-                        {!course.has_access && (
-                            <Link href="/app/tariffs" style={{ display: 'block', padding: '10px', backgroundColor: '#007bff', color: 'white', textAlign: 'center', textDecoration: 'none', borderRadius: '4px' }}>
+                        {!course.has_access && !course.is_public ? (
+                            <Link
+                                href={`/app/tariffs?courseId=${id}`}
+                                className="w-full py-5 bg-primary text-white rounded-2xl font-black text-center shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-[0.98] tracking-widest uppercase text-sm"
+                            >
                                 Kursni sotib olish
                             </Link>
+                        ) : (
+                            <div className="flex items-center gap-3 py-4 px-6 bg-emerald-50 text-emerald-600 rounded-2xl font-bold border border-emerald-100/50">
+                                <span className="text-xl">✅</span>
+                                Kirish huquqi mavjud
+                            </div>
                         )}
                     </div>
                 </div>
             </div>
 
             {/* Modules & Lessons List */}
-            <div>
-                <h2>Kurs rejasi</h2>
+            <div className="space-y-8">
+                <h2 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-3">
+                    <span className="w-1.5 h-6 bg-primary rounded-full"></span>
+                    Kurs rejasi
+                </h2>
 
                 {course.modules && course.modules.length > 0 ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    <div className="space-y-6">
                         {course.modules
                             .sort((a, b) => a.order_num - b.order_num)
                             .map((module) => (
-                                <div key={module.id} style={{ border: '1px solid #ccc', borderRadius: '8px', overflow: 'hidden' }}>
-                                    <div style={{ padding: '10px', backgroundColor: '#eee', borderBottom: '1px solid #ccc' }}>
-                                        <h3 style={{ margin: 0 }}>{module.name}</h3>
+                                <div key={module.id} className="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-soft">
+                                    <div className="px-6 py-4 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+                                        <h3 className="font-bold text-gray-900">{module.name}</h3>
+                                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                            {module.lessons.length} DARS
+                                        </span>
                                     </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <div className="divide-y divide-gray-50">
                                         {module.lessons
                                             .sort((a, b) => a.order_num - b.order_num)
                                             .map((lesson) => (
-                                                <div key={lesson.id} style={{ padding: '15px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                    <span>{lesson.order_num}. {lesson.name}</span>
+                                                <div key={lesson.id} className="p-5 flex items-center justify-between transition-colors hover:bg-slate-50/50 group">
+                                                    <div className="flex items-center gap-4">
+                                                        <span className="text-xs font-black text-gray-300 group-hover:text-primary/40 transition-colors">
+                                                            {lesson.order_num < 10 ? `0${lesson.order_num}` : lesson.order_num}
+                                                        </span>
+                                                        <span className="font-bold text-gray-700 group-hover:text-gray-900 transition-colors">
+                                                            {lesson.name}
+                                                        </span>
+                                                    </div>
                                                     <div>
-                                                        {course.has_access || lesson.is_public ? (
+                                                        {course.has_access || course.is_public || lesson.is_public ? (
                                                             <Link
                                                                 href={`/app/lessons/${lesson.id}`}
-                                                                style={{ padding: '5px 15px', backgroundColor: '#007bff', color: 'white', textDecoration: 'none', borderRadius: '4px', fontSize: '12px' }}
+                                                                className={`px-5 py-2 rounded-xl border-2 transition-all font-bold text-xs uppercase tracking-widest ${lesson.is_completed
+                                                                    ? 'bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-100'
+                                                                    : 'bg-primary/5 text-primary border-primary/10 hover:bg-primary hover:text-white hover:border-primary'
+                                                                    }`}
                                                             >
                                                                 {lesson.is_completed ? 'Ko‘rilgan' : 'Boshlash'}
                                                             </Link>
                                                         ) : (
-                                                            <span style={{ color: '#ccc', fontSize: '12px' }}>🔒 Yopiq</span>
+                                                            <span className="flex items-center gap-2 text-[10px] font-black text-gray-300 uppercase tracking-widest">
+                                                                🔒 Yopiq
+                                                            </span>
                                                         )}
                                                     </div>
                                                 </div>
@@ -138,7 +174,9 @@ export default function CourseDetailPage() {
                             ))}
                     </div>
                 ) : (
-                    <p style={{ textAlign: 'center', color: '#999' }}>Tez kunda yangi darslar yuklanadi.</p>
+                    <div className="py-20 bg-slate-50/50 rounded-3xl border-2 border-dashed border-gray-100 text-center">
+                        <p className="text-gray-400 font-medium italic">Tez kunda yangi darslar yuklanadi.</p>
+                    </div>
                 )}
             </div>
         </div>

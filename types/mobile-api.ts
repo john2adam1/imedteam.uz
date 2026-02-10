@@ -86,6 +86,7 @@ export interface MobileCourseRes {
   name: string;
   description: string;
   image_url?: string;
+  is_public?: boolean;
   documents: number;
   duration: number;
   has_access: boolean;

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { notificationService } from '@/services';
 import { UserNotification } from '@/types/mobile-api';
+import { Bell, CheckCheck, Inbox, Calendar, Trash2 } from 'lucide-react';
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<UserNotification[]>([]);
@@ -29,7 +30,6 @@ export default function NotificationsPage() {
   const handleMarkAsRead = async (id: string) => {
     try {
       await notificationService.markAsRead(id);
-      // Update local state
       setNotifications(notifications.map(n =>
         n.id === id ? { ...n, is_read: true } : n
       ));
@@ -41,7 +41,7 @@ export default function NotificationsPage() {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('uz-UZ', {
-      month: 'short',
+      month: 'long',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
@@ -50,67 +50,106 @@ export default function NotificationsPage() {
 
   if (isLoading && notifications.length === 0) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      <div className="flex flex-col items-center justify-center py-32 space-y-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary/20 border-t-primary"></div>
+        <p className="text-gray-400 font-bold animate-pulse">Yuklanmoqda...</p>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>Bildirishnomalar</h1>
+    <div className="max-w-4xl mx-auto p-6 lg:p-10 space-y-12">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+        <div className="space-y-4">
+          <h1 className="text-4xl lg:text-5xl font-black text-gray-900 tracking-tight">Bildirishnomalar</h1>
+          <p className="text-lg text-gray-400 font-medium">Barcha muhim xabarlar va yangiliklar bir joyda.</p>
+        </div>
 
-      <div style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
-        <button
-          onClick={() => setFilter('all')}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: filter === 'all' ? '#007bff' : '#f8f9fa',
-            color: filter === 'all' ? 'white' : 'black',
-            border: '1px solid #ccc',
-            cursor: 'pointer'
-          }}
-        >
-          Hammasi
-        </button>
-        <button
-          onClick={() => setFilter('unread')}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: filter === 'unread' ? '#007bff' : '#f8f9fa',
-            color: filter === 'unread' ? 'white' : 'black',
-            border: '1px solid #ccc',
-            cursor: 'pointer'
-          }}
-        >
-          O'qilmagan
-        </button>
+        {/* Filter Selector */}
+        <div className="p-1.5 bg-slate-100 rounded-[2rem] flex gap-1 shadow-inner h-fit border border-gray-100">
+          <button
+            onClick={() => setFilter('all')}
+            className={`px-8 py-2.5 rounded-[1.5rem] text-sm font-black transition-all duration-300 tracking-tight
+                      ${filter === 'all'
+                ? 'bg-white text-gray-900 shadow-md'
+                : 'text-gray-400 hover:text-gray-600'
+              }`}
+          >
+            Hammasi
+          </button>
+          <button
+            onClick={() => setFilter('unread')}
+            className={`px-8 py-2.5 rounded-[1.5rem] text-sm font-black transition-all duration-300 tracking-tight
+                      ${filter === 'unread'
+                ? 'bg-white text-gray-900 shadow-md'
+                : 'text-gray-400 hover:text-gray-600'
+              }`}
+          >
+            O'qilmagan
+          </button>
+        </div>
       </div>
 
       {notifications.length === 0 ? (
-        <div style={{ padding: '40px', textAlign: 'center', border: '1px dashed #ccc' }}>
-          <p>{filter === 'unread' ? "O'qilmagan bildirishnomalar yo'q" : "Hozircha bildirishnomalar yo'q"}</p>
+        <div className="bg-slate-50 rounded-[3rem] border-2 border-dashed border-gray-100 p-24 text-center">
+          <div className="w-20 h-20 bg-white rounded-[2rem] shadow-sm flex items-center justify-center mx-auto mb-8">
+            <Inbox className="w-10 h-10 text-gray-200" />
+          </div>
+          <p className="text-gray-400 text-xl font-bold">
+            {filter === 'unread' ? "O'qilmagan xabarlar yo'q" : "Hozircha xabarlar yo'q"}
+          </p>
+          <p className="text-gray-300 text-sm mt-2 font-medium">Yangi xabarlar kelishi bilan birinchi bo'lib senga xabar beramiz.</p>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div className="space-y-6">
           {notifications.map((notification) => (
             <div
               key={notification.id}
-              style={{
-                padding: '15px',
-                border: '1px solid #ccc',
-                borderRadius: '8px',
-                backgroundColor: !notification.is_read ? '#f0f7ff' : 'white'
-              }}
+              className={`bg-white p-8 rounded-[2.5rem] border border-gray-100 transition-all duration-500 hover:shadow-premium group relative overflow-hidden
+                ${!notification.is_read ? 'ring-2 ring-primary/5 shadow-soft border-primary/10' : 'opacity-80'}`}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <h3 style={{ margin: '0 0 10px 0' }}>{notification.title}</h3>
+              {!notification.is_read && (
+                <div className="absolute top-0 right-0 w-3 h-full bg-primary/10"></div>
+              )}
+
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 relative z-10">
+                <div className="flex gap-6">
+                  <div className={`w-14 h-14 rounded-2xl flex-shrink-0 flex items-center justify-center transition-transform group-hover:scale-110 duration-500
+                    ${!notification.is_read ? 'bg-primary/10 text-primary' : 'bg-slate-50 text-gray-300'}`}>
+                    <Bell size={28} />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className={`text-xl font-black tracking-tight leading-tight ${!notification.is_read ? 'text-gray-900' : 'text-gray-500'}`}>
+                      {notification.title}
+                    </h3>
+                    <p className={`text-sm font-medium leading-relaxed max-w-2xl ${!notification.is_read ? 'text-gray-600' : 'text-gray-400 italic'}`}>
+                      {notification.message}
+                    </p>
+                    <div className="flex items-center gap-4 pt-2">
+                      <div className="flex items-center gap-1.5 text-[10px] font-black text-gray-300 uppercase tracking-widest">
+                        <Calendar size={12} />
+                        {formatDate(notification.created_at)}
+                      </div>
+                      {!notification.is_read && (
+                        <div className="flex items-center gap-1 px-2 py-0.5 bg-primary/5 text-primary text-[8px] font-black uppercase rounded-md tracking-widest">
+                          Yangi
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
                 {!notification.is_read && (
-                  <button onClick={() => handleMarkAsRead(notification.id)}>Mark as Read</button>
+                  <button
+                    onClick={() => handleMarkAsRead(notification.id)}
+                    className="self-end sm:self-start px-5 py-3 bg-slate-50 text-gray-400 rounded-2xl font-bold text-xs hover:bg-primary-tint hover:text-primary transition-all flex items-center gap-2 group/btn"
+                  >
+                    <CheckCheck size={16} className="group-hover/btn:scale-110 transition-transform" />
+                    O'qilgan
+                  </button>
                 )}
               </div>
-              <p style={{ margin: '0 0 10px 0' }}>{notification.message}</p>
-              <span style={{ fontSize: '10px', color: '#999' }}>{formatDate(notification.created_at)}</span>
             </div>
           ))}
         </div>
@@ -118,4 +157,3 @@ export default function NotificationsPage() {
     </div>
   );
 }
-

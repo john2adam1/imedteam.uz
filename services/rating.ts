@@ -9,7 +9,8 @@ export const ratingService = {
      */
     getRating: async (params?: any): Promise<any> => {
         const queryString = params ? buildQueryString(params) : '';
-        return apiClient(`/user/rating${queryString}`);
+        const response = await apiClient<any>(`/user/rating${queryString}`);
+        return response.data || response;
     },
 };
 

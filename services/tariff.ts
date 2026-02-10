@@ -8,7 +8,11 @@ export const tariffService = {
      * Get all tariffs
      */
     getAll: async (): Promise<any> => {
-        return apiClient('/tariff');
+        const response = await apiClient<any>('/tariff');
+        return {
+            tariffs: response.data || [],
+            count: response.total || 0
+        };
     },
 
     /**

@@ -9,7 +9,8 @@ export const profileService = {
      * Get user profile
      */
     getUserProfile: async (): Promise<UserRes> => {
-        return apiClient<UserRes>('/user/get/profile');
+        const response = await apiClient<any>('/user/get/profile');
+        return response.data || response;
     },
 
     /**

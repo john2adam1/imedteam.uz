@@ -12,10 +12,31 @@ export const courseService = {
         const queryString = params ? buildQueryString(params) : '';
         const response = await apiClient<any>(`/course${queryString}`);
 
-        // API returns {data: [], total: number} but we need {courses: [], count: number}
+        // Helper to extract array from various potential formats
+        const getArray = (data: any, key: string): any[] => {
+            if (Array.isArray(data)) return data;
+            if (!data || typeof data !== 'object') return [];
+
+            // Check top level keys
+            if (Array.isArray(data[key])) return data[key];
+            if (Array.isArray(data.data)) return data.data;
+            if (Array.isArray(data.items)) return data.items;
+
+            // Check nested data property
+            if (data.data && typeof data.data === 'object') {
+                if (Array.isArray(data.data[key])) return data.data[key];
+                if (Array.isArray(data.data.items)) return data.data.items;
+            }
+
+            return [];
+        };
+
+        const courses = getArray(response, 'courses');
+        const total = response.total || response.count || courses.length;
+
         return {
-            courses: response.data || [],
-            count: response.total || 0
+            courses,
+            count: total
         };
     },
 
@@ -33,10 +54,31 @@ export const courseService = {
         const queryString = params ? buildQueryString(params) : '';
         const response = await apiClient<any>(`/course/permission${queryString}`);
 
-        // API returns {data: [], total: number} but we need {user_courses: [], count: number}
+        // Helper to extract array from various potential formats
+        const getArray = (data: any, key: string): any[] => {
+            if (Array.isArray(data)) return data;
+            if (!data || typeof data !== 'object') return [];
+
+            // Check top level keys
+            if (Array.isArray(data[key])) return data[key];
+            if (Array.isArray(data.data)) return data.data;
+            if (Array.isArray(data.items)) return data.items;
+
+            // Check nested data property
+            if (data.data && typeof data.data === 'object') {
+                if (Array.isArray(data.data[key])) return data.data[key];
+                if (Array.isArray(data.data.items)) return data.data.items;
+            }
+
+            return [];
+        };
+
+        const user_courses = getArray(response, 'user_courses');
+        const total = response.total || response.count || user_courses.length;
+
         return {
-            user_courses: response.data || [],
-            count: response.total || 0
+            user_courses,
+            count: total
         };
     },
 

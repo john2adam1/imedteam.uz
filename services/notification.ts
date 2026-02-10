@@ -12,10 +12,13 @@ export const notificationService = {
         const queryString = params ? buildQueryString(params) : '';
         const response = await apiClient<any>(`/notification/user${queryString}`);
 
-        // API returns {data: [], total: number} but we need {notifications: [], count: number}
+        // API sometimes returns an array directly, or {data: [], total: number}
+        const notifications = Array.isArray(response) ? response : (response.data || []);
+        const total = Array.isArray(response) ? response.length : (response.total || 0);
+
         return {
-            notifications: response.data || [],
-            count: response.total || 0
+            notifications,
+            count: total
         };
     },
 

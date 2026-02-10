@@ -1,29 +1,102 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { tariffService, courseService } from '@/services';
-import { useRouter } from 'next/navigation';
-import { Clock, BookOpen } from 'lucide-react';
+import { useState, useEffect, Suspense } from 'react';
+import { tariffService, courseService, orderService } from '@/services';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Clock, BookOpen, CreditCard } from 'lucide-react';
+import { MobileCourseRes } from '@/types/mobile-api';
 
-export default function TariffsPage() {
+function TariffsContent() {
     const [tariffs, setTariffs] = useState<any>(null);
+    const [selectedCourse, setSelectedCourse] = useState<MobileCourseRes | null>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const courseId = searchParams?.get('courseId');
 
     useEffect(() => {
-        const loadTariffs = async () => {
+        const loadData = async () => {
             try {
-                const data = await tariffService.getAll();
-                setTariffs(data);
+                const [tariffData, courseData] = await Promise.all([
+                    tariffService.getAll(),
+                    courseId ? courseService.getCourseById(courseId) : Promise.resolve(null)
+                ]);
+
+                setTariffs(tariffData);
+                if (courseData) {
+                    setSelectedCourse(courseData);
+                }
             } catch (error) {
-                console.error('Failed to load tariffs:', error);
+                console.error('Failed to load data:', error);
             } finally {
                 setLoading(false);
             }
         };
 
-        loadTariffs();
-    }, []);
+        loadData();
+    }, [courseId]);
+
+    const getPriceForTariff = (tariffId: string, defaultPrice: number) => {
+        if (!selectedCourse?.price) return defaultPrice;
+        const coursePrice = selectedCourse.price.find(p => p.tariff_id === tariffId);
+        return coursePrice ? coursePrice.price : defaultPrice;
+    };
+
+    const formatPrice = (price: any) => {
+        const numPrice = Number(price);
+        if (isNaN(numPrice)) return 'Noma’lum';
+
+        return new Intl.NumberFormat('uz-UZ', {
+            style: 'currency',
+            currency: 'UZS',
+            maximumFractionDigits: 0
+        }).format(numPrice);
+    };
+
+    // Filter tariffs that actually have a price for this course if courseId is present
+    const displayedTariffs = tariffs?.tariffs?.filter((tariff: any) => {
+        if (!courseId) return true; // Show all if no specific course selected
+        if (!selectedCourse?.price) return false;
+
+        // Find if this specific course has a price for this tariff
+        const coursePrice = selectedCourse.price.find(p => p.tariff_id === tariff.id);
+        return coursePrice !== undefined && typeof coursePrice.price === 'number' && !isNaN(coursePrice.price);
+    }) || [];
+
+    const [purchasingId, setPurchasingId] = useState<string | null>(null);
+
+    const handlePurchase = async (tariffId: string) => {
+        if (!courseId) {
+            router.push('/app/courses');
+            return;
+        }
+
+        try {
+            setPurchasingId(tariffId);
+            const response = await orderService.create({
+                tariff_id: tariffId,
+                course_id: courseId, // Adding course_id in case it's needed
+                payment_method: 'payme' // Default payment method
+            }) as any;
+
+            console.log('Order created:', response);
+
+            if (response.url) {
+                window.location.assign(response.url);
+            } else if (response.order_id) {
+                // If no payment URL, maybe show success and redirect to user courses
+                alert('Buyurtma muvaffaqiyatli yaratildi');
+                router.push('/app/courses');
+            } else {
+                throw new Error('To‘lov havolasi topilmadi');
+            }
+        } catch (error: any) {
+            console.error('Purchase failed:', error);
+            alert(error.message || 'To‘lovni amalga oshirishda xatolik yuz berdi');
+        } finally {
+            setPurchasingId(null);
+        }
+    };
 
     if (loading) {
         return (
@@ -37,104 +110,142 @@ export default function TariffsPage() {
     }
 
     return (
-        <div className="max-w-7xl mx-auto p-6 space-y-8">
+        <div className="max-w-7xl mx-auto p-6 lg:p-10 space-y-12">
             {/* Header */}
-            <div className="text-center">
-                <h1 className="text-4xl font-bold text-gray-900 mb-3">Obuna davomiyligi</h1>
-                <p className="text-lg text-gray-600">Kurslarga kirish uchun obuna muddatini tanlang</p>
+            <div className="text-center space-y-4">
+                <h1 className="text-4xl lg:text-5xl font-black text-gray-900 tracking-tight">Obuna davomiyligi</h1>
+                <p className="text-lg text-gray-400 font-medium max-w-2xl mx-auto">
+                    Bilim olishda cheklov yo'q. O'zingizga mos muddatni tanlang va darhol o'rganishni boshlang.
+                </p>
+                {selectedCourse && (
+                    <div className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 bg-primary/5 rounded-full text-primary font-bold border border-primary/10">
+                        <BookOpen size={18} />
+                        Kurs: {selectedCourse.name}
+                    </div>
+                )}
             </div>
 
             {/* Info Banner */}
-            <div className="bg-primary-50 border border-primary-200 rounded-2xl p-6">
-                <div className="flex items-start gap-4">
-                    <BookOpen className="w-6 h-6 text-primary-600 flex-shrink-0 mt-1" />
+            <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-soft relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-2 h-full bg-primary"></div>
+                <div className="flex items-start gap-6 relative z-10">
+                    <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center flex-shrink-0">
+                        <BookOpen className="w-7 h-7 text-primary" />
+                    </div>
                     <div>
-                        <h3 className="font-semibold text-gray-900 mb-1">Qanday ishlaydi?</h3>
-                        <p className="text-gray-700 text-sm">
-                            Har bir kurs o'zining narxiga ega. Siz kursni tanlaganingizda, turli obuna muddatlari uchun
-                            narxlarni ko'rishingiz mumkin. Obuna muddati tugaguncha kurs materiallariga to'liq kirish huquqiga ega bo'lasiz.
+                        <h3 className="text-xl font-black text-gray-900 mb-2">Qanday ishlaydi?</h3>
+                        <p className="text-gray-500 leading-relaxed font-medium">
+                            Siz kursni tanlaganingizda, turli obuna muddatlari uchun
+                            maxsus narxlarni ko'rishingiz mumkin. Tanlangan muddat davomida siz kurs materiallariga, videolariga va testlariga
+                            <span className="text-primary font-bold"> cheksiz kirish </span> huquqiga ega bo'lasiz.
                         </p>
                     </div>
                 </div>
             </div>
 
             {/* Tariff Cards Grid */}
-            <div className="grid md:grid-cols-2 gap-6 mt-12">
-                {tariffs?.tariffs?.map((tariff: any) => (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
+                {displayedTariffs.map((tariff: any) => (
                     <div
                         key={tariff.id}
-                        className="bg-white rounded-2xl border-2 border-gray-200 p-8 hover:border-primary-300 hover:shadow-lg transition-all duration-300"
+                        className="bg-white rounded-[2.5rem] border border-gray-100 p-10 flex flex-col hover:shadow-premium hover:-translate-y-2 transition-all duration-500 group relative"
                     >
                         {/* Tariff Name & Duration */}
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center">
-                                <Clock className="w-6 h-6 text-primary-600" />
+                        <div className="flex flex-col items-center text-center mb-8">
+                            <div className="w-20 h-20 bg-slate-50 rounded-[2rem] flex items-center justify-center mb-6 group-hover:bg-primary/5 transition-colors group-hover:scale-110 duration-500">
+                                <Clock className="w-10 h-10 text-primary" />
                             </div>
-                            <div>
-                                <h3 className="text-2xl font-bold text-gray-900">{tariff.name}</h3>
-                                <p className="text-sm text-gray-600">{tariff.duration} kun</p>
+                            <h3 className="text-2xl font-black text-gray-900 mb-2">{tariff.name}</h3>
+                            <div className="px-4 py-1.5 bg-emerald-50 text-emerald-600 rounded-full text-xs font-black uppercase tracking-widest">
+                                {tariff.duration} kunlik kirish
                             </div>
                         </div>
 
                         {/* Description */}
                         {tariff.description && (
-                            <p className="text-gray-600 text-sm mb-6">{tariff.description}</p>
+                            <p className="text-gray-400 text-sm font-medium mb-10 text-center flex-grow leading-relaxed">
+                                {tariff.description}
+                            </p>
                         )}
 
-                        {/* Duration Highlight */}
-                        <div className="bg-gray-50 rounded-xl p-4 mb-6">
-                            <div className="flex items-center justify-between">
-                                <span className="text-gray-600 text-sm">Obuna muddati:</span>
-                                <span className="text-xl font-bold text-gray-900">{tariff.duration} kun</span>
+                        {/* Price Section */}
+                        <div className="mb-10 text-center">
+                            <div className="text-[10px] text-gray-300 font-black uppercase tracking-[0.2em] mb-2">Obuna narxi</div>
+                            <div className="text-4xl font-black text-gray-900 tracking-tight">
+                                {formatPrice(getPriceForTariff(tariff.id, tariff.price))}
                             </div>
                         </div>
 
-                        {/* Info Text */}
-                        <p className="text-xs text-gray-500 text-center mb-4">
-                            Narx har bir kurs uchun alohida belgilanadi
-                        </p>
-
                         {/* CTA Button */}
                         <button
-                            onClick={() => router.push('/app/courses')}
-                            className="w-full py-3 px-6 rounded-xl font-semibold bg-primary-600 text-white hover:bg-primary-700 transition-all shadow-md"
+                            disabled={purchasingId !== null}
+                            onClick={() => handlePurchase(tariff.id)}
+                            className="w-full py-5 px-8 rounded-2xl font-black bg-primary text-white hover:bg-primary-600 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
                         >
-                            Kurslarni ko'rish
+                            {purchasingId === tariff.id ? (
+                                <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                            ) : (
+                                <CreditCard className="w-6 h-6" />
+                            )}
+                            <span className="text-lg">{purchasingId === tariff.id ? 'Yaratilmoqda...' : 'Sotib olish'}</span>
                         </button>
                     </div>
                 ))}
 
                 {/* Empty State */}
-                {(!tariffs?.tariffs || tariffs.tariffs.length === 0) && (
-                    <div className="col-span-full text-center py-16">
-                        <div className="bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 p-12">
-                            <p className="text-gray-500 text-lg">Hozircha obuna davomiyliklari mavjud emas</p>
+                {displayedTariffs.length === 0 && (
+                    <div className="col-span-full text-center py-20">
+                        <div className="bg-slate-50 rounded-[3rem] border-2 border-dashed border-gray-100 p-20">
+                            <div className="w-20 h-20 bg-white rounded-[2rem] shadow-sm flex items-center justify-center mx-auto mb-6">
+                                <BookOpen className="w-10 h-10 text-gray-200" />
+                            </div>
+                            <p className="text-gray-400 text-xl font-bold">
+                                {courseId ? "Bu kurs uchun hozircha tariflar mavjud emas" : "Hozircha obuna davomiyliklari mavjud emas"}
+                            </p>
                         </div>
                     </div>
                 )}
             </div>
 
             {/* How it Works Section */}
-            <div className="mt-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">Kurs sotib olish jarayoni</h3>
-                <div className="grid md:grid-cols-3 gap-6">
-                    <div className="text-center">
-                        <div className="w-12 h-12 bg-primary-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-3">1</div>
-                        <h4 className="font-semibold text-gray-900 mb-2">Kursni tanlang</h4>
-                        <p className="text-sm text-gray-600">O'zingizga mos kursni topib, tafsilotlarini ko'ring</p>
+            <div className="mt-20 bg-gradient-to-br from-slate-50 to-white rounded-[3rem] p-12 border border-gray-100 shadow-inner">
+                <h3 className="text-3xl font-black text-gray-900 mb-12 text-center tracking-tight">Kurs sotib olish jarayoni</h3>
+                <div className="grid md:grid-cols-3 gap-12">
+                    <div className="text-center relative">
+                        <div className="w-16 h-16 bg-white text-primary rounded-[1.5rem] flex items-center justify-center text-2xl font-black mx-auto mb-8 shadow-card">1</div>
+                        <h4 className="text-xl font-black text-gray-900 mb-3">Kursni tanlang</h4>
+                        <p className="text-sm text-gray-400 font-medium leading-relaxed">
+                            O'zingizga mos kursni topib, tafsilotlarini va dasturini ko'rib chiqing.
+                        </p>
                     </div>
                     <div className="text-center">
-                        <div className="w-12 h-12 bg-primary-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-3">2</div>
-                        <h4 className="font-semibold text-gray-900 mb-2">Muddatni tanlang</h4>
-                        <p className="text-sm text-gray-600">6 kun yoki 12 kun obuna muddatini tanlang</p>
+                        <div className="w-16 h-16 bg-primary text-white rounded-[1.5rem] flex items-center justify-center text-2xl font-black mx-auto mb-8 shadow-lg shadow-primary/30">2</div>
+                        <h4 className="text-xl font-black text-gray-900 mb-3">Muddatni tanlang</h4>
+                        <p className="text-sm text-gray-400 font-medium leading-relaxed">
+                            Mutaxassislarimiz tomonidan tavsiya etilgan muddatli tarifni tanlang.
+                        </p>
                     </div>
                     <div className="text-center">
-                        <div className="w-12 h-12 bg-primary-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-3">3</div>
-                        <h4 className="font-semibold text-gray-900 mb-2">To'lovni amalga oshiring</h4>
-                        <p className="text-sm text-gray-600">To'lov qiling va darhol kursga kirish huquqini oling</p>
+                        <div className="w-16 h-16 bg-white text-primary rounded-[1.5rem] flex items-center justify-center text-2xl font-black mx-auto mb-8 shadow-card">3</div>
+                        <h4 className="text-xl font-black text-gray-900 mb-3">To'lov qiling</h4>
+                        <p className="text-sm text-gray-400 font-medium leading-relaxed">
+                            Xavfsiz to'lov tizimi orqali to'lov qiling va darhol o'rganishni boshlang.
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function TariffsPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+            </div>
+        }>
+            <TariffsContent />
+        </Suspense>
     );
 }

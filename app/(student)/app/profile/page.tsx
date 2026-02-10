@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { authService, activityService, profileService } from '@/services';
 import { ActivityStatsResponse } from '@/types/mobile-api';
+import { User, Phone, Shield, BarChart3, Trash2, Camera, LogOut, Key } from 'lucide-react';
 
 export default function ProfilePage() {
     const { user, logout, refreshUser } = useAuth();
@@ -118,67 +119,113 @@ export default function ProfilePage() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto p-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">Shaxsiy profil</h1>
+        <div className="max-w-7xl mx-auto p-6 lg:p-10">
+            <h1 className="text-3xl font-black text-gray-900 mb-10 tracking-tight">Shaxsiy kabinet</h1>
 
             {error && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm">
-                    {error}
+                <div className="mb-8 p-5 bg-primary/5 border border-primary/10 rounded-2xl text-primary text-sm font-medium flex items-center gap-3">
+                    <span className="text-xl">⚠️</span> {error}
                 </div>
             )}
             {message && (
-                <div className="mb-6 p-4 bg-green-50 border border-green-100 rounded-xl text-green-600 text-sm">
-                    {message}
+                <div className="mb-8 p-5 bg-emerald-50 border border-emerald-100/50 rounded-2xl text-emerald-600 text-sm font-medium flex items-center gap-3">
+                    <span className="text-xl">✅</span> {message}
                 </div>
             )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                 {/* Left Column: Avatar & Basic Info */}
-                <div className="lg:col-span-1 border border-gray-200 bg-white p-6 rounded-2xl h-fit shadow-sm">
-                    <div className="text-center mb-6">
-                        <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4 overflow-hidden text-3xl font-bold text-gray-400 border border-gray-100">
-                            {user?.image_url ? (
-                                <img src={user.image_url} alt={user.name} className="w-full h-full object-cover" />
-                            ) : (
-                                user?.name?.charAt(0) || 'U'
-                            )}
+                <div className="lg:col-span-1 space-y-6">
+                    <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-soft text-center relative overflow-hidden group">
+                        <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-primary/10 to-primary/5 -mt-4"></div>
+
+                        <div className="relative inline-block mt-4 mb-6">
+                            <div className="w-32 h-32 rounded-[2.5rem] bg-white shadow-card flex items-center justify-center mx-auto overflow-hidden text-4xl font-black text-primary p-1 border-4 border-white">
+                                <div className="w-full h-full rounded-[2.2rem] bg-primary-tint flex items-center justify-center overflow-hidden">
+                                    {user?.image_url ? (
+                                        <img src={user.image_url} alt={user.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        user?.name?.charAt(0) || 'U'
+                                    )}
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                className="absolute bottom-0 right-0 w-10 h-10 bg-white rounded-2xl shadow-lg border border-gray-100 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all active:scale-90"
+                            >
+                                <Camera size={18} />
+                            </button>
                         </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-1">{user?.name}</h3>
-                        <p className="text-gray-500 mb-6">{user?.phone_number}</p>
-                        <button
-                            onClick={() => setShowEditProfileForm(true)}
-                            className="w-full py-2.5 bg-primary-50 text-primary-600 rounded-xl font-medium hover:bg-primary-100 transition-colors"
-                        >
-                            Edit Profile
-                        </button>
+
+                        <h3 className="text-2xl font-black text-gray-900 mb-1">{user?.name}</h3>
+                        <p className="text-gray-400 font-medium mb-8 flex items-center justify-center gap-2">
+                            <Phone size={14} /> {user?.phone_number}
+                        </p>
+
+                        <div className="grid grid-cols-1 gap-3">
+                            <button
+                                onClick={() => setShowEditProfileForm(true)}
+                                className="w-full py-4 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-[0.98]"
+                            >
+                                Profilni tahrirlash
+                            </button>
+                            <button
+                                onClick={logout}
+                                className="w-full py-4 bg-slate-50 text-gray-400 rounded-2xl font-bold hover:bg-red-50 hover:text-red-500 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                            >
+                                <LogOut size={18} /> Chiqish
+                            </button>
+                        </div>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            ref={fileInputRef}
+                            className="hidden"
+                            onChange={(e) => {
+                                if (e.target.files && e.target.files[0]) {
+                                    setEditImage(e.target.files[0]);
+                                }
+                            }}
+                        />
                     </div>
 
-
-                    <div className="mt-6 pt-6 border-t border-gray-100">
-                        <h4 className="text-sm font-semibold text-gray-900 mb-3">Security</h4>
+                    <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-soft">
+                        <h4 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                            <Shield size={16} /> Xavfsizlik
+                        </h4>
                         <button
                             onClick={() => setShowPasswordForm(true)}
-                            className="w-full py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors shadow-sm"
+                            className="w-full py-4 px-6 bg-slate-50 border border-gray-100 text-gray-700 rounded-2xl font-bold hover:bg-white hover:border-primary-200 hover:shadow-md transition-all flex items-center justify-between group"
                         >
-                            Change Password
+                            <span className="flex items-center gap-3"><Key size={18} className="text-primary" /> Parolni o'zgartirish</span>
+                            <span className="text-gray-300 group-hover:text-primary transition-colors">&rarr;</span>
                         </button>
                     </div>
                 </div>
 
                 {/* Right Column: Dynamic Forms & Stats */}
-                <div className="lg:col-span-2 space-y-6">
+                <div className="lg:col-span-2 space-y-8">
                     {/* Activity Stats */}
                     {activityStats && (
-                        <div className="border border-gray-200 bg-white p-6 rounded-2xl shadow-sm">
-                            <h3 className="text-lg font-bold text-gray-900 mb-4">Success Stats</h3>
-                            <div className="flex gap-4">
-                                <div className="flex-1 p-4 bg-blue-50 rounded-xl border border-blue-100">
-                                    <p className="text-xs text-blue-600 font-medium uppercase tracking-wider">Total Points</p>
-                                    <p className="text-3xl font-bold text-blue-900 mt-1">{activityStats.total} ball</p>
+                        <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-soft">
+                            <h3 className="text-xl font-black text-gray-900 mb-8 flex items-center gap-3">
+                                <BarChart3 className="text-primary" />
+                                Muvaffaqiyatlarim
+                            </h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div className="p-8 bg-blue-50/50 rounded-[2rem] border border-blue-100 relative overflow-hidden group">
+                                    <div className="absolute -right-4 -bottom-4 text-blue-100 group-hover:scale-110 transition-transform duration-500">
+                                        <BarChart3 size={100} strokeWidth={1} />
+                                    </div>
+                                    <p className="text-[10px] text-blue-500 font-black uppercase tracking-widest mb-2">Jami ball</p>
+                                    <p className="text-4xl font-black text-blue-900 mt-1">{activityStats.total} <span className="text-lg font-bold opacity-50">ball</span></p>
                                 </div>
-                                <div className="flex-1 p-4 bg-green-50 rounded-xl border border-green-100">
-                                    <p className="text-xs text-green-600 font-medium uppercase tracking-wider">Time Spent</p>
-                                    <p className="text-3xl font-bold text-green-900 mt-1">{formatTime(activityStats.total)}</p>
+                                <div className="p-8 bg-emerald-50/50 rounded-[2rem] border border-emerald-100 relative overflow-hidden group">
+                                    <div className="absolute -right-4 -bottom-4 text-emerald-100 group-hover:scale-110 transition-transform duration-500">
+                                        <BarChart3 size={100} strokeWidth={1} />
+                                    </div>
+                                    <p className="text-[10px] text-emerald-500 font-black uppercase tracking-widest mb-2">O'qish vaqti</p>
+                                    <p className="text-4xl font-black text-emerald-900 mt-1">{formatTime(activityStats.total)}</p>
                                 </div>
                             </div>
                         </div>
@@ -186,55 +233,43 @@ export default function ProfilePage() {
 
                     {/* Edit Profile Form */}
                     {showEditProfileForm && (
-                        <div className="border border-gray-200 bg-white p-6 rounded-2xl shadow-sm">
-                            <h3 className="text-lg font-bold text-gray-900 mb-4">Edit Profile</h3>
-                            <form onSubmit={handleUpdateProfile} className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Name</label>
-                                    <input
-                                        type="text"
-                                        value={editName}
-                                        onChange={(e) => setEditName(e.target.value)}
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 outline-none transition-all"
-                                    />
+                        <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-soft">
+                            <h3 className="text-xl font-black text-gray-900 mb-8">Profilni tahrirlash</h3>
+                            <form onSubmit={handleUpdateProfile} className="space-y-6">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Ism familingiz</label>
+                                        <input
+                                            type="text"
+                                            value={editName}
+                                            onChange={(e) => setEditName(e.target.value)}
+                                            className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Telefon raqam</label>
+                                        <input
+                                            type="tel"
+                                            value={editPhone}
+                                            onChange={(e) => setEditPhone(e.target.value)}
+                                            className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
+                                        />
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Phone</label>
-                                    <input
-                                        type="tel"
-                                        value={editPhone}
-                                        onChange={(e) => setEditPhone(e.target.value)}
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 outline-none transition-all"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Avatar</label>
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        ref={fileInputRef}
-                                        onChange={(e) => {
-                                            if (e.target.files && e.target.files[0]) {
-                                                setEditImage(e.target.files[0]);
-                                            }
-                                        }}
-                                        className="w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 transition-all cursor-pointer"
-                                    />
-                                </div>
-                                <div className="flex gap-3 pt-2">
+                                <div className="flex gap-4 pt-4">
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="px-6 py-2.5 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors disabled:opacity-70 shadow-sm shadow-primary-600/30"
+                                        className="px-10 py-4 bg-primary text-white rounded-2xl font-black shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-[0.98] disabled:opacity-50"
                                     >
-                                        {loading ? 'Saving...' : 'Save'}
+                                        {loading ? 'Saqlanmoqda...' : 'Saqlash'}
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setShowEditProfileForm(false)}
-                                        className="px-6 py-2.5 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+                                        className="px-10 py-4 bg-slate-50 text-gray-500 rounded-2xl font-bold hover:bg-slate-100 transition-all active:scale-[0.98]"
                                     >
-                                        Cancel
+                                        Bekor qilish
                                     </button>
                                 </div>
                             </form>
@@ -243,53 +278,57 @@ export default function ProfilePage() {
 
                     {/* Password Form */}
                     {showPasswordForm && (
-                        <div className="border border-gray-200 bg-white p-6 rounded-2xl shadow-sm">
-                            <h3 className="text-lg font-bold text-gray-900 mb-4">Change Password</h3>
-                            <form onSubmit={handleChangePassword} className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Old Password</label>
-                                    <input
-                                        type="password"
-                                        value={oldPassword}
-                                        onChange={(e) => setOldPassword(e.target.value)}
-                                        required
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 outline-none transition-all"
-                                    />
+                        <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-soft">
+                            <h3 className="text-xl font-black text-gray-900 mb-8">Parolni o'zgartirish</h3>
+                            <form onSubmit={handleChangePassword} className="space-y-6">
+                                <div className="grid grid-cols-1 gap-6">
+                                    <div>
+                                        <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Eski parol</label>
+                                        <input
+                                            type="password"
+                                            value={oldPassword}
+                                            onChange={(e) => setOldPassword(e.target.value)}
+                                            required
+                                            className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Yangi parol</label>
+                                            <input
+                                                type="password"
+                                                value={newPassword}
+                                                onChange={(e) => setNewPassword(e.target.value)}
+                                                required
+                                                className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Yangi parolni tasdiqlang</label>
+                                            <input
+                                                type="password"
+                                                value={confirmPassword}
+                                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                                required
+                                                className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">New Password</label>
-                                    <input
-                                        type="password"
-                                        value={newPassword}
-                                        onChange={(e) => setNewPassword(e.target.value)}
-                                        required
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 outline-none transition-all"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Confirm Password</label>
-                                    <input
-                                        type="password"
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                        required
-                                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 outline-none transition-all"
-                                    />
-                                </div>
-                                <div className="flex gap-3 pt-2">
+                                <div className="flex gap-4 pt-4">
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="px-6 py-2.5 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors disabled:opacity-70 shadow-sm shadow-primary-600/30"
+                                        className="px-10 py-4 bg-primary text-white rounded-2xl font-black shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-[0.98] disabled:opacity-50"
                                     >
-                                        {loading ? 'Saving...' : 'Update Password'}
+                                        {loading ? 'Yangilanmoqda...' : 'Parolni yangilash'}
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setShowPasswordForm(false)}
-                                        className="px-6 py-2.5 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+                                        className="px-10 py-4 bg-slate-50 text-gray-500 rounded-2xl font-bold hover:bg-slate-100 transition-all active:scale-[0.98]"
                                     >
-                                        Cancel
+                                        Bekor qilish
                                     </button>
                                 </div>
                             </form>
@@ -297,33 +336,36 @@ export default function ProfilePage() {
                     )}
 
                     {/* Danger Zone */}
-                    <div className="border border-red-100 bg-red-50 p-6 rounded-2xl">
-                        <h3 className="text-lg font-bold text-red-700 mb-2">Danger Zone</h3>
-                        <p className="text-red-600 text-sm mb-4">Deleting your account is permanent and cannot be undone.</p>
+                    <div className="bg-red-50/50 p-8 rounded-[2.5rem] border border-red-100">
+                        <h3 className="text-xl font-black text-red-700 mb-2 flex items-center gap-2">
+                            <Trash2 size={24} /> Xavfli hudud
+                        </h3>
+                        <p className="text-red-600 font-medium mb-8">Hisobingizni o'chirish qaytarib bo'lmas jarayon bo'lib, barcha ma'lumotlaringiz butunlay yo'qoladi.</p>
 
                         {!showDeleteConfirm ? (
                             <button
                                 onClick={() => setShowDeleteConfirm(true)}
-                                className="px-6 py-2.5 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-colors shadow-sm shadow-red-600/20"
+                                className="px-10 py-4 bg-white border-2 border-red-100 text-red-600 rounded-2xl font-bold hover:bg-red-600 hover:text-white hover:border-red-600 transition-all active:scale-[0.98] shadow-sm"
                             >
-                                Delete Account
+                                Hisobni o'chirish
                             </button>
                         ) : (
-                            <div className="p-4 border border-red-200 bg-white rounded-xl">
-                                <p className="mb-4 text-gray-900 font-medium">Are you sure you want to delete your account?</p>
-                                <div className="flex gap-3">
+                            <div className="p-8 bg-white rounded-[2rem] border-2 border-red-100 shadow-xl relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-2 h-full bg-red-600"></div>
+                                <p className="mb-8 text-gray-900 font-black text-lg leading-tight uppercase tracking-tight">Haqiqatan ham hisobingizni o'chirib yubormoqchimisiz?</p>
+                                <div className="flex flex-col sm:flex-row gap-4">
                                     <button
                                         onClick={handleDeleteAccount}
                                         disabled={loading}
-                                        className="px-6 py-2.5 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-colors disabled:opacity-70 shadow-sm shadow-red-600/20"
+                                        className="px-10 py-4 bg-red-600 text-white rounded-2xl font-black shadow-lg shadow-red-600/20 hover:bg-red-700 transition-all active:scale-[0.98] disabled:opacity-50"
                                     >
-                                        Yes, Delete
+                                        {loading ? 'O\'chirilmoqda...' : 'Ha, o\'chirilsin'}
                                     </button>
                                     <button
                                         onClick={() => setShowDeleteConfirm(false)}
-                                        className="px-6 py-2.5 border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+                                        className="px-10 py-4 bg-slate-50 text-gray-500 rounded-2xl font-bold hover:bg-slate-100 transition-all active:scale-[0.98]"
                                     >
-                                        Cancel
+                                        Yo'q, qolsin
                                     </button>
                                 </div>
                             </div>
@@ -334,4 +376,3 @@ export default function ProfilePage() {
         </div>
     );
 }
-

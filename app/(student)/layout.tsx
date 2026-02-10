@@ -29,17 +29,16 @@ export default function StudentLayout({
     }
 
     return (
-        <div style={{ display: 'flex', minHeight: '100vh' }}>
+        <div className="flex min-h-screen bg-slate-50/50">
             {/* Sidebar for Desktop */}
             <Sidebar />
 
             {/* Main Content Area */}
-            <div style={{ flex: 1, padding: '20px' }}>
-                <main>
+            <div className="flex-1 flex flex-col p-4 lg:p-10">
+                <main className="flex-1">
                     {children}
                 </main>
             </div>
-
         </div>
     );
 }

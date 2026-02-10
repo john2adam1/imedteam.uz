@@ -7,7 +7,7 @@ export default function Services() {
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-primary/10 text-primary text-sm font-bold mb-8">
                             Nega bizni tanlashadi?
                         </div>
-                        <h2 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+                        <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 tracking-tight leading-tight">
                             iMed Team — <br />
                             <span className="text-primary">Tibbiyotni rivojlantirish </span>
                             yorqin kelajak garovidir!
@@ -28,8 +28,8 @@ export default function Services() {
                                 "Nazariy va amaliy bilimlarni uyg‘unlashtirish",
                                 "Har bir bemorga individual yondashuvni o‘rgatish"
                             ].map((item, i) => (
-                                <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 font-bold text-slate-800">
-                                    <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0">
+                                <div key={i} className="flex items-center gap-4 p-5 rounded-2xl bg-slate-50 border border-slate-100 font-semibold text-slate-800 transition-all hover:bg-white hover:shadow-soft">
+                                    <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 text-xs">
                                         ✓
                                     </div>
                                     {item}
@@ -39,10 +39,10 @@ export default function Services() {
                     </div>
 
                     <div className="grid gap-8">
-                        <div className="reveal bg-slate-900 rounded-[2.5rem] p-10 text-white shadow-2xl shadow-slate-900/20 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/40 transition-colors"></div>
-                            <div className="text-5xl mb-6 transform group-hover:scale-110 transition-transform">🎯</div>
-                            <h3 className="text-3xl font-black mb-4">Feedback</h3>
+                        <div className="reveal bg-slate-900 rounded-3xl p-10 text-white shadow-xl shadow-slate-900/10 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/40 transition-all duration-300"></div>
+                            <div className="text-5xl mb-6 transform group-hover:scale-105 transition-transform duration-300">🎯</div>
+                            <h3 className="text-3xl font-bold mb-4">Feedback</h3>
                             <p className="text-white/70 font-medium mb-8">
                                 Bizning kurslarimizda o’qigan minglab talabalarning samimiy fikrlari bilan tanishing.
                             </p>
@@ -50,15 +50,15 @@ export default function Services() {
                                 href="https://t.me/imedteam_feedback"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex py-4 px-8 rounded-2xl bg-primary hover:bg-white hover:text-primary font-black transition-all active:scale-95"
+                                className="inline-flex py-4 px-8 rounded-2xl bg-primary text-white hover:bg-primary-600 font-bold transition-all active:scale-95"
                             >
                                 Fikrlarni o’qish
                             </a>
                         </div>
 
-                        <div className="reveal bg-white rounded-[2.5rem] p-10 border-2 border-slate-100 shadow-xl shadow-slate-200/50 group">
-                            <div className="text-5xl mb-6 transform group-hover:scale-110 transition-transform">🤝</div>
-                            <h3 className="text-3xl font-black text-slate-900 mb-4 group-hover:text-primary transition-colors">Konsalting</h3>
+                        <div className="reveal bg-white rounded-3xl p-10 border border-slate-100 shadow-soft hover:shadow-card transition-all duration-300 group">
+                            <div className="text-5xl mb-6 transform group-hover:scale-105 transition-transform duration-300">🤝</div>
+                            <h3 className="text-3xl font-bold text-slate-900 mb-4 group-hover:text-primary transition-colors">Konsalting</h3>
                             <p className="text-slate-500 font-medium mb-8">
                                 Professional jamoamiz bilan loyiha tahlili, roadmap va texnik qarorlar qabul qiling.
                             </p>
@@ -66,7 +66,7 @@ export default function Services() {
                                 href="https://t.me/iMed_team"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex py-4 px-8 rounded-2xl bg-slate-100 hover:bg-primary hover:text-white text-slate-900 font-black transition-all active:scale-95"
+                                className="inline-flex py-4 px-8 rounded-2xl bg-slate-100 hover:bg-primary hover:text-white text-slate-900 font-bold transition-all active:scale-95 shadow-sm"
                             >
                                 Bog‘lanish
                             </a>
