@@ -55,13 +55,16 @@ export default function CoursesPage() {
         fetchCourses();
     }, [activeTab, selectedSubject]);
 
+    // ✅ Helper function to check if course is free
+    const isCourseFreeFn = (course: any) => !!(course.is_public || (Array.isArray(course.price) && course.price.some((p: any) => p.price === 0)));
+
     // Filter courses based on selection
     const getDisplayedCourses = () => {
         if (activeTab === 'my') return myCourses;
 
         if (selectedSubject === 'free') {
             // ✅ FIX: Show only public/free courses
-            return allCourses.filter(course => !!course.is_public);
+            return allCourses.filter(course => isCourseFreeFn(course));
         }
 
         // Show all courses (already filtered by subject_id in API call if needed)
@@ -75,8 +78,6 @@ export default function CoursesPage() {
         return allCourses.filter(course => course.subject_id === subjectId).length;
     };
 
-    // ✅ Helper function to check if course is free
-    const isCourseFreeFn = (course: any) => !!course.is_public;
 
     return (
         <div className="max-w-7xl mx-auto p-6 lg:p-10">

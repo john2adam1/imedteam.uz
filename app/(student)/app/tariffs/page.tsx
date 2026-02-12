@@ -27,7 +27,8 @@ function TariffsContent() {
                     setSelectedCourse(courseData);
 
                     // ✅ CRITICAL GUARD: If course is free, redirect immediately
-                    if (!!courseData.is_public) {
+                    const isFree = !!(courseData.is_public || courseData.price?.some(p => p.price === 0));
+                    if (isFree) {
                         router.replace(`/app/courses/${courseId}`);
                         return;
                     }
@@ -64,7 +65,8 @@ function TariffsContent() {
     const displayedTariffs = tariffs?.tariffs?.filter((tariff: any) => {
         if (!courseId) return true; // Show all if no specific course selected
         if (!selectedCourse?.price) return false;
-        if (!!selectedCourse?.is_public) return false; // ✅ No tariffs for free courses
+        const isFree = !!(selectedCourse.is_public || selectedCourse.price?.some(p => p.price === 0));
+        if (isFree) return false; // ✅ No tariffs for free courses
 
         // Find if this specific course has a price for this tariff
         const coursePrice = selectedCourse.price.find(p => p.tariff_id === tariff.id);
@@ -79,9 +81,10 @@ function TariffsContent() {
             return;
         }
 
-        // ✅ ABSOLUTE GUARD: DO NOT create order for free courses
-        if (!!selectedCourse?.is_public) {
-            console.warn('Blocked order creation for public course');
+        // ✅ ABSOLUTE GUARD: DO NOT create order for free courses normally
+        const isFree = !!(selectedCourse?.is_public || selectedCourse?.price?.some(p => p.price === 0));
+        if (isFree) {
+            console.warn('Blocked order creation for public/free course in tariffs page');
             router.push(`/app/courses/${courseId}`);
             return;
         }
@@ -124,7 +127,8 @@ function TariffsContent() {
     }
 
     // ✅ ABSOLUTE GUARD: If somehow we're here with a free course, block UI
-    if (!!selectedCourse?.is_public) {
+    const isFree = !!(selectedCourse?.is_public || selectedCourse?.price?.some(p => p.price === 0));
+    if (isFree) {
         return (
             <div className="max-w-2xl mx-auto p-10 text-center">
                 <div className="bg-emerald-50 border border-emerald-100 rounded-3xl p-10 mb-8">

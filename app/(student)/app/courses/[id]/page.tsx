@@ -1,19 +1,22 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { courseService } from '@/services';
+import { courseService, orderService } from '@/services';
 import { MobileCourseRes } from '@/types/mobile-api';
 import Image from 'next/image';
 import Link from 'next/link';
-import { notFound, useParams } from 'next/navigation';
+import { notFound, useParams, useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 export default function CourseDetailPage() {
     const params = useParams();
+    const router = useRouter();
     const id = params?.id as string;
 
     const [course, setCourse] = useState<MobileCourseRes | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [isEnrolling, setIsEnrolling] = useState(false);
 
     useEffect(() => {
         if (!id) return;
@@ -57,8 +60,29 @@ export default function CourseDetailPage() {
     }
 
     // ✅ CRITICAL FIX: Robust check for free course
-    const isFree = !!course.is_public;
+    const isFree = !!(course.is_public || course.price?.some(p => p.price === 0));
+    // ✅ FIX: Free courses should ALWAYS be considered as having access
     const hasAccess = !!(course.has_access || isFree);
+
+    const handleStartFreeCourse = async () => {
+        try {
+            setIsEnrolling(true);
+
+            // ✅ FIX: For free courses, just navigate to first lesson directly
+            // No need to create order or enroll for truly free courses
+            const firstLessonId = course.modules?.[0]?.lessons?.[0]?.id;
+            if (firstLessonId) {
+                router.push(`/app/lessons/${firstLessonId}`);
+            } else {
+                toast.error('Kursda hali darslar yuklanmagan');
+            }
+        } catch (err) {
+            console.error('Failed to start free course:', err);
+            toast.error('Kursni boshlashda xatolik yuz berdi');
+        } finally {
+            setIsEnrolling(false);
+        }
+    };
 
     return (
         <div className="max-w-4xl mx-auto px-6 py-10">
@@ -114,22 +138,27 @@ export default function CourseDetailPage() {
                             </div>
                         </div>
 
-                        {/* ✅ FIX: Show purchase button ONLY for paid courses without access */}
-                        {!hasAccess ? (
+                        {/* ✅ FIX: Show appropriate access message/button based on course type */}
+                        {course.has_access ? (
+                            <div className="flex items-center gap-3 py-4 px-6 rounded-2xl font-bold bg-primary/5 text-primary border border-primary/10">
+                                <span className="text-xl">✅</span>
+                                Kirish huquqi mavjud
+                            </div>
+                        ) : isFree ? (
+                            <button
+                                onClick={handleStartFreeCourse}
+                                disabled={isEnrolling}
+                                className="w-full py-5 bg-emerald-500 text-white rounded-2xl font-black text-center shadow-lg shadow-emerald-200 hover:bg-emerald-600 transition-all active:scale-[0.98] tracking-widest uppercase text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isEnrolling ? 'Yuklanmoqda...' : 'O\'RGANISHNI BOSHLASH'}
+                            </button>
+                        ) : (
                             <Link
                                 href={`/app/tariffs?courseId=${id}`}
                                 className="w-full py-5 bg-primary text-white rounded-2xl font-black text-center shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-[0.98] tracking-widest uppercase text-sm"
                             >
                                 Kursni sotib olish
                             </Link>
-                        ) : (
-                            <div className={`flex items-center gap-3 py-4 px-6 rounded-2xl font-bold border ${isFree
-                                ? 'bg-emerald-50 text-emerald-600 border-emerald-100/50'
-                                : 'bg-primary/5 text-primary border-primary/10'
-                                }`}>
-                                <span className="text-xl">{isFree ? '🎁' : '✅'}</span>
-                                {isFree ? 'Bepul – darhol boshlang' : 'Kirish huquqi mavjud'}
-                            </div>
                         )}
                     </div>
                 </div>
@@ -158,8 +187,8 @@ export default function CourseDetailPage() {
                                         {module.lessons
                                             .sort((a, b) => a.order_num - b.order_num)
                                             .map((lesson) => {
-                                                // ✅ FIX: Lesson is ALWAYS accessible if course is free
-                                                const lessonAccessible = !!(hasAccess || lesson.is_public || isFree);
+                                                // ✅ FIX: hasAccess already includes free courses, so check that OR if lesson itself is public
+                                                const lessonAccessible = !!(hasAccess || lesson.is_public);
 
                                                 return (
                                                     <div key={lesson.id} className="p-5 flex items-center justify-between transition-colors hover:bg-slate-50/50 group">

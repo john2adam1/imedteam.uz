@@ -48,6 +48,5 @@ export const authService = {
      */
     logout: (): void => {
         removeAuthToken();
-        console.log('User logged out');
     },
 };

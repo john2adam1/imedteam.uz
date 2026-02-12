@@ -5,6 +5,7 @@ import { lessonService, activityService } from '@/services';
 import { SourceLessonMobileRes } from '@/types/mobile-api';
 import { useRouter, useParams } from 'next/navigation';
 import { Play, FileText, ClipboardList, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { getYoutubeEmbedUrl } from '@/lib/utils';
 
 export default function LessonPage() {
     const params = useParams();
@@ -124,7 +125,7 @@ export default function LessonPage() {
                                     </div>
                                     <div className="aspect-video bg-black rounded-[2rem] overflow-hidden shadow-2xl ring-1 ring-white/10 group-hover:ring-primary/20 transition-all duration-500">
                                         <iframe
-                                            src={v.url}
+                                            src={getYoutubeEmbedUrl(v.url)}
                                             className="w-full h-full border-none"
                                             allowFullScreen
                                         />

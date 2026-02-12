@@ -46,14 +46,10 @@ export async function apiClient<T>(
         const token = getAuthToken();
         if (token) {
             headers['Authorization'] = `Bearer ${token}`;
-            console.log(`[API Auth] Using token for ${endpoint}`);
-        } else {
-            console.warn(`[API Auth] No token found for authenticated endpoint: ${endpoint}`);
         }
     }
 
     try {
-        console.log(`[API Request] ${options.method || 'GET'} ${url}`);
         const response = await fetch(url, {
             ...fetchOptions,
             headers,
@@ -75,7 +71,6 @@ export async function apiClient<T>(
             data = { message: text };
         }
 
-        console.log(`[API Response] ${url}:`, data);
 
         if (!response.ok) {
             throw new Error(data.message || data.error || `API error: ${response.status}`);
