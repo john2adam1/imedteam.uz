@@ -7,13 +7,21 @@ export function middleware(request: NextRequest) {
     // Get token from cookies
     const token = request.cookies.get('auth_token')?.value;
 
-    // Protect /app (student) routes
-    if (pathname.startsWith('/app')) {
-        if (!token) {
-            // Redirect to student login
-            const url = new URL('/auth/login', request.url);
-            return NextResponse.redirect(url);
-        }
+    // Landing page is public
+    if (pathname === '/') {
+        return NextResponse.next();
+    }
+
+    // Auth routes are public
+    const isAuthRoute = pathname.startsWith('/auth/');
+    if (isAuthRoute) {
+        return NextResponse.next();
+    }
+
+    // All other routes (student area) require authentication
+    if (!token) {
+        const url = new URL('/auth/login', request.url);
+        return NextResponse.redirect(url);
     }
 
     return NextResponse.next();
@@ -21,5 +29,5 @@ export function middleware(request: NextRequest) {
 
 // Specify which routes this middleware should run on
 export const config = {
-    matcher: ['/app/:path*'],
+    matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 };

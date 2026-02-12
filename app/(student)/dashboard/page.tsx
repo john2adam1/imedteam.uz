@@ -41,7 +41,7 @@ export default function AppHome() {
                 fetchData(() => courseService.getUserCourses(), setUserCourses, 'user courses'),
                 fetchData(() => bannerService.getBanners(), setBanners, 'banners'),
                 fetchData(() => notificationService.getNotifications(), setNotifications, 'notifications'),
-                fetchData(() => activityService.getStats(), setActivity, 'activity'),
+                fetchData(() => activityService.getStats({ type: 'year' }), setActivity, 'activity'),
                 fetchData(() => ratingService.getRating(), setRating, 'rating')
             ]);
 
@@ -80,7 +80,7 @@ export default function AppHome() {
                         <Sun size={22} className="group-hover:rotate-45 transition-transform duration-500" />
                     </button>
                     <button
-                        onClick={() => router.push('/app/notifications')}
+                        onClick={() => router.push('/notifications')}
                         className="p-4 rounded-[1.5rem] bg-white border border-gray-100 text-gray-400 hover:text-primary hover:border-primary/20 hover:shadow-premium transition-all relative active:scale-95 group"
                     >
                         <Bell size={22} className="group-hover:ring-offset-2 group-hover:ring-2 ring-primary/20 rounded-full transition-all" />
@@ -196,7 +196,7 @@ export default function AppHome() {
                         Mening kurslarim
                     </h2>
                     <button
-                        onClick={() => router.push('/app/courses')}
+                        onClick={() => router.push('/courses')}
                         className="group flex items-center gap-2 text-sm font-black text-primary hover:gap-3 transition-all uppercase tracking-widest"
                     >
                         Barchasini ko'rish <ChevronRight size={18} />
@@ -209,7 +209,7 @@ export default function AppHome() {
                             <div
                                 key={course.id}
                                 className="group bg-white border border-gray-100 rounded-[2.5rem] p-6 shadow-soft hover:shadow-premium transition-all duration-500 cursor-pointer hover:-translate-y-2 flex flex-col"
-                                onClick={() => router.push(`/app/courses/${course.course_id}`)}
+                                onClick={() => router.push(`/courses/${course.course_id}`)}
                             >
                                 <div className="aspect-[16/10] bg-slate-50 rounded-3xl mb-6 overflow-hidden relative ring-1 ring-gray-100">
                                     {course.course_image_url ? (
@@ -264,7 +264,7 @@ export default function AppHome() {
                             Siz hali hech qaysi kursga a'zo bo'lmagansiz. Hozirgi kurslarni ko'rib chiqing va o'rganishni boshlang!
                         </p>
                         <button
-                            onClick={() => router.push('/app/courses')}
+                            onClick={() => router.push('/courses')}
                             className="px-10 py-5 bg-primary text-white rounded-2xl font-black shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-[0.98] uppercase tracking-widest text-sm"
                         >
                             Kurslarni ko'rish

@@ -7,10 +7,10 @@ import { Home, BookOpen, Activity, Bell, User, LogOut, Grid } from 'lucide-react
 import { useAuth } from '@/lib/auth-context';
 
 const navItems = [
-    { name: 'Asosiy', href: '/app', icon: Home },
-    { name: 'Barcha kurslar', href: '/app/courses', icon: Grid },
-    { name: 'Reyting', href: '/app/leaderboard', icon: Activity },
-    { name: 'Profil', href: '/app/profile', icon: User },
+    { name: 'Asosiy', href: '/dashboard', icon: Home },
+    { name: 'Barcha kurslar', href: '/courses', icon: Grid },
+    { name: 'Reyting', href: '/leaderboard', icon: Activity },
+    { name: 'Profil', href: '/profile', icon: User },
 ];
 
 export default function Sidebar() {
@@ -21,7 +21,7 @@ export default function Sidebar() {
         <div className="w-80 bg-white border-r border-gray-100 flex flex-col h-screen sticky top-0 overflow-hidden shadow-[10px_0_30px_-15px_rgba(0,0,0,0.05)]">
             {/* Logo Area */}
             <div className="p-8 mb-4">
-                <Link href="/app" className="flex items-center gap-3 group">
+                <Link href="/dashboard" className="flex items-center gap-3 group">
                     <div className="w-12 h-12 bg-primary rounded-[1rem] flex items-center justify-center text-white shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform">
                         <BookOpen size={24} />
                     </div>
@@ -34,7 +34,7 @@ export default function Sidebar() {
             {/* Navigation */}
             <nav className="flex-1 px-4 space-y-2">
                 {navItems.map((item) => {
-                    const isActive = pathname === item.href || (item.href !== '/app' && pathname.startsWith(item.href));
+                    const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
                     const Icon = item.icon;
                     return (
                         <Link

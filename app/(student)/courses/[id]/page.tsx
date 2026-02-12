@@ -52,15 +52,25 @@ export default function CourseDetailPage() {
                     <p className="text-red-600 font-bold mb-2">Xatolik!</p>
                     <p className="text-red-500">{error || 'Kurs topilmadi'}</p>
                 </div>
-                <Link href="/app/courses" className="inline-flex items-center gap-2 text-primary-600 font-bold hover:gap-3 transition-all">
+                <Link href="/courses" className="inline-flex items-center gap-2 text-primary-600 font-bold hover:gap-3 transition-all">
                     <span>&larr;</span> <span>Kurslarga qaytish</span>
                 </Link>
             </div>
         );
     }
 
-    // ✅ CRITICAL FIX: Robust check for free course
-    const isFree = !!(course.is_public || course.price?.some(p => p.price === 0));
+    // ✅ ROBUST FREE COURSE DETECTION
+    // A course is free if ANY of these conditions are true:
+    // 1. is_public flag is true (primary indicator)
+    // 2. No price array exists (undefined/null)
+    // 3. Price array is empty
+    // 4. ALL prices in the array are 0
+    const isFree = !!(
+        course.is_public ||
+        !course.price ||
+        course.price.length === 0 ||
+        course.price.every(p => p.price === 0)
+    );
     // ✅ FIX: Free courses should ALWAYS be considered as having access
     const hasAccess = !!(course.has_access || isFree);
 
@@ -72,7 +82,7 @@ export default function CourseDetailPage() {
             // No need to create order or enroll for truly free courses
             const firstLessonId = course.modules?.[0]?.lessons?.[0]?.id;
             if (firstLessonId) {
-                router.push(`/app/lessons/${firstLessonId}`);
+                router.push(`/lessons/${firstLessonId}`);
             } else {
                 toast.error('Kursda hali darslar yuklanmagan');
             }
@@ -88,7 +98,7 @@ export default function CourseDetailPage() {
         <div className="max-w-4xl mx-auto px-6 py-10">
             {/* Back Link */}
             <Link
-                href="/app/courses"
+                href="/courses"
                 className="inline-flex items-center gap-2 text-gray-500 font-bold hover:text-primary transition-all mb-8 group"
             >
                 <span className="group-hover:-translate-x-1 transition-transform">←</span>
@@ -154,7 +164,7 @@ export default function CourseDetailPage() {
                             </button>
                         ) : (
                             <Link
-                                href={`/app/tariffs?courseId=${id}`}
+                                href={`/tariffs?courseId=${id}`}
                                 className="w-full py-5 bg-primary text-white rounded-2xl font-black text-center shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-[0.98] tracking-widest uppercase text-sm"
                             >
                                 Kursni sotib olish
@@ -203,7 +213,7 @@ export default function CourseDetailPage() {
                                                         <div>
                                                             {lessonAccessible ? (
                                                                 <Link
-                                                                    href={`/app/lessons/${lesson.id}`}
+                                                                    href={`/lessons/${lesson.id}`}
                                                                     className={`px-5 py-2 rounded-xl border-2 transition-all font-bold text-xs uppercase tracking-widest ${lesson.is_completed
                                                                         ? 'bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-100'
                                                                         : 'bg-primary/5 text-primary border-primary/10 hover:bg-primary hover:text-white hover:border-primary'

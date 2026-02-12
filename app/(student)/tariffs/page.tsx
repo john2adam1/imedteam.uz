@@ -26,10 +26,15 @@ function TariffsContent() {
                 if (courseData) {
                     setSelectedCourse(courseData);
 
-                    // ✅ CRITICAL GUARD: If course is free, redirect immediately
-                    const isFree = !!(courseData.is_public || courseData.price?.some(p => p.price === 0));
+                    // ✅ ROBUST FREE COURSE DETECTION: Redirect free courses immediately
+                    const isFree = !!(
+                        courseData.is_public ||
+                        !courseData.price ||
+                        courseData.price.length === 0 ||
+                        courseData.price.every(p => p.price === 0)
+                    );
                     if (isFree) {
-                        router.replace(`/app/courses/${courseId}`);
+                        router.replace(`/courses/${courseId}`);
                         return;
                     }
                 }
@@ -60,12 +65,17 @@ function TariffsContent() {
         }).format(numPrice);
     };
 
-    // ✅ FIX: Filter tariffs that actually have a price for this course
-    // Also exclude if course is free (already redirected above, but double-check)
+    // ✅ ROBUST TARIFF FILTERING: Exclude free courses and invalid prices
     const displayedTariffs = tariffs?.tariffs?.filter((tariff: any) => {
         if (!courseId) return true; // Show all if no specific course selected
         if (!selectedCourse?.price) return false;
-        const isFree = !!(selectedCourse.is_public || selectedCourse.price?.some(p => p.price === 0));
+        // Comprehensive free course check
+        const isFree = !!(
+            selectedCourse.is_public ||
+            !selectedCourse.price ||
+            selectedCourse.price.length === 0 ||
+            selectedCourse.price.every(p => p.price === 0)
+        );
         if (isFree) return false; // ✅ No tariffs for free courses
 
         // Find if this specific course has a price for this tariff
@@ -77,15 +87,20 @@ function TariffsContent() {
 
     const handlePurchase = async (tariffId: string) => {
         if (!courseId) {
-            router.push('/app/courses');
+            router.push('/courses');
             return;
         }
 
-        // ✅ ABSOLUTE GUARD: DO NOT create order for free courses normally
-        const isFree = !!(selectedCourse?.is_public || selectedCourse?.price?.some(p => p.price === 0));
+        // ✅ ROBUST GUARD: DO NOT create order for free courses
+        const isFree = !!(
+            selectedCourse?.is_public ||
+            !selectedCourse?.price ||
+            selectedCourse?.price.length === 0 ||
+            selectedCourse?.price.every(p => p.price === 0)
+        );
         if (isFree) {
             console.warn('Blocked order creation for public/free course in tariffs page');
-            router.push(`/app/courses/${courseId}`);
+            router.push(`/courses/${courseId}`);
             return;
         }
 
@@ -103,7 +118,7 @@ function TariffsContent() {
                 window.location.assign(response.url);
             } else if (response.order_id) {
                 alert('Buyurtma muvaffaqiyatli yaratildi');
-                router.push('/app/courses');
+                router.push('/courses');
             } else {
                 throw new Error('Tolov havolasi topilmadi');
             }
@@ -126,8 +141,13 @@ function TariffsContent() {
         );
     }
 
-    // ✅ ABSOLUTE GUARD: If somehow we're here with a free course, block UI
-    const isFree = !!(selectedCourse?.is_public || selectedCourse?.price?.some(p => p.price === 0));
+    // ✅ ROBUST UI GUARD: If somehow we're here with a free course, show message and redirect
+    const isFree = !!(
+        selectedCourse?.is_public ||
+        !selectedCourse?.price ||
+        selectedCourse?.price.length === 0 ||
+        selectedCourse?.price.every(p => p.price === 0)
+    );
     if (isFree) {
         return (
             <div className="max-w-2xl mx-auto p-10 text-center">
@@ -139,7 +159,7 @@ function TariffsContent() {
                     </p>
                 </div>
                 <button
-                    onClick={() => router.push(`/app/courses/${courseId}`)}
+                    onClick={() => router.push(`/courses/${courseId}`)}
                     className="px-10 py-5 bg-primary text-white rounded-2xl font-black shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-95"
                 >
                     Kursga qaytish

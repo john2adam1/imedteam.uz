@@ -28,7 +28,7 @@ export default function LoginPage() {
         password: password,
       });
 
-      router.push('/app');
+      router.push('/dashboard');
     } catch (err: any) {
       console.error('Login error:', err);
       setError(err.message || 'Login failed');
@@ -60,7 +60,7 @@ export default function LoginPage() {
         password: password,
       });
 
-      router.push('/app');
+      router.push('/dashboard');
     } catch (err: any) {
       console.error('Registration error:', err);
       setError(err.message || 'Registration failed');
@@ -79,8 +79,8 @@ export default function LoginPage() {
         <button
           onClick={() => setMode('login')}
           className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${mode === 'login'
-              ? 'bg-white text-primary-600 shadow-sm'
-              : 'text-gray-500 hover:text-gray-700'
+            ? 'bg-white text-primary-600 shadow-sm'
+            : 'text-gray-500 hover:text-gray-700'
             }`}
         >
           Kirish
@@ -88,8 +88,8 @@ export default function LoginPage() {
         <button
           onClick={() => setMode('register')}
           className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${mode === 'register'
-              ? 'bg-white text-primary-600 shadow-sm'
-              : 'text-gray-500 hover:text-gray-700'
+            ? 'bg-white text-primary-600 shadow-sm'
+            : 'text-gray-500 hover:text-gray-700'
             }`}
         >
           Ro'yxatdan o'tish

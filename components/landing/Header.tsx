@@ -8,7 +8,7 @@ export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { isAuthenticated } = useAuth();
 
-    const authPath = isAuthenticated ? '/app' : '/auth/login';
+    const authPath = isAuthenticated ? '/dashboard' : '/auth/login';
 
     return (
         <>

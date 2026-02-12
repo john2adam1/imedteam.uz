@@ -99,7 +99,7 @@ export default function CoursesSection() {
                                 <div className="space-y-3">
                                     {subjectCourses.slice(0, 3).map(course => (
                                         <Link
-                                            href={`/app/courses/${course.id}`}
+                                            href={`/courses/${course.id}`}
                                             key={course.id}
                                             className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 group-hover:bg-white border border-transparent group-hover:border-slate-100 transition-all hover:border-primary/20 hover:text-primary"
                                         >
@@ -109,7 +109,7 @@ export default function CoursesSection() {
                                     ))}
                                     {subjectCourses.length > 3 && (
                                         <Link
-                                            href="/app/courses"
+                                            href="/courses"
                                             className="block text-center pt-2 text-sm font-bold text-slate-400 hover:text-primary transition-colors"
                                         >
                                             Yana {subjectCourses.length - 3} ta kurs...
@@ -118,7 +118,7 @@ export default function CoursesSection() {
                                 </div>
 
                                 <Link
-                                    href="/app/courses"
+                                    href="/courses"
                                     className="mt-8 py-4 px-6 rounded-2xl bg-primary text-white font-bold text-center hover:bg-primary-600 transition-all shadow-md active:scale-95 flex items-center justify-center gap-2"
                                 >
                                     Ko‘rish

@@ -42,7 +42,7 @@ export default function MyCoursesPage() {
     return (
         <div style={{ padding: '20px' }}>
             <h1>My Courses</h1>
-            
+
             {error && (
                 <div style={{ color: 'red', marginBottom: '20px', padding: '10px', border: '1px solid red' }}>
                     {error}
@@ -52,7 +52,7 @@ export default function MyCoursesPage() {
             {courses.length === 0 ? (
                 <div>
                     <p>You haven't enrolled in any courses yet.</p>
-                    <button onClick={() => router.push('/app/courses')}>
+                    <button onClick={() => router.push('/courses')}>
                         Browse Courses
                     </button>
                 </div>
@@ -65,7 +65,7 @@ export default function MyCoursesPage() {
                             <p>Progress: {course.percentage || 0}%</p>
                             <p>Completed: {course.completed_lessons || 0} / {course.total_lessons || 0} lessons</p>
                             <p>Tariff: {course.tariff_name || 'Basic'}</p>
-                            <button onClick={() => router.push(`/app/courses/${course.course_id || course.id}`)}>
+                            <button onClick={() => router.push(`/courses/${course.course_id || course.id}`)}>
                                 Continue Learning
                             </button>
                         </div>
