@@ -17,7 +17,7 @@ export default function Partners() {
                                 className="flex items-center gap-4 px-8 py-4 rounded-[2rem] bg-white border border-slate-100 shadow-xl shadow-slate-200/30 min-w-[240px] group hover:border-primary/20 transition-all duration-500"
                             >
                                 <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center flex-shrink-0 group-hover:rotate-12 transition-transform">
-                                    <img src="/imedteamlogo.png" alt="Logo" className="w-6 h-6 brightness-0 invert" />
+                                    <img src="/imedteamlogo.svg" alt="Logo" className="w-6 h-6 brightness-0 invert" />
                                 </div>
                                 <span className="font-black text-lg text-slate-900 tracking-tight">iMed Team</span>
                             </div>

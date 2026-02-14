@@ -26,7 +26,7 @@ export default function Header() {
                     <div className="h-20 flex items-center justify-between">
                         <Link href="/" className="flex items-center gap-3 group">
                             <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform duration-300">
-                                <img src="/imedteamlogo.png" alt="Logo" className="w-8 h-8 brightness-0 invert" />
+                                <img src="/imedteamlogo.svg" alt="Logo" className="w-8 h-8 brightness-0 invert" />
                             </div>
                             <div className="flex flex-col">
                                 <span className="font-black text-xl tracking-tight text-slate-900 leading-none group-hover:text-primary transition-colors">

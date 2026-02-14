@@ -24,7 +24,7 @@ export async function apiClient<T>(
 
     // Normalize base URL: strip trailing /web or /api if we're adding it via namespace
     let baseUrl = API_BASE_URL.replace(/\/$/, '');
-    if (baseUrl.endsWith('/web') || baseUrl.endsWith('/api')) {
+    if (baseUrl.endsWith('/web') || baseUrl.endsWith('/api') || baseUrl.endsWith('/mobile')) {
         baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf('/'));
     }
 
