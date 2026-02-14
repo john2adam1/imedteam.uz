@@ -17,27 +17,40 @@ function TariffsContent() {
     useEffect(() => {
         const loadData = async () => {
             try {
-                const [tariffData, courseData] = await Promise.all([
-                    tariffService.getAll(),
-                    courseId ? courseService.getCourseById(courseId) : Promise.resolve(null)
-                ]);
+                // 1. Fetch course details first (if courseId exists)
+                let courseData: MobileCourseRes | null = null;
 
-                setTariffs(tariffData);
-                if (courseData) {
-                    setSelectedCourse(courseData);
+                if (courseId) {
+                    try {
+                        courseData = await courseService.getCourseById(courseId);
+                        setSelectedCourse(courseData);
 
-                    // ✅ ROBUST FREE COURSE DETECTION: Redirect free courses immediately
-                    const isFree = !!(
-                        courseData.is_public ||
-                        !courseData.price ||
-                        courseData.price.length === 0 ||
-                        courseData.price.every(p => p.price === 0)
-                    );
-                    if (isFree) {
-                        router.replace(`/courses/${courseId}`);
-                        return;
+                        // ✅ ROBUST FREE COURSE DETECTION: Redirect free courses immediately
+                        const isFree = !!(
+                            courseData.is_public ||
+                            !courseData.price ||
+                            courseData.price.length === 0 ||
+                            courseData.price.every(p => p.price === 0)
+                        );
+
+                        // If free, redirect immediately and STOP here
+                        if (isFree) {
+                            console.log('Redirecting free course:', courseId);
+                            router.replace(`/courses/${courseId}`);
+                            return;
+                        }
+                    } catch (err) {
+                        console.error('Failed to fetch course:', err);
+                        // If course fetch fails, we might still want to try showing tariffs? 
+                        // Or maybe just fail safely. For now, let's continue to try fetching tariffs
+                        // but usually if course fails, tariffs for it won't make sense.
                     }
                 }
+
+                // 2. Only fetch tariffs if we're not redirecting
+                const tariffData = await tariffService.getAll();
+                setTariffs(tariffData);
+
             } catch (error) {
                 console.error('Failed to load data:', error);
             } finally {

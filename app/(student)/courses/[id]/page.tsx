@@ -78,6 +78,9 @@ export default function CourseDetailPage() {
         try {
             setIsEnrolling(true);
 
+            // ✅ FIX: Save to local storage so it appears in "My Courses"
+            courseService.startFreeCourse(id);
+
             // ✅ FIX: For free courses, just navigate to first lesson directly
             // No need to create order or enroll for truly free courses
             const firstLessonId = course.modules?.[0]?.lessons?.[0]?.id;
@@ -144,7 +147,17 @@ export default function CourseDetailPage() {
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1">Muddati</span>
-                                <span className="text-2xl font-black text-gray-900">{course.duration} kun</span>
+                                <span className="text-2xl font-black text-gray-900">
+                                    {(() => {
+                                        const mins = course.duration || 0;
+                                        if (mins < 60) return `${mins} daqiqa`;
+                                        const hours = Math.floor(mins / 60);
+                                        const remainingMins = mins % 60;
+                                        return remainingMins > 0
+                                            ? `${hours} soat ${remainingMins} daqiqa`
+                                            : `${hours} soat`;
+                                    })()}
+                                </span>
                             </div>
                         </div>
 

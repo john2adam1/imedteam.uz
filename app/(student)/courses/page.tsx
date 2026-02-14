@@ -63,8 +63,10 @@ export default function CoursesPage() {
                 } else {
                     // My courses tab
                     const data = await courseService.getUserCourses();
-                    setCourses(data.user_courses || []);
-                    setTotalCount(data.count || 0);
+                    const userCourses = data.user_courses || [];
+                    setCourses(userCourses);
+                    // Update total count to reflect both API and local courses
+                    setTotalCount(userCourses.length);
                 }
             } catch (err: any) {
                 console.error('Failed to load courses:', err);
@@ -108,15 +110,15 @@ export default function CoursesPage() {
                             <button
                                 onClick={() => setSelectedSubject(null)}
                                 className={`w-full text-left px-4 py-3 rounded-2xl transition-all duration-200 active:scale-[0.98] ${selectedSubject === null
-                                        ? 'bg-primary text-white shadow-md shadow-primary/20'
-                                        : 'text-gray-600 hover:bg-slate-50 font-medium'
+                                    ? 'bg-primary text-white shadow-md shadow-primary/20'
+                                    : 'text-gray-600 hover:bg-slate-50 font-medium'
                                     }`}
                             >
                                 <div className="flex items-center justify-between">
                                     <span className="font-bold text-sm">Barcha kurslar</span>
                                     <span className={`text-xs px-2 py-0.5 rounded-full ${selectedSubject === null
-                                            ? 'bg-white/20 text-white'
-                                            : 'bg-slate-100 text-gray-400'
+                                        ? 'bg-white/20 text-white'
+                                        : 'bg-slate-100 text-gray-400'
                                         }`}>
                                         {totalCount}
                                     </span>
@@ -127,15 +129,15 @@ export default function CoursesPage() {
                             <button
                                 onClick={() => setSelectedSubject('free')}
                                 className={`w-full text-left px-4 py-3 rounded-2xl transition-all duration-200 active:scale-[0.98] ${selectedSubject === 'free'
-                                        ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
-                                        : 'text-gray-600 hover:bg-emerald-50/50 font-medium'
+                                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+                                    : 'text-gray-600 hover:bg-emerald-50/50 font-medium'
                                     }`}
                             >
                                 <div className="flex items-center justify-between">
                                     <span className="font-bold text-sm">🎁 Bepul kurslar</span>
                                     <span className={`text-xs px-2 py-0.5 rounded-full ${selectedSubject === 'free'
-                                            ? 'bg-white/20 text-white'
-                                            : 'bg-emerald-100/50 text-emerald-600'
+                                        ? 'bg-white/20 text-white'
+                                        : 'bg-emerald-100/50 text-emerald-600'
                                         }`}>
                                         {selectedSubject === 'free' ? courses.length : getFreeCoursesCount()}
                                     </span>
@@ -177,8 +179,8 @@ export default function CoursesPage() {
                                     setSelectedSubject(null);
                                 }}
                                 className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'all'
-                                        ? 'bg-white text-gray-900 shadow-sm shadow-black/5'
-                                        : 'text-gray-500 hover:text-gray-700'
+                                    ? 'bg-white text-gray-900 shadow-sm shadow-black/5'
+                                    : 'text-gray-500 hover:text-gray-700'
                                     }`}
                             >
                                 Barcha kurslar
@@ -186,8 +188,8 @@ export default function CoursesPage() {
                             <button
                                 onClick={() => setActiveTab('my')}
                                 className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'my'
-                                        ? 'bg-white text-gray-900 shadow-sm shadow-black/5'
-                                        : 'text-gray-500 hover:text-gray-700'
+                                    ? 'bg-white text-gray-900 shadow-sm shadow-black/5'
+                                    : 'text-gray-500 hover:text-gray-700'
                                     }`}
                             >
                                 Mening kurslarim
@@ -269,8 +271,8 @@ function SubjectFilterButton({ subject, isSelected, onClick }: { subject: Subjec
         <button
             onClick={onClick}
             className={`w-full text-left px-4 py-3 rounded-2xl transition-all duration-200 active:scale-[0.98] ${isSelected
-                    ? 'bg-primary text-white shadow-md shadow-primary/20'
-                    : 'text-gray-600 hover:bg-slate-50 font-medium'
+                ? 'bg-primary text-white shadow-md shadow-primary/20'
+                : 'text-gray-600 hover:bg-slate-50 font-medium'
                 }`}
         >
             <div className="flex items-center justify-between">
@@ -360,8 +362,8 @@ function CourseCard({ course, activeTab, isFree, onClick }: { course: any; activ
                             </span>
                         </div>
                         <div className={`px-4 py-2 text-xs font-black rounded-xl transition-all ${isFree
-                                ? 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white'
-                                : 'bg-primary/5 text-primary group-hover:bg-primary group-hover:text-white'
+                            ? 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white'
+                            : 'bg-primary/5 text-primary group-hover:bg-primary group-hover:text-white'
                             }`}>
                             {isFree ? "KO'RISH" : 'BATAFSIL'}
                         </div>

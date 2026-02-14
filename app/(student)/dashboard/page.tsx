@@ -11,6 +11,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { Bell, Sun, Trophy, BookOpen, Clock, ChevronRight, Play, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
+import BannerSlider from '@/components/student/BannerSlider';
 
 export default function AppHome() {
     const { user: authUser } = useAuth();
@@ -92,51 +93,10 @@ export default function AppHome() {
             </div>
 
             {/* Banners Section - Prominent & Visual */}
+            {/* Banners Section - Prominent & Visual */}
             {(banners?.banners && banners.banners.length > 0) ? (
-                <div className="grid gap-8 overflow-hidden animate-in fade-in zoom-in duration-700">
-                    {banners.banners.map((banner: any) => (
-                        <div
-                            key={banner.id}
-                            className="relative min-h-[300px] rounded-[3rem] overflow-hidden group shadow-premium hover:shadow-2xl transition-all duration-700 cursor-pointer"
-                            onClick={() => banner.link_url && window.open(banner.link_url, '_blank')}
-                        >
-                            {/* Background Image with Fallback */}
-                            {banner.image_url ? (
-                                <img
-                                    src={banner.image_url}
-                                    alt={banner.title}
-                                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
-                                    onError={(e) => {
-                                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/800x400/800000/FFFFFF?text=IMED+PLATFORMA';
-                                    }}
-                                />
-                            ) : (
-                                <div className="absolute inset-0 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900" />
-                            )}
-
-                            {/* Overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-10 lg:p-14">
-                                <div className="max-w-3xl space-y-4 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-full font-black text-[10px] uppercase tracking-widest shadow-lg">
-                                        Yangi e'lon
-                                    </div>
-                                    <h2 className="text-3xl lg:text-5xl font-black text-white leading-tight">
-                                        {banner.title}
-                                    </h2>
-                                    <p className="text-white/80 text-lg font-medium leading-relaxed line-clamp-2">
-                                        {banner.description}
-                                    </p>
-                                    {banner.link_url && (
-                                        <div className="pt-4">
-                                            <span className="inline-flex items-center gap-2 text-white font-black uppercase tracking-widest text-sm group/btn hover:gap-4 transition-all">
-                                                Batafsil bilish <ChevronRight size={18} />
-                                            </span>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    ))}
+                <div className="animate-in fade-in zoom-in duration-700">
+                    <BannerSlider banners={banners.banners} />
                 </div>
             ) : (
                 /* Diagnostic Placeholder when no banners found but no error thrown */
