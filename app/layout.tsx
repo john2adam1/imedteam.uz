@@ -7,6 +7,9 @@ import ToastProvider from '@/components/common/ToastProvider';
 export const metadata: Metadata = {
   title: 'Imed - Educational Platform',
   description: 'Online learning platform for medical education',
+  icons: {
+    icon: '/assets/favicon.ico.png',
+  },
 };
 
 export default function RootLayout({

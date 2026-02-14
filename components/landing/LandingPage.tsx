@@ -6,7 +6,6 @@ import Partners from '@/components/landing/Partners';
 import Services from '@/components/landing/Services';
 import CoursesSection from '@/components/landing/CoursesSection';
 import Team from '@/components/landing/Team';
-import Blog from '@/components/landing/Blog';
 import Contact from '@/components/landing/Contact';
 
 export default function LandingPage() {
@@ -38,7 +37,6 @@ export default function LandingPage() {
             <Services />
             <CoursesSection />
             <Team />
-            <Blog />
             <Contact />
         </div>
     );

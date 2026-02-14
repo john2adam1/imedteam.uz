@@ -13,15 +13,20 @@ const navItems = [
     { name: 'Profil', href: '/profile', icon: User },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+    className?: string;
+    onClose?: () => void;
+}
+
+export default function Sidebar({ className = '', onClose }: SidebarProps) {
     const pathname = usePathname();
     const { logout } = useAuth();
 
     return (
-        <div className="w-80 bg-white border-r border-gray-100 flex flex-col h-screen sticky top-0 overflow-hidden shadow-[10px_0_30px_-15px_rgba(0,0,0,0.05)]">
+        <div className={`w-80 bg-white border-r border-gray-100 flex flex-col h-screen sticky top-0 overflow-hidden shadow-[10px_0_30px_-15px_rgba(0,0,0,0.05)] ${className}`}>
             {/* Logo Area */}
-            <div className="p-8 mb-4">
-                <Link href="/dashboard" className="flex items-center gap-3 group">
+            <div className="p-8 mb-4 flex justify-between items-center">
+                <Link href="/dashboard" className="flex items-center gap-3 group" onClick={onClose}>
                     <div className="w-12 h-12 bg-primary rounded-[1rem] flex items-center justify-center text-white shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform">
                         <BookOpen size={24} />
                     </div>
@@ -29,6 +34,14 @@ export default function Sidebar() {
                         iMed <span className="text-primary italic">Team</span>
                     </h2>
                 </Link>
+                {/* Close button for mobile */}
+                {onClose && (
+                    <button onClick={onClose} className="lg:hidden p-2 text-gray-400 hover:text-gray-900">
+                        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                )}
             </div>
 
             {/* Navigation */}
@@ -40,6 +53,7 @@ export default function Sidebar() {
                         <Link
                             key={item.name}
                             href={item.href}
+                            onClick={onClose}
                             className={`flex items-center gap-4 px-6 py-4 rounded-[1.5rem] font-bold transition-all duration-300 group
                                 ${isActive
                                     ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]'

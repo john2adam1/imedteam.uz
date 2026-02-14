@@ -14,10 +14,10 @@ export default function Partners() {
                         {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                             <div
                                 key={i}
-                                className="flex items-center gap-4 px-8 py-4 rounded-[2rem] bg-white border border-slate-100 shadow-xl shadow-slate-200/30 min-w-[240px] group hover:border-primary/20 transition-all duration-500"
+                                className="flex items-center gap-4 px-8 py-4 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/30 min-w-[240px] group hover:border-primary/20 transition-all duration-500"
                             >
-                                <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center flex-shrink-0 group-hover:rotate-12 transition-transform">
-                                    <img src="/imedteamlogo.svg" alt="Logo" className="w-6 h-6 brightness-0 invert" />
+                                <div className="w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:rotate-12 transition-transform">
+                                    <img src="/assets/favicon.ico.png" alt="Logo" className="w-12 h-12 object-contain" />
                                 </div>
                                 <span className="font-black text-lg text-slate-900 tracking-tight">iMed Team</span>
                             </div>

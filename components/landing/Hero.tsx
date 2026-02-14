@@ -83,7 +83,7 @@ export default function Hero() {
                     <div className="absolute inset-0 bg-primary/10 rounded-[3rem] rotate-3 scale-105 blur-2xl"></div>
                     <div className="relative bg-white p-4 rounded-[3rem] shadow-2xl shadow-primary/10 border border-slate-100 overflow-hidden transform hover:-rotate-1 transition-transform duration-700">
                         <img
-                            src="/hero-illustration.png"
+                            src="/assets/masterklass.jpg"
                             alt="Medical Students Studying"
                             className="w-full h-full object-cover rounded-[2.5rem]"
                         />
