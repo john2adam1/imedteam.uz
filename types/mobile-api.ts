@@ -460,3 +460,22 @@ export interface RatingQueryParams {
 // ============================================================================
 
 export type Language = 'uz' | 'ru' | 'en';
+
+export interface PromocodeReq {
+  code: string;
+  tariff_id?: string;
+  course_id?: string;
+}
+
+export interface PromocodeRes {
+  is_valid: boolean;
+  message: string;
+  discount_type: 'percent' | 'fixed' | null;
+  discount_value: number | null; // The percentage or fixed amount value
+  tariff_id: string | null;
+  course_id: string | null;
+  promocode_id: string | null;
+  course_amount: number | null; // Original price
+  discount_amount: number | null; // Calculated discount amount
+  total_amount: number | null; // Final price
+}

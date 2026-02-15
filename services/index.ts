@@ -12,6 +12,7 @@ export { tariffService } from './tariff';
 export { orderService } from './order';
 export { activityService } from './activity';
 export { ratingService } from './rating';
+export { promocodeService } from './promocode';
 
 // Re-export API client utilities
 export { apiClient, setAuthToken, removeAuthToken } from '@/lib/api-client';
