@@ -215,7 +215,7 @@ export default function AppHome() {
                         ))}
                     </div>
                 ) : (
-                    <div className="py-32 flex flex-col items-center justify-center bg-slate-50/20 rounded-[3rem] border-2 border-dashed border-gray-100 text-center animate-in fade-in duration-1000">
+                    <div className="py-32 flex flex-col items-center justify-center bg-white rounded-[3rem] border-2 border-dashed border-gray-100 text-center animate-in fade-in duration-1000">
                         <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-8 shadow-card text-4xl grayscale opacity-30">
                             📚
                         </div>

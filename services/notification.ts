@@ -13,8 +13,23 @@ export const notificationService = {
         const response = await apiClient<any>(`/notification/user${queryString}`);
 
         // API sometimes returns an array directly, or {data: [], total: number}
-        const notifications = Array.isArray(response) ? response : (response.data || []);
-        const total = Array.isArray(response) ? response.length : (response.total || 0);
+        // API sometimes returns an array directly, or {data: [], total: number}, or {items: [], count: number}
+        let notifications: any[] = [];
+        let total = 0;
+
+        if (Array.isArray(response)) {
+            notifications = response;
+            total = response.length;
+        } else if (response.data && Array.isArray(response.data)) {
+            notifications = response.data;
+            total = response.total || response.count || response.data.length;
+        } else if (response.items && Array.isArray(response.items)) {
+            notifications = response.items;
+            total = response.total || response.count || response.items.length;
+        } else if (response.notifications && Array.isArray(response.notifications)) {
+            notifications = response.notifications;
+            total = response.count || response.total || response.notifications.length;
+        }
 
         return {
             notifications,

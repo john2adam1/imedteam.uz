@@ -2,6 +2,7 @@
 // Handles banner operations
 
 import { apiClient } from '@/lib/api-client';
+import { getMediaUrl } from '@/lib/utils';
 import { BannerMobileList, BannerMobileRes } from '@/types/mobile-api';
 
 export const bannerService = {
@@ -30,7 +31,10 @@ export const bannerService = {
             return [];
         };
 
-        const banners = getArray(response, 'banners');
+        const banners = getArray(response, 'banners').map((b: any) => ({
+            ...b,
+            image_url: getMediaUrl(b.image_url)
+        }));
         const total = response.total || response.count || banners.length;
 
         return {
@@ -43,6 +47,10 @@ export const bannerService = {
      * Get banner by ID
      */
     getBannerById: async (id: string): Promise<BannerMobileRes> => {
-        return apiClient<BannerMobileRes>(`/banner/${id}`);
+        const banner = await apiClient<BannerMobileRes>(`/banner/${id}`);
+        if (banner) {
+            banner.image_url = getMediaUrl(banner.image_url);
+        }
+        return banner;
     },
 };

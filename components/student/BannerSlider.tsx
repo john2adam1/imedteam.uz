@@ -66,25 +66,29 @@ export default function BannerSlider({ banners }: BannerSliderProps) {
                             <div className="absolute inset-0 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900" />
                         )}
 
-                        {/* Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-10 lg:p-14">
-                            <div className="max-w-3xl space-y-4">
-                                <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-full font-black text-[10px] uppercase tracking-widest shadow-lg">
-                                    Yangi e'lon
-                                </div>
-                                <h2 className="text-3xl lg:text-5xl font-black text-white leading-tight drop-shadow-md">
-                                    {banner.title}
-                                </h2>
-                                <p className="text-white/90 text-lg font-medium leading-relaxed line-clamp-2 drop-shadow-sm max-w-2xl">
-                                    {banner.description}
-                                </p>
-                                {banner.link_url && (
-                                    <div className="pt-4">
-                                        <span className="inline-flex items-center gap-2 text-white font-black uppercase tracking-widest text-sm hover:gap-4 transition-all">
-                                            Batafsil bilish <ChevronRight size={18} />
-                                        </span>
+                        {/* Floating Glass Card Overlay */}
+                        <div className="absolute inset-0 p-6 md:p-10 flex flex-col justify-end items-start pointer-events-none">
+                            <div className="max-w-md w-full bg-black/30 backdrop-blur-md rounded-[2rem] p-6 border border-white/10 shadow-lg pointer-events-auto transform transition-transform duration-300 hover:scale-[1.02]">
+                                <div className="space-y-3">
+                                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary text-white rounded-full font-black text-[9px] uppercase tracking-widest shadow-lg">
+                                        Yangi e'lon
                                     </div>
-                                )}
+                                    <h2 className="text-xl md:text-2xl font-black text-white leading-tight drop-shadow-md">
+                                        {banner.title}
+                                    </h2>
+                                    {banner.description && (
+                                        <p className="text-white/90 text-sm font-medium leading-relaxed line-clamp-2 drop-shadow-sm">
+                                            {banner.description}
+                                        </p>
+                                    )}
+                                    {banner.link_url && (
+                                        <div className="pt-2">
+                                            <span className="inline-flex items-center gap-2 text-white font-black uppercase tracking-widest text-xs hover:gap-3 transition-all">
+                                                Batafsil <ChevronRight size={14} />
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -116,8 +120,8 @@ export default function BannerSlider({ banners }: BannerSliderProps) {
                                 key={index}
                                 onClick={(e) => { e.stopPropagation(); setCurrentIndex(index); }}
                                 className={`h-1.5 rounded-full transition-all duration-300 ${index === currentIndex
-                                        ? 'w-8 bg-white'
-                                        : 'w-2 bg-white/40 hover:bg-white/60'
+                                    ? 'w-8 bg-white'
+                                    : 'w-2 bg-white/40 hover:bg-white/60'
                                     }`}
                                 aria-label={`Go to slide ${index + 1}`}
                             />

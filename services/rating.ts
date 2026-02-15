@@ -2,6 +2,8 @@
 // Handles user ratings and leaderboard
 
 import { apiClient } from '@/lib/api-client';
+import { getMediaUrl } from '@/lib/utils';
+import { RatingUser } from '@/types/mobile-api';
 
 export const ratingService = {
     /**
@@ -10,7 +12,20 @@ export const ratingService = {
     getRating: async (params?: any): Promise<any> => {
         const queryString = params ? buildQueryString(params) : '';
         const response = await apiClient<any>(`/user/rating${queryString}`);
-        return response.data || response;
+        const data = response.data || response;
+
+        if (data.items) {
+            data.items = data.items.map((item: RatingUser) => ({
+                ...item,
+                image_url: getMediaUrl(item.image_url)
+            }));
+        }
+
+        if (data.me) {
+            data.me.image_url = getMediaUrl(data.me.image_url);
+        }
+
+        return data;
     },
 };
 

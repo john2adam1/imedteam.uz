@@ -2,6 +2,7 @@
 // Handles course-related operations
 
 import { apiClient } from '@/lib/api-client';
+import { getMediaUrl } from '@/lib/utils';
 import { CourseMobileList, MobileCourseRes, CourseQueryParams, UserCourseMobileList, UserCourseMobileRes } from '@/types/mobile-api';
 
 export const courseService = {
@@ -12,7 +13,10 @@ export const courseService = {
         const queryString = params ? buildQueryString(params) : '';
         const response = await apiClient<any>(`/course${queryString}`);
 
-        const courses = getArray(response, 'courses');
+        const courses = getArray(response, 'courses').map((c: any) => ({
+            ...c,
+            image_url: getMediaUrl(c.image_url)
+        }));
         const total = response.total || response.count || courses.length;
 
         return {
@@ -27,24 +31,43 @@ export const courseService = {
     getCourseById: async (id: string): Promise<MobileCourseRes> => {
         const course = await apiClient<MobileCourseRes>(`/course/${id}`);
 
+        if (course) {
+            course.image_url = getMediaUrl(course.image_url);
+        }
+
         // Helper to check if any price is 0
         const hasFreePrice = course.price?.some(p => p.price === 0);
 
         // ✅ CRITICAL FIX: The detail API often misses the is_public flag
-        // Also check for price === 0 as per user requirements
+        // Also check for price === 0 detection
         if (course && !course.is_public && !hasFreePrice) {
             try {
-                // Fetch list to find correct status fallback
-                // Optimally search by name to avoid pagination issues
-                const query = course.name ? `?name=${encodeURIComponent(course.name)}` : '?limit=100';
-                const response = await apiClient<any>(`/course${query}`);
-                const courses = getArray(response, 'courses');
-                const found = courses.find((c: any) => (c.id === id || c.course_id === id));
+                // Strategy 1: Search by name (sanitized) to handle special chars like quotes
+                let found: any = undefined;
+
+                if (course.name) {
+                    // Remove quotes and special chars for better search compatibility
+                    const cleanName = course.name.replace(/['"]/g, '').trim();
+                    const query = `?name=${encodeURIComponent(cleanName)}`;
+                    const response = await apiClient<any>(`/course${query}`);
+                    const courses = getArray(response, 'courses');
+                    found = courses.find((c: any) => (c.id === id || c.course_id === id));
+                }
+
+                // Strategy 2: If name search failed, try fetching latest 100 courses
+                // This covers cases where name search is broken or fuzzy match fails
+                if (!found) {
+                    const response = await apiClient<any>(`/course?limit=100`);
+                    const courses = getArray(response, 'courses');
+                    found = courses.find((c: any) => (c.id === id || c.course_id === id));
+                }
+
                 if (found?.is_public) {
                     course.is_public = true;
                 }
             } catch (err) {
                 // Silently fail fallback
+                console.warn('Failed to recover is_public flag', err);
             }
         }
 
@@ -54,66 +77,56 @@ export const courseService = {
     /**
      * Get user's enrolled courses (API + Local Storage for free courses)
      */
+    /**
+     * Get user's enrolled courses (API + Local Storage for free courses)
+     */
     getUserCourses: async (params?: any): Promise<UserCourseMobileList> => {
         const queryString = params ? buildQueryString(params) : '';
 
         try {
             // 1. Fetch official enrollments from API
             const response = await apiClient<any>(`/course/permission${queryString}`);
-            const apiCourses = getArray(response, 'user_courses');
+            const apiCourses = getArray(response, 'user_courses').map((c: any) => ({
+                ...c,
+                course_image_url: getMediaUrl(c.course_image_url)
+            }));
             let total = response.total || response.count || apiCourses.length;
 
             // 2. Fetch locally saved free courses
             if (typeof window !== 'undefined') {
-                const localIds = getLocalFreeCourses();
-                if (localIds.length > 0) {
-                    // Filter out IDs that are already in API response to avoid duplicates
-                    const existingIds = new Set(apiCourses.map((c: any) => c.course_id));
-                    const newLocalIds = localIds.filter(id => !existingIds.has(id));
+                // Determine which IDs are causing duplicates
+                const existingIds = new Set(apiCourses.map((c: any) => c.course_id || c.id));
 
-                    if (newLocalIds.length > 0) {
-                        // Fetch details for these local courses
-                        // We can use getCourses with IDs if API supports it, or fetch individually
-                        // For simplicity, let's try to fetch them one by one (limit this in production!)
-                        // Or better: fetch all courses and filter client side if list is small, 
-                        // but getCourses is paginated.
-                        // Strategy: Fetch individual details for up to 5 courses to avoid spamming
-                        const localCoursesDetails = await Promise.all(
-                            newLocalIds.slice(0, 5).map(async (id) => {
-                                try {
-                                    const course = await courseService.getCourseById(id);
-                                    if (!course) return null;
+                // Retrieve DETAILED course objects from local storage
+                // This avoids making 50+ individual API calls which is slow and error-prone
+                const localDetails = getLocalFreeCourseDetails();
 
-                                    // Map to UserCourseMobileRes format
-                                    return {
-                                        id: `local_${course.id}`,
-                                        course_id: course.id,
-                                        course_name: course.name,
-                                        course_image_url: course.image_url,
-                                        user_id: 'local_user', // Placeholder
-                                        user_name: 'Me',
-                                        tariff_id: 'free_tariff',
-                                        tariff_name: 'Bepul',
-                                        duration: course.duration || 0,
-                                        percentage: 0, // Cannot track progress properly without backend
-                                        total_lessons: course.lessons || 0,
-                                        completed_lessons: 0,
-                                        is_active: true,
-                                        started_at: new Date().toISOString(),
-                                        ended_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-                                        created_at: new Date().toISOString(),
-                                        updated_at: new Date().toISOString()
-                                    } as UserCourseMobileRes;
-                                } catch (e) {
-                                    return null;
-                                }
-                            })
-                        );
+                // Filter courses that are not already in the API response
+                const validLocalCourses = localDetails
+                    .filter((course: MobileCourseRes) => !existingIds.has(course.id))
+                    .map((course: MobileCourseRes) => ({
+                        id: `local_${course.id}`,
+                        course_id: course.id,
+                        course_name: course.name,
+                        course_image_url: course.image_url,
+                        user_id: 'local_user',
+                        user_name: 'Me',
+                        tariff_id: 'free_tariff',
+                        tariff_name: 'Bepul',
+                        duration: course.duration || 0,
+                        percentage: 0,
+                        total_lessons: course.lessons || course.modules?.reduce((acc: number, m: any) => acc + (m.lessons?.length || 0), 0) || 0,
+                        completed_lessons: 0,
+                        is_active: true,
+                        started_at: new Date().toISOString(),
+                        ended_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    } as UserCourseMobileRes));
 
-                        const validLocalCourses = localCoursesDetails.filter(Boolean) as UserCourseMobileRes[];
-                        apiCourses.push(...validLocalCourses);
-                        total += validLocalCourses.length;
-                    }
+                if (validLocalCourses.length > 0) {
+                    apiCourses.push(...validLocalCourses);
+                    total += validLocalCourses.length;
                 }
             }
 
@@ -123,8 +136,6 @@ export const courseService = {
             };
         } catch (error) {
             console.error('Failed to get user courses:', error);
-            // Fallback to empty if API fails, but maybe still show local?
-            // For now, just throw or return empty
             return { user_courses: [], count: 0 };
         }
     },
@@ -132,12 +143,21 @@ export const courseService = {
     /**
      * Start a free course (Local Storage only)
      */
-    startFreeCourse: (courseId: string) => {
-        if (typeof window === 'undefined') return;
+    startFreeCourse: (course: Partial<MobileCourseRes>) => {
+        if (typeof window === 'undefined' || !course.id) return;
+
+        // 1. Update ID list for backward compatibility (optional, but good)
         const ids = getLocalFreeCourses();
-        if (!ids.includes(courseId)) {
-            ids.push(courseId);
+        if (!ids.includes(course.id)) {
+            ids.push(course.id);
             localStorage.setItem('my_free_courses', JSON.stringify(ids));
+        }
+
+        // 2. Update Details list
+        const details = getLocalFreeCourseDetails();
+        if (!details.find((d: MobileCourseRes) => d.id === course.id)) {
+            details.push(course as MobileCourseRes);
+            localStorage.setItem('my_free_course_details', JSON.stringify(details));
         }
     },
 
@@ -145,7 +165,11 @@ export const courseService = {
      * Get course with permission details
      */
     getCourseWithPermission: async (id: string): Promise<UserCourseMobileRes> => {
-        return apiClient<UserCourseMobileRes>(`/course/permission/${id}`);
+        const course = await apiClient<UserCourseMobileRes>(`/course/permission/${id}`);
+        if (course) {
+            course.course_image_url = getMediaUrl(course.course_image_url);
+        }
+        return course;
     },
 };
 
@@ -191,6 +215,19 @@ function getLocalFreeCourses(): string[] {
     if (typeof window === 'undefined') return [];
     try {
         const item = localStorage.getItem('my_free_courses');
+        return item ? JSON.parse(item) : [];
+    } catch {
+        return [];
+    }
+}
+
+/**
+ * Helper to get local free course details
+ */
+function getLocalFreeCourseDetails(): MobileCourseRes[] {
+    if (typeof window === 'undefined') return [];
+    try {
+        const item = localStorage.getItem('my_free_course_details');
         return item ? JSON.parse(item) : [];
     } catch {
         return [];

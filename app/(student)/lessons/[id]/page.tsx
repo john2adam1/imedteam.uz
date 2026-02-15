@@ -6,6 +6,7 @@ import { SourceLessonMobileRes } from '@/types/mobile-api';
 import { useRouter, useParams } from 'next/navigation';
 import { Play, FileText, ClipboardList, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { getYoutubeEmbedUrl } from '@/lib/utils';
+import PDFViewer from '@/components/ui/PDFViewer';
 
 export default function LessonPage() {
     const params = useParams();
@@ -16,6 +17,7 @@ export default function LessonPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
     const [startTime] = useState(Date.now());
+    const [viewPdf, setViewPdf] = useState<{ url: string; name: string } | null>(null);
 
     useEffect(() => {
         if (!id) return;
@@ -107,6 +109,15 @@ export default function LessonPage() {
                 </div>
             </div>
 
+            {/* PDF Viewer Modal */}
+            {viewPdf && (
+                <PDFViewer
+                    url={viewPdf.url}
+                    name={viewPdf.name}
+                    onClose={() => setViewPdf(null)}
+                />
+            )}
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                 {/* Main Content: Video and Completion */}
                 <div className="lg:col-span-2 space-y-10">
@@ -177,17 +188,15 @@ export default function LessonPage() {
                             <ul className="space-y-3">
                                 {lesson.documents.map((doc) => (
                                     <li key={doc.id}>
-                                        <a
-                                            href={doc.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-transparent hover:border-blue-100 hover:bg-blue-50/30 transition-all group"
+                                        <button
+                                            onClick={() => setViewPdf({ url: doc.url, name: doc.name })}
+                                            className="w-full flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-transparent hover:border-blue-100 hover:bg-blue-50/30 transition-all group text-left"
                                         >
                                             <div className="w-8 h-8 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 group-hover:text-blue-500 transition-colors">
                                                 <FileText size={16} />
                                             </div>
                                             <span className="text-sm font-bold text-gray-700 group-hover:text-gray-900 line-clamp-1">{doc.name}</span>
-                                        </a>
+                                        </button>
                                     </li>
                                 ))}
                             </ul>
@@ -209,17 +218,15 @@ export default function LessonPage() {
                             <ul className="space-y-3">
                                 {lesson.tests.map((test) => (
                                     <li key={test.id}>
-                                        <a
-                                            href={test.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-transparent hover:border-amber-100 hover:bg-amber-50/30 transition-all group"
+                                        <button
+                                            onClick={() => setViewPdf({ url: test.url, name: test.name })}
+                                            className="w-full flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-transparent hover:border-amber-100 hover:bg-amber-50/30 transition-all group text-left"
                                         >
                                             <div className="w-8 h-8 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 group-hover:text-amber-500 transition-colors">
                                                 <ClipboardList size={16} />
                                             </div>
                                             <span className="text-sm font-bold text-gray-700 group-hover:text-gray-900 line-clamp-1">{test.name}</span>
-                                        </a>
+                                        </button>
                                     </li>
                                 ))}
                             </ul>

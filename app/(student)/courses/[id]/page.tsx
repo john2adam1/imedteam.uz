@@ -79,7 +79,8 @@ export default function CourseDetailPage() {
             setIsEnrolling(true);
 
             // ✅ FIX: Save to local storage so it appears in "My Courses"
-            courseService.startFreeCourse(id);
+            // We pass the full object now to avoid API re-fetching issues in the dashboard
+            courseService.startFreeCourse(course);
 
             // ✅ FIX: For free courses, just navigate to first lesson directly
             // No need to create order or enroll for truly free courses

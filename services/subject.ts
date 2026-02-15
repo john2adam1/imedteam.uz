@@ -2,6 +2,7 @@
 // Handles subject operations
 
 import { apiClient } from '@/lib/api-client';
+import { getMediaUrl } from '@/lib/utils';
 
 export const subjectService = {
     /**
@@ -11,9 +12,14 @@ export const subjectService = {
         const queryString = params ? buildQueryString(params) : '';
         const response = await apiClient<any>(`/subject${queryString}`);
 
+        const subjects = (response.data || []).map((s: any) => ({
+            ...s,
+            image_url: getMediaUrl(s.image_url)
+        }));
+
         // API returns {data: [], total: number} but we need {subjects: [], count: number}
         return {
-            subjects: response.data || [],
+            subjects,
             count: response.total || 0
         };
     },

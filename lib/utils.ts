@@ -35,7 +35,23 @@ export function getYoutubeEmbedUrl(url: string = ''): string {
   } catch (e) {
     console.error('Error parsing YouTube URL:', e);
   }
-
   return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
+}
+
+/**
+ * Formats media URLs to include base URL if needed
+ */
+export function getMediaUrl(url: string | undefined | null): string {
+  if (!url) return '';
+
+  if (url.startsWith('http')) {
+    return url;
+  }
+
+  if (url.startsWith('/media')) {
+    return `https://prod.axadjonovsardorbek.uz${url}`;
+  }
+
+  return url;
 }
 

@@ -16,7 +16,7 @@ export default function AuthLayout({
             <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
                 <div className="flex justify-center mb-8">
                     <div className="w-20 h-20 rounded-2xl bg-white shadow-xl shadow-slate-200/50 flex items-center justify-center p-4">
-                        <img src="/assets/imedteamlogo.png" alt="Logo" className="w-full h-full object-contain" />
+                        <img src="/assets/favicon.ico.png" alt="Logo" className="w-full h-full object-contain" />
                     </div>
                 </div>
             </div>

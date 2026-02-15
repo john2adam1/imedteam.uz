@@ -2,6 +2,7 @@
 // Handles user profile operations
 
 import { apiClient } from '@/lib/api-client';
+import { getMediaUrl } from '@/lib/utils';
 import { UserRes, ProfileUpdateBody } from '@/types/mobile-api';
 
 export const profileService = {
@@ -10,7 +11,11 @@ export const profileService = {
      */
     getUserProfile: async (): Promise<UserRes> => {
         const response = await apiClient<any>('/user/get/profile');
-        return response.data || response;
+        const user = response.data || response;
+        if (user) {
+            user.image_url = getMediaUrl(user.image_url);
+        }
+        return user;
     },
 
     /**

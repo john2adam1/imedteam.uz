@@ -220,7 +220,7 @@ export default function CoursesPage() {
 
                             {/* Empty State */}
                             {courses.length === 0 ? (
-                                <div className="text-center py-20 bg-slate-50/50 rounded-[2.5rem] border-2 border-dashed border-gray-100 flex flex-col items-center">
+                                <div className="text-center py-20 bg-white rounded-[2.5rem] border-2 border-dashed border-gray-100 flex flex-col items-center">
                                     <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center text-3xl mb-6 opacity-50 grayscale">
                                         📚
                                     </div>
