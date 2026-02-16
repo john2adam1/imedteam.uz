@@ -4,6 +4,8 @@ import React, { useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/student/Sidebar';
+import { notificationService } from '@/services';
+import { Bell } from 'lucide-react';
 
 
 export default function StudentLayout({
@@ -14,6 +16,21 @@ export default function StudentLayout({
     const { user, isLoading } = useAuth();
     const router = useRouter();
     const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+    const [notifications, setNotifications] = React.useState<{ notifications: any[], count: number }>({ notifications: [], count: 0 });
+
+    useEffect(() => {
+        if (!isLoading && user) {
+            notificationService.getNotifications()
+                .then(data => {
+                    if (data) setNotifications(data);
+                })
+                .catch(err => console.error('Failed to load notifications in layout:', err));
+        }
+    }, [user, isLoading]);
+
+    const hasUnread = React.useMemo(() => {
+        return notifications?.notifications?.some((n: any) => !n.is_read);
+    }, [notifications]);
 
     useEffect(() => {
         if (!isLoading && !user) {
@@ -44,6 +61,16 @@ export default function StudentLayout({
                     </button>
                     <span className="font-bold text-lg text-slate-900">iMed Team</span>
                 </div>
+
+                <button
+                    onClick={() => router.push('/notifications')}
+                    className="p-2 text-gray-400 hover:text-primary relative active:scale-95 group"
+                >
+                    <Bell size={24} />
+                    {hasUnread && (
+                        <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-primary rounded-full border-2 border-white animate-pulse" />
+                    )}
+                </button>
             </div>
 
             {/* Mobile Sidebar Overlay */}

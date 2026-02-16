@@ -9,15 +9,15 @@ import {
     ratingService
 } from '@/services';
 import { useRouter } from 'next/navigation';
-import { Bell, Sun, Trophy, BookOpen, Clock, ChevronRight, Play, AlertCircle } from 'lucide-react';
+import { Bell, Sun, Trophy, BookOpen, Clock, ChevronRight, Play } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import BannerSlider from '@/components/student/BannerSlider';
+import { cn } from '@/lib/utils';
 
 export default function AppHome() {
     const { user: authUser } = useAuth();
     const [userCourses, setUserCourses] = useState<{ user_courses: any[], count: number }>({ user_courses: [], count: 0 });
     const [banners, setBanners] = useState<{ banners: any[], count: number }>({ banners: [], count: 0 });
-    const [notifications, setNotifications] = useState<{ notifications: any[], count: number }>({ notifications: [], count: 0 });
     const [activity, setActivity] = useState<any>(null);
     const [rating, setRating] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -41,7 +41,6 @@ export default function AppHome() {
             await Promise.allSettled([
                 fetchData(() => courseService.getUserCourses(), setUserCourses, 'user courses'),
                 fetchData(() => bannerService.getBanners(), setBanners, 'banners'),
-                fetchData(() => notificationService.getNotifications(), setNotifications, 'notifications'),
                 fetchData(() => activityService.getStats({ type: 'year' }), setActivity, 'activity'),
                 fetchData(() => ratingService.getRating(), setRating, 'rating')
             ]);
@@ -52,10 +51,15 @@ export default function AppHome() {
         loadDashboardData();
     }, []);
 
-    // Memoize the hasUnread check
-    const hasUnread = useMemo(() => {
-        return notifications?.notifications?.some((n: any) => !n.is_read);
-    }, [notifications]);
+    // Memoize the derived statistics
+    const stats = useMemo(() => {
+        if (!userCourses?.user_courses) return { enrolled: 0, completed: 0 };
+        const courses = userCourses.user_courses;
+        return {
+            enrolled: userCourses.count || courses.length,
+            completed: courses.reduce((acc: number, c: any) => acc + (c.completed_lessons || 0), 0)
+        };
+    }, [userCourses]);
 
     if (loading) {
         return (
@@ -77,29 +81,15 @@ export default function AppHome() {
                     <p className="text-lg text-gray-500 mt-2 font-medium italic">Bugun yangi bilimlar olish uchun ajoyib kun!</p>
                 </div>
                 <div className="flex items-center gap-4">
-                    <button className="p-4 rounded-[1.5rem] bg-white border border-gray-100 text-gray-400 hover:text-primary hover:border-primary/20 hover:shadow-premium transition-all active:scale-95 group">
-                        <Sun size={22} className="group-hover:rotate-45 transition-transform duration-500" />
-                    </button>
-                    <button
-                        onClick={() => router.push('/notifications')}
-                        className="p-4 rounded-[1.5rem] bg-white border border-gray-100 text-gray-400 hover:text-primary hover:border-primary/20 hover:shadow-premium transition-all relative active:scale-95 group"
-                    >
-                        <Bell size={22} className="group-hover:ring-offset-2 group-hover:ring-2 ring-primary/20 rounded-full transition-all" />
-                        {hasUnread && (
-                            <span className="absolute top-4 right-4 w-3 h-3 bg-primary rounded-full border-2 border-white animate-pulse" />
-                        )}
-                    </button>
                 </div>
             </div>
 
-            {/* Banners Section - Prominent & Visual */}
             {/* Banners Section - Prominent & Visual */}
             {(banners?.banners && banners.banners.length > 0) ? (
                 <div className="animate-in fade-in zoom-in duration-700">
                     <BannerSlider banners={banners.banners} />
                 </div>
             ) : (
-                /* Diagnostic Placeholder when no banners found but no error thrown */
                 <div className="hidden">No banners available in the data</div>
             )}
 
@@ -113,7 +103,7 @@ export default function AppHome() {
                         <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em]">O'qilayotgan kurslar</p>
                     </div>
                     <div className="flex items-end justify-between">
-                        <p className="text-5xl font-black text-gray-900 tracking-tighter">{userCourses?.count || 0}</p>
+                        <p className="text-5xl font-black text-gray-900 tracking-tighter">{stats.enrolled}</p>
                         <p className="text-xs font-bold text-gray-400 mb-2">ta kurs</p>
                     </div>
                 </div>
@@ -126,7 +116,7 @@ export default function AppHome() {
                         <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em]">Tugatilgan darslar</p>
                     </div>
                     <div className="flex items-end justify-between">
-                        <p className="text-5xl font-black text-gray-900 tracking-tighter">{activity?.completed_lessons || 0}</p>
+                        <p className="text-5xl font-black text-gray-900 tracking-tighter">{stats.completed}</p>
                         <p className="text-xs font-bold text-gray-400 mb-2">ta dars</p>
                     </div>
                 </div>
@@ -140,7 +130,9 @@ export default function AppHome() {
                     </div>
                     <div className="flex items-end justify-between">
                         <div className="flex items-center gap-2">
-                            <p className="text-5xl font-black text-gray-900 tracking-tighter">{rating?.rating || 0}</p>
+                            <p className="text-5xl font-black text-gray-900 tracking-tighter">
+                                {rating?.me?.activity || 0}
+                            </p>
                             <span className="text-3xl text-yellow-500 drop-shadow-sm">★</span>
                         </div>
                         <p className="text-xs font-bold text-gray-400 mb-2">ball</p>
@@ -188,11 +180,6 @@ export default function AppHome() {
                                             </div>
                                         </div>
                                     )}
-
-                                    {/* Progress Circle Top Right */}
-                                    <div className="absolute top-4 right-4 w-12 h-12 rounded-2xl bg-white/90 backdrop-blur-md shadow-card flex items-center justify-center border border-white/20">
-                                        <span className="text-xs font-black text-primary">{Math.round(course.percentage || 0)}%</span>
-                                    </div>
                                 </div>
 
                                 <h3 className="text-lg font-black text-gray-900 mb-3 line-clamp-1 group-hover:text-primary transition-colors tracking-tight">
@@ -200,11 +187,19 @@ export default function AppHome() {
                                 </h3>
 
                                 <div className="space-y-4 mt-auto">
-                                    <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden shadow-inner">
+                                    <div className="w-full bg-slate-100 rounded-full h-5 overflow-hidden shadow-inner relative">
                                         <div
                                             className="bg-primary h-full rounded-full transition-all duration-1000 shadow-lg shadow-primary/20"
                                             style={{ width: `${course.percentage || 0}%` }}
                                         />
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <span className={cn(
+                                                "text-[10px] font-black uppercase tracking-widest",
+                                                (course.percentage || 0) > 55 ? "text-white" : "text-primary"
+                                            )}>
+                                                {Math.round(course.percentage || 0)}% TUGATILDI
+                                            </span>
+                                        </div>
                                     </div>
                                     <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-gray-400">
                                         <span>{course.completed_lessons || 0} DARS</span>

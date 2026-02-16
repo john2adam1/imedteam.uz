@@ -316,13 +316,13 @@ function CourseCard({ course, activeTab, isFree, onClick }: { course: any; activ
                             </div>
                         </div>
                     </div>
-                ) : course.image_url ? (
+                ) : (course.image_url || course.course_image_url) ? (
                     <img
-                        src={course.image_url}
+                        src={course.image_url || course.course_image_url}
                         alt={course.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                         onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x250/800000/FFFFFF?text=KURS';
+                            (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x250/800000/FFFFFF?text=TIBBIYOT';
                         }}
                     />
                 ) : (

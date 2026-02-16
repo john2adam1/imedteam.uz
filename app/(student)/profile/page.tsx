@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth-context';
 import { authService, activityService, profileService } from '@/services';
 import { ActivityStatsResponse } from '@/types/mobile-api';
 import { User, Phone, Shield, BarChart3, Trash2, Camera, LogOut, Key } from 'lucide-react';
+import Modal from '@/components/ui/Modal';
 
 export default function ProfilePage() {
     const { user, logout, refreshUser } = useAuth();
@@ -231,110 +232,6 @@ export default function ProfilePage() {
                         </div>
                     )}
 
-                    {/* Edit Profile Form */}
-                    {showEditProfileForm && (
-                        <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-soft">
-                            <h3 className="text-xl font-black text-gray-900 mb-8">Profilni tahrirlash</h3>
-                            <form onSubmit={handleUpdateProfile} className="space-y-6">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Ism familingiz</label>
-                                        <input
-                                            type="text"
-                                            value={editName}
-                                            onChange={(e) => setEditName(e.target.value)}
-                                            className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Telefon raqam</label>
-                                        <input
-                                            type="tel"
-                                            value={editPhone}
-                                            onChange={(e) => setEditPhone(e.target.value)}
-                                            className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="flex gap-4 pt-4">
-                                    <button
-                                        type="submit"
-                                        disabled={loading}
-                                        className="px-10 py-4 bg-primary text-white rounded-2xl font-black shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-[0.98] disabled:opacity-50"
-                                    >
-                                        {loading ? 'Saqlanmoqda...' : 'Saqlash'}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowEditProfileForm(false)}
-                                        className="px-10 py-4 bg-slate-50 text-gray-500 rounded-2xl font-bold hover:bg-slate-100 transition-all active:scale-[0.98]"
-                                    >
-                                        Bekor qilish
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    )}
-
-                    {/* Password Form */}
-                    {showPasswordForm && (
-                        <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-soft">
-                            <h3 className="text-xl font-black text-gray-900 mb-8">Parolni o'zgartirish</h3>
-                            <form onSubmit={handleChangePassword} className="space-y-6">
-                                <div className="grid grid-cols-1 gap-6">
-                                    <div>
-                                        <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Eski parol</label>
-                                        <input
-                                            type="password"
-                                            value={oldPassword}
-                                            onChange={(e) => setOldPassword(e.target.value)}
-                                            required
-                                            className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                        <div>
-                                            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Yangi parol</label>
-                                            <input
-                                                type="password"
-                                                value={newPassword}
-                                                onChange={(e) => setNewPassword(e.target.value)}
-                                                required
-                                                className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Yangi parolni tasdiqlang</label>
-                                            <input
-                                                type="password"
-                                                value={confirmPassword}
-                                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                                required
-                                                className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="flex gap-4 pt-4">
-                                    <button
-                                        type="submit"
-                                        disabled={loading}
-                                        className="px-10 py-4 bg-primary text-white rounded-2xl font-black shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-[0.98] disabled:opacity-50"
-                                    >
-                                        {loading ? 'Yangilanmoqda...' : 'Parolni yangilash'}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPasswordForm(false)}
-                                        className="px-10 py-4 bg-slate-50 text-gray-500 rounded-2xl font-bold hover:bg-slate-100 transition-all active:scale-[0.98]"
-                                    >
-                                        Bekor qilish
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    )}
-
                     {/* Danger Zone */}
                     <div className="bg-red-50/50 p-8 rounded-[2.5rem] border border-red-100">
                         <h3 className="text-xl font-black text-red-700 mb-2 flex items-center gap-2">
@@ -373,6 +270,145 @@ export default function ProfilePage() {
                     </div>
                 </div>
             </div>
+
+            {/* Modals */}
+            <Modal
+                isOpen={showEditProfileForm}
+                onClose={() => setShowEditProfileForm(false)}
+                title="Profilni tahrirlash"
+            >
+                <form onSubmit={handleUpdateProfile} className="space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Ism familingiz</label>
+                            <input
+                                type="text"
+                                value={editName}
+                                onChange={(e) => setEditName(e.target.value)}
+                                className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Telefon raqam</label>
+                            <input
+                                type="tel"
+                                value={editPhone}
+                                onChange={(e) => setEditPhone(e.target.value)}
+                                className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
+                            />
+                        </div>
+                    </div>
+                    <div className="flex gap-4 pt-4">
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="flex-1 py-4 bg-primary text-white rounded-2xl font-black shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-[0.98] disabled:opacity-50"
+                        >
+                            {loading ? 'Saqlanmoqda...' : 'Saqlash'}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setShowEditProfileForm(false)}
+                            className="flex-1 py-4 bg-slate-50 text-gray-500 rounded-2xl font-bold hover:bg-slate-100 transition-all active:scale-[0.98]"
+                        >
+                            Bekor qilish
+                        </button>
+                    </div>
+                </form>
+            </Modal>
+
+            <Modal
+                isOpen={showPasswordForm}
+                onClose={() => setShowPasswordForm(false)}
+                title="Parolni o'zgartirish"
+            >
+                <form onSubmit={handleChangePassword} className="space-y-6">
+                    <div className="space-y-6">
+                        <div>
+                            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Eski parol</label>
+                            <input
+                                type="password"
+                                value={oldPassword}
+                                onChange={(e) => setOldPassword(e.target.value)}
+                                required
+                                className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
+                            />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Yangi parol</label>
+                                <input
+                                    type="password"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    required
+                                    className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Tasdiqlash</label>
+                                <input
+                                    type="password"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    required
+                                    className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex gap-4 pt-4">
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="flex-1 py-4 bg-primary text-white rounded-2xl font-black shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-[0.98] disabled:opacity-50"
+                        >
+                            {loading ? 'Yangilanmoqda...' : 'Parolni yangilash'}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setShowPasswordForm(false)}
+                            className="flex-1 py-4 bg-slate-50 text-gray-500 rounded-2xl font-bold hover:bg-slate-100 transition-all active:scale-[0.98]"
+                        >
+                            Bekor qilish
+                        </button>
+                    </div>
+                </form>
+            </Modal>
+
+            <Modal
+                isOpen={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                title="Hisobni o'chirish"
+                className="max-w-md"
+            >
+                <div className="text-center space-y-6">
+                    <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Trash2 size={40} />
+                    </div>
+                    <p className="text-gray-900 font-black text-xl leading-tight tracking-tight uppercase">
+                        Haqiqatan ham hisobingizni o'chirib yubormoqchimisiz?
+                    </p>
+                    <p className="text-red-600 font-medium">
+                        Bu qaytarib bo'lmas jarayon bo'lib, barcha ma'lumotlaringiz butunlay yo'qoladi.
+                    </p>
+                    <div className="flex flex-col gap-3 pt-4">
+                        <button
+                            onClick={handleDeleteAccount}
+                            disabled={loading}
+                            className="w-full py-4 bg-red-600 text-white rounded-2xl font-black shadow-lg shadow-red-600/20 hover:bg-red-700 transition-all active:scale-[0.98] disabled:opacity-50"
+                        >
+                            {loading ? 'O\'chirilmoqda...' : 'Ha, o\'chirilsin'}
+                        </button>
+                        <button
+                            onClick={() => setShowDeleteConfirm(false)}
+                            className="w-full py-4 bg-slate-50 text-gray-500 rounded-2xl font-bold hover:bg-slate-100 transition-all active:scale-[0.98]"
+                        >
+                            Yo'q, qolsin
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 }

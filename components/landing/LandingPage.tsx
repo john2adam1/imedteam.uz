@@ -25,9 +25,7 @@ export default function LandingPage() {
         // Trigger once on load
         onScrollReveal();
 
-        return () => {
-            window.removeEventListener('scroll', onScrollReveal);
-        };
+        return () => window.removeEventListener('scroll', onScrollReveal);
     }, []);
 
     return (

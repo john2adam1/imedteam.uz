@@ -100,29 +100,37 @@ export const courseService = {
                 // Retrieve DETAILED course objects from local storage
                 // This avoids making 50+ individual API calls which is slow and error-prone
                 const localDetails = getLocalFreeCourseDetails();
+                const completedLessonIds = getLocalCompletedLessons();
 
                 // Filter courses that are not already in the API response
                 const validLocalCourses = localDetails
                     .filter((course: MobileCourseRes) => !existingIds.has(course.id))
-                    .map((course: MobileCourseRes) => ({
-                        id: `local_${course.id}`,
-                        course_id: course.id,
-                        course_name: course.name,
-                        course_image_url: course.image_url,
-                        user_id: 'local_user',
-                        user_name: 'Me',
-                        tariff_id: 'free_tariff',
-                        tariff_name: 'Bepul',
-                        duration: course.duration || 0,
-                        percentage: 0,
-                        total_lessons: course.lessons || course.modules?.reduce((acc: number, m: any) => acc + (m.lessons?.length || 0), 0) || 0,
-                        completed_lessons: 0,
-                        is_active: true,
-                        started_at: new Date().toISOString(),
-                        ended_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-                        created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString()
-                    } as UserCourseMobileRes));
+                    .map((course: MobileCourseRes) => {
+                        const lessons = course.modules?.flatMap(m => m.lessons || []) || [];
+                        const total_lessons = lessons.length || course.lessons || 0;
+                        const completed_count = lessons.filter(l => completedLessonIds.has(l.id)).length;
+                        const percentage = total_lessons > 0 ? Math.round((completed_count / total_lessons) * 100) : 0;
+
+                        return {
+                            id: `local_${course.id}`, // Prefix to distinguish from API courses if needed
+                            course_id: course.id,
+                            course_name: course.name,
+                            course_image_url: course.image_url,
+                            user_id: 'local_user',
+                            user_name: 'Me',
+                            tariff_id: 'free_tariff',
+                            tariff_name: 'Bepul',
+                            duration: course.duration || 0,
+                            percentage: percentage,
+                            total_lessons: total_lessons,
+                            completed_lessons: completed_count,
+                            is_active: true,
+                            started_at: new Date().toISOString(),
+                            ended_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString()
+                        } as UserCourseMobileRes;
+                    });
 
                 if (validLocalCourses.length > 0) {
                     apiCourses.push(...validLocalCourses);
@@ -231,5 +239,19 @@ function getLocalFreeCourseDetails(): MobileCourseRes[] {
         return item ? JSON.parse(item) : [];
     } catch {
         return [];
+    }
+}
+
+/**
+ * Helper to get local completed lesson IDs
+ */
+function getLocalCompletedLessons(): Set<string> {
+    if (typeof window === 'undefined') return new Set();
+    try {
+        const item = localStorage.getItem('completed_lessons');
+        const ids = item ? JSON.parse(item) : [];
+        return new Set(Array.isArray(ids) ? ids : []);
+    } catch {
+        return new Set();
     }
 }

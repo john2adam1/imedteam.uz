@@ -54,40 +54,11 @@ export default function Header() {
                         <div className="flex items-center gap-4">
                             <Link
                                 href={authPath}
-                                className="hidden md:inline-flex px-8 py-3 rounded-2xl bg-slate-900 text-white text-sm font-bold hover:bg-primary transition-all shadow-lg shadow-slate-900/10 active:scale-95"
+                                className="inline-flex px-8 py-3 rounded-2xl bg-slate-900 text-white text-sm font-bold hover:bg-primary transition-all shadow-lg shadow-slate-900/10 active:scale-95 whitespace-nowrap"
                             >
                                 {isAuthenticated ? 'Kabinet' : 'Kirish'}
                             </Link>
-                            <button
-                                className="lg:hidden w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-900 hover:bg-primary/5 hover:text-primary transition-all"
-                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                            >
-                                {mobileMenuOpen ? '✕' : '☰'}
-                            </button>
                         </div>
-                    </div>
-                </div>
-
-                {/* Mobile menu */}
-                <div className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${mobileMenuOpen ? 'max-h-[500px] border-t border-slate-100' : 'max-h-0'}`}>
-                    <div className="max-w-7xl mx-auto px-6 py-8 grid gap-4 bg-white">
-                        {['Bosh sahifa', 'Xizmatlar', 'Kurslar', 'Jamoa', 'Yangiliklar', 'Aloqa'].map((item, i) => (
-                            <a
-                                key={i}
-                                href={`#${['home', 'services', 'courses', 'team', 'blog', 'contact'][i]}`}
-                                className="py-2 text-lg font-black text-slate-900 hover:text-primary transition-colors"
-                                onClick={() => setMobileMenuOpen(false)}
-                            >
-                                {item}
-                            </a>
-                        ))}
-                        <Link
-                            href={authPath}
-                            className="mt-4 py-4 px-6 rounded-2xl bg-primary text-white font-black text-center shadow-lg shadow-primary/20"
-                            onClick={() => setMobileMenuOpen(false)}
-                        >
-                            {isAuthenticated ? 'Shaxsiy kabinet' : "Kirish / Ro'yxatdan o'tish"}
-                        </Link>
                     </div>
                 </div>
             </header>

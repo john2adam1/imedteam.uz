@@ -15,18 +15,18 @@ export default function Services() {
 
                         <div className="text-slate-600 mt-8 space-y-6 text-lg font-medium leading-relaxed">
                             <p>
-                                2021-yildan buyon 6000 dan ziyod talaba va shifokorlarni o‘qitib kelayotgan professional platformamizga qo'shiling.
+                                “iMed Team” tibbiy platformasi 2021-yildan buyon o‘z faoliyatlarini olib bormoqda. Shu kungacha biz 6000 dan ziyod bo‘lgan talaba va shifokorlarni o‘qitib keldik.
                             </p>
                             <p>
-                                Bizning kurslarimiz xalqaro standartlar asosida tuzilgan va O‘zbekiston tibbiyot muhitiga mukammal moslashtirilgan.
+                                Bizning kurslarimizdagi barcha manbalar xalqaro darajadagi ma’lumotlar asosiga tuzilgan va O’zbekiston muhitiga moslashtirilgan.
                             </p>
                         </div>
 
                         <div className="mt-12 space-y-4">
                             {[
-                                "Talabalarni zamonaviy va isbotli tibbiyot bilan tanishtirish",
-                                "Nazariy va amaliy bilimlarni uyg‘unlashtirish",
-                                "Har bir bemorga individual yondashuvni o‘rgatish"
+                                "Talaba va shifokorlarni zamonaviy va isbotli tibbiyot bilan tanishtirish",
+                                "Nazariy va amaliy bilimlarni birgalikda uyg‘unlashtira olish",
+                                "Har bir bemorga o‘z yaqini sifatida individual yondashuvni o‘rgatish"
                             ].map((item, i) => (
                                 <div key={i} className="flex items-center gap-4 p-5 rounded-2xl bg-slate-50 border border-slate-100 font-semibold text-slate-800 transition-all hover:bg-white hover:shadow-soft">
                                     <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 text-xs">
