@@ -49,28 +49,31 @@ export default function StudentLayout({
     return (
         <div className="flex min-h-screen bg-background">
             {/* Mobile Header */}
-            <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-100 z-40 flex items-center justify-between px-4">
-                <div className="flex items-center gap-3">
-                    <button
-                        onClick={() => setMobileMenuOpen(true)}
-                        className="p-2 -ml-2 text-gray-600 hover:bg-slate-50 rounded-xl"
-                    >
-                        <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
+            <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-100 z-40 flex items-center px-4">
+                <button
+                    onClick={() => setMobileMenuOpen(true)}
+                    className="p-2 -ml-2 text-gray-900 hover:bg-slate-50 rounded-xl relative z-10 active:scale-90 transition-transform"
+                >
+                    <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+
+                <div className="absolute inset-0 flex items-center justify-center">
                     <span className="font-bold text-lg text-slate-900">iMed Team</span>
                 </div>
 
-                <button
-                    onClick={() => router.push('/notifications')}
-                    className="p-2 text-gray-400 hover:text-primary relative active:scale-95 group"
-                >
-                    <Bell size={24} />
-                    {hasUnread && (
-                        <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-primary rounded-full border-2 border-white animate-pulse" />
-                    )}
-                </button>
+                <div className="ml-auto relative z-10">
+                    <button
+                        onClick={() => router.push('/notifications')}
+                        className="p-2 -mr-2 text-gray-400 hover:text-primary relative active:scale-95 group"
+                    >
+                        <Bell size={24} />
+                        {hasUnread && (
+                            <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-primary rounded-full border-2 border-white animate-pulse" />
+                        )}
+                    </button>
+                </div>
             </div>
 
             {/* Mobile Sidebar Overlay */}
@@ -90,8 +93,8 @@ export default function StudentLayout({
             </div>
 
             {/* Main Content Area */}
-            <div className="flex-1 flex flex-col p-4 lg:p-10 pt-20 lg:pt-10">
-                <main className="flex-1 max-w-7xl w-full mx-auto">
+            <div className="flex-1 min-w-0 flex flex-col pt-16 lg:pt-0 overflow-x-hidden">
+                <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-6 lg:py-10">
                     {children}
                 </main>
             </div>

@@ -54,7 +54,7 @@ export default function Sidebar({ className = '', onClose }: SidebarProps) {
                             key={item.name}
                             href={item.href}
                             onClick={onClose}
-                            className={`flex items-center gap-4 px-6 py-4 rounded-[1.5rem] font-bold transition-all duration-300 group
+                            className={`flex items-center gap-4 px-6 py-4 rounded-[1.5rem] font-black transition-all duration-300 group
                                 ${isActive
                                     ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]'
                                     : 'text-gray-400 hover:bg-slate-50 hover:text-gray-900'
@@ -74,7 +74,7 @@ export default function Sidebar({ className = '', onClose }: SidebarProps) {
             <div className="p-6 border-t border-slate-50 bg-slate-50/30">
                 <button
                     onClick={() => logout()}
-                    className="w-full flex items-center gap-4 px-6 py-4 rounded-[1.5rem] font-bold text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all group"
+                    className="w-full flex items-center gap-4 px-6 py-4 rounded-[1.5rem] font-black text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all group"
                 >
                     <LogOut size={22} className="group-hover:rotate-12 transition-transform" />
                     <span className="tracking-tight">Chiqish</span>

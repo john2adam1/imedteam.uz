@@ -95,7 +95,7 @@ export default function CoursesPage() {
 
     // ===== RENDER =====
     return (
-        <div className="max-w-7xl mx-auto p-6 lg:p-10">
+        <div className="">
             <div className="flex flex-col lg:flex-row gap-10">
                 {/* ===== SIDEBAR - FILTERS ===== */}
                 <aside className="lg:w-72 flex-shrink-0">

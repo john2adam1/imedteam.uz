@@ -71,7 +71,7 @@ export default function AppHome() {
     }
 
     return (
-        <div className="max-w-7xl mx-auto p-6 lg:p-10 space-y-12">
+        <div className="space-y-12">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
                 <div className="animate-in fade-in slide-in-from-left duration-700">
