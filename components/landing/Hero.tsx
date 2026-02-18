@@ -2,7 +2,7 @@
 
 export default function Hero() {
     return (
-        <section id="home" className="relative overflow-hidden pt-20 pb-16 lg:pt-32 lg:pb-28">
+        <section id="home" className="relative overflow-hidden pt-20 pb-10 lg:pt-32 lg:pb-16">
             <div className="absolute inset-0 -z-10 overflow-hidden">
                 <div className="absolute top-0 right-0 w-[50rem] h-[50rem] rounded-full bg-primary/5 blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
                 <div className="absolute bottom-0 left-0 w-[40rem] h-[40rem] rounded-full bg-primary/10 blur-[100px] translate-y-1/2 -translate-x-1/2"></div>
@@ -42,29 +42,6 @@ export default function Hero() {
                                 <span className="text-lg">App Store</span>
                             </div>
                         </a>
-
-                        <a
-                            href="/assets/app-release.apk"
-                            download
-                            className="group relative px-8 py-5 bg-white text-slate-900 border-2 border-slate-100 rounded-2xl font-bold flex items-center gap-4 hover:border-primary/20 hover:bg-primary/5 transition-all duration-300 shadow-xl shadow-slate-200/50 active:scale-95"
-                        >
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/d/d7/Android_robot.svg" alt="Android" className="w-6 h-6" />
-                            <div className="flex flex-col items-start leading-none text-left">
-                                <span className="text-[10px] uppercase tracking-widest opacity-60">Get it for</span>
-                                <span className="text-lg">Android</span>
-                            </div>
-                        </a>
-                    </div>
-
-                    <div className="mt-12 flex items-center gap-4 text-slate-500 font-medium tracking-tight">
-                        <div className="flex -space-x-3">
-                            {[11, 12, 13, 14].map(i => (
-                                <div key={i} className="w-10 h-10 rounded-full border-4 border-white bg-slate-200 overflow-hidden">
-                                    <img src={`https://i.pravatar.cc/100?img=${i}`} alt="User" />
-                                </div>
-                            ))}
-                        </div>
-                        <span className="text-sm px-2">6,000+ talabalar biz bilan!</span>
                     </div>
                 </div>
 

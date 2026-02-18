@@ -12,14 +12,6 @@ export default function Header() {
 
     return (
         <>
-            {/* Top bar */}
-            <div className="w-full bg-primary-50 text-primary-700 text-sm">
-                <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
-                    <span className="font-medium">📣 Yangi oqim uchun ro‘yxat davom etmoqda!</span>
-                    <a href="#contact" className="font-semibold link-underline">Aloqa</a>
-                </div>
-            </div>
-
             {/* Header */}
             <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-slate-100">
                 <div className="max-w-7xl mx-auto px-6">

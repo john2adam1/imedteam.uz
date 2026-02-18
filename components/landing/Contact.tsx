@@ -1,6 +1,6 @@
 export default function Contact() {
     return (
-        <section id="contact" className="py-24 bg-slate-900 relative overflow-hidden">
+        <section id="contact" className="py-12 bg-slate-900 relative overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(var(--primary),0.05),transparent)] opacity-20"></div>
             <div className="max-w-7xl mx-auto px-6 relative z-10">
                 <div className="grid lg:grid-cols-2 gap-20 items-center">
@@ -55,7 +55,7 @@ export default function Contact() {
                             <div className="mt-10 pt-10 border-t border-slate-100 text-center">
                                 <p className="text-slate-400 font-bold text-sm tracking-wide">
                                     BIZNING RASMIY KANALIMIZ:
-                                    <a href="https://t.me/imedteam" className="text-primary ml-2 hover:underline">@imedteam</a>
+                                    <a href="https://t.me/iMed_team" className="text-primary ml-2 hover:underline">@iMed_team</a>
                                 </p>
                             </div>
                         </div>

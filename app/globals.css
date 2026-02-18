@@ -102,10 +102,21 @@ a {
   user-select: none;
 }
 
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
 .marquee-track {
   display: flex;
   gap: 2rem;
-  animation: marquee 28s linear infinite;
+  width: max-content;
+  animation: marquee 30s linear infinite;
 }
 
 details>summary {

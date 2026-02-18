@@ -45,9 +45,9 @@ export default function Team() {
     ];
 
     return (
-        <section id="team" className="py-24 bg-slate-50 relative">
+        <section id="team" className="py-12 bg-slate-50 relative">
             <div className="max-w-7xl mx-auto px-6">
-                <div className="reveal text-center max-w-3xl mx-auto mb-20">
+                <div className="reveal text-center max-w-3xl mx-auto mb-10">
                     <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 tracking-tight leading-tight">
                         “iMed Team” jamoasi
                     </h2>

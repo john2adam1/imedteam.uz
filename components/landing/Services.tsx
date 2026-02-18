@@ -1,6 +1,6 @@
 export default function Services() {
     return (
-        <section id="services" className="py-24 bg-white relative">
+        <section id="services" className="py-12 bg-white relative">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="reveal grid lg:grid-cols-2 gap-20 items-center">
                     <div>
