@@ -16,7 +16,7 @@ export default function AuthLayout({
             <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
                 <div className="flex justify-center mb-8">
                     <div className="w-20 h-20 rounded-2xl bg-white shadow-xl shadow-slate-200/50 flex items-center justify-center p-4">
-                        <img src="/assets/favicon.ico.png" alt="Logo" className="w-full h-full object-contain" />
+                        <img src="/assets/logo.png" alt="Logo" className="w-full h-full object-contain" />
                     </div>
                 </div>
             </div>
@@ -24,6 +24,12 @@ export default function AuthLayout({
             <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
                 <div className="bg-white py-12 px-10 shadow-2xl shadow-slate-200/50 rounded-[3rem] border border-slate-100">
                     {children}
+                </div>
+
+                <div className="mt-8 text-center px-4">
+                    <p className="text-slate-500 text-sm leading-relaxed font-medium">
+                        <span className="text-primary font-bold">Eslatma!</span> Agar siz avval imedteam.uz sayti yoki ilovasida akkaunt yaratgan bo'lsangiz, tizimga kirishingiz kerak, ammo agar siz avval akkaunt yaratmagan bo'lsangiz, ro'yxatdan o'tish bo'limidan akkaunt yaratishingiz kerak bo'ladi.
+                    </p>
                 </div>
             </div>
         </div>

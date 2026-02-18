@@ -8,7 +8,7 @@ export default function Footer() {
                     <div className="col-span-2">
                         <Link href="/" className="flex items-center gap-3 mb-8 group">
                             <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-                                <img src="/assets/favicon.ico.png" alt="Logo" className="w-8 h-8 brightness-0 invert" />
+                                <img src="/assets/logo.png" alt="Logo" className="w-8 h-8 brightness-0 invert" />
                             </div>
                             <span className="font-black text-2xl tracking-tight text-slate-900 group-hover:text-primary transition-colors">
                                 iMed Team

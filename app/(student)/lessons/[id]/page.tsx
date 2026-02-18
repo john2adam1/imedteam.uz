@@ -5,7 +5,7 @@ import { lessonService, activityService } from '@/services';
 import { SourceLessonMobileRes } from '@/types/mobile-api';
 import { useRouter, useParams } from 'next/navigation';
 import { Play, FileText, ClipboardList, ArrowLeft, CheckCircle2 } from 'lucide-react';
-import { getYoutubeEmbedUrl } from '@/lib/utils';
+import { getYoutubeEmbedUrl, getMediaUrl } from '@/lib/utils';
 import PDFViewer from '@/components/ui/PDFViewer';
 
 export default function LessonPage() {
@@ -189,7 +189,7 @@ export default function LessonPage() {
                                 {lesson.documents.map((doc) => (
                                     <li key={doc.id}>
                                         <button
-                                            onClick={() => setViewPdf({ url: doc.url, name: doc.name })}
+                                            onClick={() => setViewPdf({ url: getMediaUrl(doc.url), name: doc.name })}
                                             className="w-full flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-transparent hover:border-blue-100 hover:bg-blue-50/30 transition-all group text-left"
                                         >
                                             <div className="w-8 h-8 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 group-hover:text-blue-500 transition-colors">
@@ -219,7 +219,7 @@ export default function LessonPage() {
                                 {lesson.tests.map((test) => (
                                     <li key={test.id}>
                                         <button
-                                            onClick={() => setViewPdf({ url: test.url, name: test.name })}
+                                            onClick={() => setViewPdf({ url: getMediaUrl(test.url), name: test.name })}
                                             className="w-full flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-transparent hover:border-amber-100 hover:bg-amber-50/30 transition-all group text-left"
                                         >
                                             <div className="w-8 h-8 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 group-hover:text-amber-500 transition-colors">

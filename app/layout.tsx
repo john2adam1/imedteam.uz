@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: 'Imed - Educational Platform',
   description: 'Online learning platform for medical education',
   icons: {
-    icon: '/assets/favicon.ico.png',
+    icon: '/assets/logo.png',
   },
 };
 

@@ -5,6 +5,7 @@ import { courseService, subjectService } from '@/services';
 import { useRouter } from 'next/navigation';
 import { Filter, Play } from 'lucide-react';
 import { Subject } from '@/types/mobile-api';
+import { cn } from '@/lib/utils';
 
 export default function CoursesPage() {
     // ===== SIMPLIFIED STATE (5 variables instead of 7+) =====
@@ -291,32 +292,7 @@ function CourseCard({ course, activeTab, isFree, onClick }: { course: any; activ
         >
             {/* Course Image/Thumbnail */}
             <div className="aspect-[16/10] bg-slate-50 rounded-2xl mb-6 overflow-hidden relative ring-1 ring-gray-100">
-                {activeTab === 'my' ? (
-                    // Progress Circle for My Courses
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="relative w-24 h-24">
-                            <svg className="w-full h-full transform -rotate-90">
-                                <circle
-                                    cx="48" cy="48" r="40"
-                                    stroke="currentColor" strokeWidth="8"
-                                    fill="transparent"
-                                    className="text-primary/10"
-                                />
-                                <circle
-                                    cx="48" cy="48" r="40"
-                                    stroke="currentColor" strokeWidth="8"
-                                    fill="transparent"
-                                    strokeDasharray={251.2}
-                                    strokeDashoffset={251.2 * (1 - (course.percentage || 0) / 100)}
-                                    className="text-primary transition-all duration-1000"
-                                />
-                            </svg>
-                            <div className="absolute inset-0 flex items-center justify-center font-black text-primary text-lg">
-                                {course.percentage || 0}%
-                            </div>
-                        </div>
-                    </div>
-                ) : (course.image_url || course.course_image_url) ? (
+                {(course.image_url || course.course_image_url) ? (
                     <img
                         src={course.image_url || course.course_image_url}
                         alt={course.name}
@@ -371,12 +347,20 @@ function CourseCard({ course, activeTab, isFree, onClick }: { course: any; activ
                 </>
             ) : (
                 <>
-                    <div className="space-y-4 mb-6 flex-grow">
-                        <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden ring-1 ring-white">
+                    <div className="space-y-3 mb-6 flex-grow">
+                        <div className="w-full bg-slate-100 rounded-full h-5 overflow-hidden relative ring-1 ring-white shadow-inner">
                             <div
                                 className="bg-primary h-full rounded-full transition-all duration-1000"
                                 style={{ width: `${course.percentage || 0}%` }}
                             />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <span className={cn(
+                                    "text-[10px] font-black uppercase tracking-widest",
+                                    (course.percentage || 0) > 55 ? "text-white" : "text-primary"
+                                )}>
+                                    {Math.round(course.percentage || 0)}%
+                                </span>
+                            </div>
                         </div>
                         <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-400">
                             <span>{course.completed_lessons || 0} DARS YAKUNLANDI</span>

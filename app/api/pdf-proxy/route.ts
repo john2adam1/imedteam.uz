@@ -9,7 +9,12 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-        const response = await fetch(url);
+        let finalUrl = url;
+        if (!url.startsWith('http')) {
+            finalUrl = `https://prod.axadjonovsardorbek.uz${url.startsWith('/') ? '' : '/'}${url}`;
+        }
+
+        const response = await fetch(finalUrl);
 
         if (!response.ok) {
             return new NextResponse(`Failed to fetch PDF: ${response.statusText}`, { status: response.status });
