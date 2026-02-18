@@ -4,7 +4,8 @@ import { useState, useEffect, Suspense } from 'react';
 import { tariffService, courseService, orderService } from '@/services';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Clock, BookOpen, CreditCard } from 'lucide-react';
-import { MobileCourseRes } from '@/types/mobile-api';
+import { MobileCourseRes, OrderCreateBody } from '@/types/mobile-api';
+import { PromoCodeModal } from '@/components/student/PromoCodeModal';
 
 function TariffsContent() {
     const [tariffs, setTariffs] = useState<any>(null);
@@ -61,73 +62,15 @@ function TariffsContent() {
         loadData();
     }, [courseId, router]);
 
-    // Promocode state
-    const [promoCode, setPromoCode] = useState('');
-    const [appliedPromo, setAppliedPromo] = useState<any>(null);
-    const [promoLoading, setPromoLoading] = useState(false);
-    const [promoError, setPromoError] = useState('');
-
-    const handleApplyPromo = async () => {
-        if (!promoCode.trim()) return;
-
-        // If specific tariff is selected, use it, otherwise use first available (less accurate but enables early check)
-        const sampleTariffId = displayedTariffs[0]?.id;
-
-        try {
-            setPromoLoading(true);
-            setPromoError('');
-            setAppliedPromo(null);
-
-            const res = await import('@/services').then(m => m.promocodeService.check({
-                code: promoCode,
-                course_id: courseId!,
-                tariff_id: sampleTariffId // Send a hint, though API might validate globally
-            }));
-
-            if (res.is_valid) {
-                setAppliedPromo(res);
-            } else {
-                setPromoError(res.message || 'Promokod yaroqsiz');
-            }
-        } catch (error: any) {
-            console.error('Promo check failed:', error);
-            const msg = error.message || '';
-            // Handle specific known error strings from backend if they come as 500s or other errors not in the 200 payload
-            if (msg.includes('not found') || msg.includes('topilmadi')) {
-                setPromoError('Bunday promokod mavjud emas');
-            } else if (msg.includes('expired')) {
-                setPromoError('Promokod muddati tugagan');
-            } else if (msg.includes('inactive')) {
-                setPromoError('Promokod faol emas');
-            } else {
-                setPromoError(msg || 'Promokod tekshirishda xatolik');
-            }
-        } finally {
-            setPromoLoading(false);
-        }
-    };
+    // PromoCode Modal State
+    const [isPromoModalOpen, setIsPromoModalOpen] = useState(false);
+    const [selectedTariff, setSelectedTariff] = useState<any>(null);
+    const [isPurchasing, setIsPurchasing] = useState(false);
 
     const getPriceForTariff = (tariffId: string, defaultPrice: number) => {
         if (!selectedCourse?.price) return defaultPrice;
         const coursePrice = selectedCourse.price.find(p => p.tariff_id === tariffId);
-        let finalPrice = coursePrice ? coursePrice.price : defaultPrice;
-
-        // Apply discount if exists and valid
-        if (appliedPromo && appliedPromo.is_valid) {
-            // Use the backend calculation if it matches the current tariff (best accuracy)
-            if (appliedPromo.tariff_id === tariffId && appliedPromo.total_amount !== null) {
-                return appliedPromo.total_amount;
-            }
-
-            // Fallback: Manual calculation for other tariffs (e.g. if user switches or checks generally)
-            if (appliedPromo.discount_type === 'percent' && appliedPromo.discount_value) {
-                finalPrice = finalPrice * (1 - appliedPromo.discount_value / 100);
-            } else if (appliedPromo.discount_type === 'fixed' && appliedPromo.discount_value) {
-                finalPrice = Math.max(0, finalPrice - appliedPromo.discount_value);
-            }
-        }
-
-        return finalPrice;
+        return coursePrice ? coursePrice.price : defaultPrice;
     };
 
     const formatPrice = (price: any) => {
@@ -158,9 +101,7 @@ function TariffsContent() {
         return coursePrice !== undefined && typeof coursePrice.price === 'number' && !isNaN(coursePrice.price);
     }) || [];
 
-    const [purchasingId, setPurchasingId] = useState<string | null>(null);
-
-    const handlePurchase = async (tariffId: string) => {
+    const handlePurchase = (tariff: any) => {
         if (!courseId) {
             router.push('/courses');
             return;
@@ -178,22 +119,28 @@ function TariffsContent() {
             return;
         }
 
+        setSelectedTariff(tariff);
+        setIsPromoModalOpen(true);
+    };
+
+    const handleConfirmPurchase = async (tariffId: string, promoCode?: string, promoId?: string) => {
         try {
-            setPurchasingId(tariffId);
-            // Include promocode if applied
-            const orderData: any = {
+            setIsPurchasing(true);
+            const orderData: OrderCreateBody = {
                 tariff_id: tariffId,
-                course_id: courseId,
-                payment_method: 'payme'
+                course_id: courseId || undefined,
+                payment_method: 'click'
             };
 
-            if (appliedPromo) {
-                orderData.promocode = promoCode; // Assuming API accepts this field
+            if (promoCode) {
+                // @ts-ignore
+                orderData.promocode = promoCode;
+            }
+            if (promoId) {
+                orderData.promocode_id = promoId;
             }
 
             const response = await orderService.create(orderData) as any;
-
-            console.log('Order created:', response);
 
             if (response.url) {
                 window.location.assign(response.url);
@@ -207,7 +154,8 @@ function TariffsContent() {
             console.error('Purchase failed:', error);
             alert(error.message || 'Tolovni amalga oshirishda xatolik yuz berdi');
         } finally {
-            setPurchasingId(null);
+            setIsPurchasing(false);
+            setIsPromoModalOpen(false);
         }
     };
 
@@ -264,87 +212,10 @@ function TariffsContent() {
                 )}
             </div>
 
-            {/* Promocode Section */}
-            <div className="max-w-xl mx-auto w-full">
-                <div className="bg-white rounded-[2rem] p-3 border-2 border-gray-100 shadow-xl shadow-gray-100/50 flex flex-col md:flex-row gap-3">
-                    <div className="flex-1 relative flex items-center">
-                        <div className="absolute left-4 pointer-events-none text-xl">
-                            🏷️
-                        </div>
-                        <input
-                            type="text"
-                            value={promoCode}
-                            onChange={(e) => setPromoCode(e.target.value)}
-                            placeholder="Promokod (masalan: SALE20)"
-                            className="w-full pl-12 pr-4 py-3 bg-slate-50 border-transparent focus:bg-white focus:border-primary/20 border-2 rounded-xl font-bold text-gray-900 placeholder:text-gray-400 outline-none transition-all uppercase"
-                            disabled={appliedPromo?.is_valid}
-                        />
-                    </div>
-                    <button
-                        onClick={handleApplyPromo}
-                        disabled={promoLoading || !promoCode || appliedPromo?.is_valid}
-                        className={`px-8 py-3 rounded-xl font-black transition-all active:scale-95 whitespace-nowrap flex items-center justify-center gap-2 ${appliedPromo?.is_valid
-                            ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30'
-                            : 'bg-gray-900 text-white hover:bg-gray-800 shadow-lg shadow-gray-900/20 disabled:opacity-50 disabled:cursor-not-allowed'
-                            }`}
-                    >
-                        {promoLoading ? (
-                            <>
-                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                <span>Tekshirish...</span>
-                            </>
-                        ) : appliedPromo?.is_valid ? (
-                            <>
-                                <span>✓</span>
-                                <span>Qabul qilindi</span>
-                            </>
-                        ) : (
-                            'Tekshirish'
-                        )}
-                    </button>
-                </div>
-
-                {/* Messages below input */}
-                <div className="mt-4 px-4 text-center">
-                    {promoError && (
-                        <div className="inline-block p-3 bg-red-50 text-red-600 font-bold rounded-xl border border-red-100 text-sm animate-in fade-in slide-in-from-top-2">
-                            ⚠️ {promoError}
-                        </div>
-                    )}
-                    {appliedPromo?.is_valid && (
-                        <div className="inline-flex items-center gap-3 p-3 bg-emerald-50 text-emerald-800 font-bold rounded-xl border border-emerald-100 text-sm animate-in fade-in slide-in-from-top-2 shadow-sm">
-                            <span className="text-xl">🎉</span>
-                            <div className="text-left">
-                                <div className="text-emerald-900">Promokod faollashtirildi</div>
-                                <div className="text-emerald-600 font-medium text-xs">
-                                    {appliedPromo.discount_type === 'percent'
-                                        ? `${appliedPromo.discount_value}% chegirma`
-                                        : `${appliedPromo.discount_value?.toLocaleString()} UZS chegirma`}
-                                    {' '} ({appliedPromo.discount_amount?.toLocaleString()} UZS tejaldi)
-                                </div>
-                            </div>
-                            <button
-                                onClick={() => {
-                                    setAppliedPromo(null);
-                                    setPromoCode('');
-                                    setPromoError('');
-                                }}
-                                className="ml-2 w-8 h-8 flex items-center justify-center rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-200 transition-colors"
-                            >✕</button>
-                        </div>
-                    )}
-                </div>
-            </div>
-
             {/* Tariff Cards Grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
                 {displayedTariffs.map((tariff: any) => {
-                    const originalPrice = getPriceForTariff(tariff.id, tariff.price);
-
-                    // For display, getPriceForTariff already returns the FINAL discounted price if promo is active
-                    // so we need to recalculate original strictly for display comparison
                     const basePrice = selectedCourse?.price?.find((p: any) => p.tariff_id === tariff.id)?.price ?? tariff.price;
-                    const finalPrice = getPriceForTariff(tariff.id, basePrice);
 
                     return (
                         <div
@@ -372,35 +243,18 @@ function TariffsContent() {
                             {/* Price Section */}
                             <div className="mb-10 text-center">
                                 <div className="text-[10px] text-gray-300 font-black uppercase tracking-[0.2em] mb-2">Obuna narxi</div>
-
-                                {appliedPromo && appliedPromo.is_valid && basePrice !== finalPrice ? (
-                                    <div className="flex flex-col items-center">
-                                        <div className="text-lg font-bold text-gray-400 line-through decoration-red-400">
-                                            {formatPrice(basePrice)}
-                                        </div>
-                                        <div className="text-4xl font-black text-emerald-600 tracking-tight">
-                                            {formatPrice(finalPrice)}
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="text-4xl font-black text-gray-900 tracking-tight">
-                                        {formatPrice(basePrice)}
-                                    </div>
-                                )}
+                                <div className="text-4xl font-black text-gray-900 tracking-tight">
+                                    {formatPrice(basePrice)}
+                                </div>
                             </div>
 
                             {/* CTA Button */}
                             <button
-                                disabled={purchasingId !== null}
-                                onClick={() => handlePurchase(tariff.id)}
-                                className="w-full py-5 px-8 rounded-2xl font-black bg-primary text-white hover:bg-primary-600 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+                                onClick={() => handlePurchase(tariff)}
+                                className="w-full py-5 px-8 rounded-2xl font-black bg-primary text-white hover:bg-primary-600 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-3 active:scale-[0.98]"
                             >
-                                {purchasingId === tariff.id ? (
-                                    <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                                ) : (
-                                    <CreditCard className="w-6 h-6" />
-                                )}
-                                <span className="text-lg">{purchasingId === tariff.id ? 'Yaratilmoqda...' : 'Sotib olish'}</span>
+                                <CreditCard className="w-6 h-6" />
+                                <span className="text-lg">Sotib olish</span>
                             </button>
                         </div>
                     );
@@ -448,6 +302,20 @@ function TariffsContent() {
                     </div>
                 </div>
             </div>
+
+            {/* Promo Modal Integration */}
+            {selectedTariff && (
+                <PromoCodeModal
+                    isOpen={isPromoModalOpen}
+                    onClose={() => setIsPromoModalOpen(false)}
+                    tariffId={selectedTariff.id}
+                    courseId={courseId!}
+                    tariffName={selectedTariff.name}
+                    basePrice={getPriceForTariff(selectedTariff.id, selectedTariff.price)}
+                    onPurchase={handleConfirmPurchase}
+                    isPurchasing={isPurchasing}
+                />
+            )}
         </div>
     );
 }

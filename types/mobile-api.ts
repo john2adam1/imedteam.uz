@@ -347,6 +347,8 @@ export interface TariffList {
 
 export interface OrderCreateBody {
   tariff_id: string;
+  course_id?: string;
+  promocode_id?: string;
   payment_method?: string;
 }
 
