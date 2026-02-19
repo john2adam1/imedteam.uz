@@ -229,7 +229,7 @@ function TariffsContent() {
                                 </div>
                                 <h3 className="text-2xl font-black text-gray-900 mb-2">{tariff.name}</h3>
                                 <div className="px-4 py-1.5 bg-emerald-50 text-emerald-600 rounded-full text-xs font-black uppercase tracking-widest">
-                                    {tariff.duration} kunlik kirish
+                                    {tariff.duration} oylik kirish
                                 </div>
                             </div>
 

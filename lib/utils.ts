@@ -49,9 +49,18 @@ export function getMediaUrl(url: string | undefined | null): string {
   }
 
   if (url.startsWith('/media')) {
-    return `https://prod.axadjonovsardorbek.uz${url}`;
+    return `https://prod.imedteam.uz${url}`;
   }
 
   return url;
+}
+
+/**
+ * Checks if a URL points to a video file
+ */
+export function isVideoUrl(url: string | undefined | null): boolean {
+  if (!url) return false;
+  const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov'];
+  return videoExtensions.some(ext => url.toLowerCase().includes(ext));
 }
 

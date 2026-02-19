@@ -7,6 +7,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { Play, FileText, ClipboardList, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { getYoutubeEmbedUrl, getMediaUrl } from '@/lib/utils';
 import PDFViewer from '@/components/ui/PDFViewer';
+import confetti from 'canvas-confetti';
 
 export default function LessonPage() {
     const params = useParams();
@@ -40,19 +41,47 @@ export default function LessonPage() {
         if (!lesson) return;
 
         try {
+            // Trigger Joy Animation (Dice)
+            const duration = 3 * 1000;
+            const end = Date.now() + duration;
+
+            const frame = () => {
+                confetti({
+                    particleCount: 2,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#800000', '#FFD700']
+                });
+                confetti({
+                    particleCount: 2,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#800000', '#FFD700']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            };
+            frame();
+
             // Calculate duration in seconds
-            const duration = Math.floor((Date.now() - startTime) / 1000);
+            const studyDuration = Math.floor((Date.now() - startTime) / 1000);
 
             // Track activity
             await activityService.create({
-                activity: duration,
+                activity: studyDuration,
             });
 
             // Mark lesson as ended
             await lessonService.endLesson(lesson.id);
 
-            // Navigate back
-            router.back();
+            // Short delay for animation to be seen
+            setTimeout(() => {
+                router.back();
+            }, 1500);
         } catch (err) {
             console.error('Failed to end lesson:', err);
             router.back();
@@ -150,27 +179,6 @@ export default function LessonPage() {
                             <p className="font-medium italic">Ushbu darsda video mavjud emas</p>
                         </div>
                     )}
-
-                    {/* Completion Card */}
-                    <div className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-soft flex flex-col md:flex-row items-center gap-8 relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32 transition-transform group-hover:scale-110 duration-700"></div>
-
-                        <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                            <CheckCircle2 size={40} />
-                        </div>
-
-                        <div className="flex-1 text-center md:text-left">
-                            <h3 className="text-xl font-black text-gray-900 mb-2 tracking-tight">Darsni yakunladingizmi?</h3>
-                            <p className="text-gray-500 font-medium">Agar mavzuni to'liq o'zlashtirgan bo'lsangiz, tugmani bosing va keyingi bosqichga o'ting.</p>
-                        </div>
-
-                        <button
-                            onClick={handleEndLesson}
-                            className="px-10 py-5 bg-primary text-white rounded-2xl font-black shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-95 uppercase tracking-widest text-sm shrink-0"
-                        >
-                            Tugatish
-                        </button>
-                    </div>
                 </div>
 
                 {/* Sidebar: Documents and Tests */}
@@ -205,6 +213,7 @@ export default function LessonPage() {
                         )}
                     </div>
 
+
                     {/* Tests Card */}
                     <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-soft">
                         <div className="flex items-center gap-3 mb-8">
@@ -234,6 +243,30 @@ export default function LessonPage() {
                             <p className="text-sm text-gray-400 font-medium italic py-4 text-center">Ushbu darsda testlar mavjud emas.</p>
                         )}
                     </div>
+
+
+
+                    {/* Completion Card (Relocated to Sidebar) */}
+                    <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-soft relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110 duration-700"></div>
+
+                        <div className="flex flex-col items-center text-center space-y-4">
+                            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-2">
+                                <CheckCircle2 size={32} />
+                            </div>
+
+                            <h3 className="text-lg font-black text-gray-900 tracking-tight leading-tight">Darsni yakunladingizmi?</h3>
+                            <p className="text-xs text-gray-500 font-medium">Mavzuni to'liq o'zlashtirgan bo'lsangiz, tugmani bosing.</p>
+
+                            <button
+                                onClick={handleEndLesson}
+                                className="w-full py-4 bg-primary text-white rounded-xl font-black shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-95 uppercase tracking-widest text-xs"
+                            >
+                                Tugatish
+                            </button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

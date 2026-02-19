@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { isVideoUrl } from '@/lib/utils';
 
 interface Banner {
     id: string;
@@ -43,47 +44,60 @@ export default function BannerSlider({ banners }: BannerSliderProps) {
             onMouseLeave={() => setIsAutoPlaying(true)}
         >
             <div
-                className="flex transition-transform duration-700 ease-in-out h-[300px] md:h-[400px]"
+                className="flex transition-transform duration-700 ease-in-out h-auto md:h-[400px]"
                 style={{ transform: `translateX(-${currentIndex * 100}%)` }}
             >
                 {banners.map((banner) => (
                     <div
                         key={banner.id}
-                        className="w-full flex-shrink-0 relative h-full cursor-pointer"
+                        className="w-full flex-shrink-0 flex flex-col md:block md:relative h-full cursor-pointer bg-white md:bg-transparent"
                         onClick={() => banner.link_url && window.open(banner.link_url, '_blank')}
                     >
-                        {/* Background Image */}
-                        {banner.image_url ? (
-                            <img
-                                src={banner.image_url}
-                                alt={banner.title}
-                                className="absolute inset-0 w-full h-full object-cover"
-                                onError={(e) => {
-                                    (e.target as HTMLImageElement).src = 'https://via.placeholder.com/1200x600/800000/FFFFFF?text=IMED+PLATFORMA';
-                                }}
-                            />
-                        ) : (
-                            <div className="absolute inset-0 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900" />
-                        )}
+                        {/* Media Container */}
+                        <div className="relative w-full aspect-[16/10] md:absolute md:inset-0 md:aspect-auto h-auto md:h-full overflow-hidden">
+                            {banner.image_url ? (
+                                isVideoUrl(banner.image_url) ? (
+                                    <video
+                                        src={banner.image_url}
+                                        className="w-full h-full object-cover"
+                                        autoPlay
+                                        muted
+                                        loop
+                                        playsInline
+                                    />
+                                ) : (
+                                    <img
+                                        src={banner.image_url}
+                                        alt={banner.title}
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                            (e.target as HTMLImageElement).src = 'https://via.placeholder.com/1200x600/800000/FFFFFF?text=IMED+PLATFORMA';
+                                        }}
+                                    />
+                                )
+                            ) : (
+                                <div className="w-full h-full bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900" />
+                            )}
+                        </div>
 
-                        {/* Floating Glass Card Overlay */}
-                        <div className="absolute inset-0 p-6 md:p-10 flex flex-col justify-end items-start pointer-events-none">
-                            <div className="max-w-md w-full bg-black/30 backdrop-blur-md rounded-[2rem] p-6 border border-white/10 shadow-lg pointer-events-auto transform transition-transform duration-300 hover:scale-[1.02]">
+                        {/* Content Container */}
+                        <div className="relative md:absolute md:inset-0 p-6 md:p-10 flex flex-col justify-end items-start pointer-events-none">
+                            <div className="max-w-md w-full bg-slate-50 md:bg-black/30 md:backdrop-blur-md rounded-[2rem] p-6 border border-gray-100 md:border-white/10 shadow-soft md:shadow-lg pointer-events-auto transform transition-transform duration-300 hover:scale-[1.02]">
                                 <div className="space-y-3">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary text-white rounded-full font-black text-[9px] uppercase tracking-widest shadow-lg">
                                         Yangi e'lon
                                     </div>
-                                    <h2 className="text-xl md:text-2xl font-black text-white leading-tight drop-shadow-md">
+                                    <h2 className="text-xl md:text-2xl font-black text-gray-900 md:text-white leading-tight drop-shadow-sm">
                                         {banner.title}
                                     </h2>
                                     {banner.description && (
-                                        <p className="text-white/90 text-sm font-medium leading-relaxed line-clamp-2 drop-shadow-sm">
+                                        <p className="text-gray-500 md:text-white/90 text-sm font-medium leading-relaxed line-clamp-2 drop-shadow-sm">
                                             {banner.description}
                                         </p>
                                     )}
                                     {banner.link_url && (
                                         <div className="pt-2">
-                                            <span className="inline-flex items-center gap-2 text-white font-black uppercase tracking-widest text-xs hover:gap-3 transition-all">
+                                            <span className="inline-flex items-center gap-2 text-primary md:text-white font-black uppercase tracking-widest text-xs hover:gap-3 transition-all">
                                                 Batafsil <ChevronRight size={14} />
                                             </span>
                                         </div>

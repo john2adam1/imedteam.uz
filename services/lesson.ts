@@ -45,7 +45,7 @@ export const lessonService = {
      */
     endLesson: async (lessonId: string): Promise<void> => {
         saveLocalLessonCompletion(lessonId);
-        await apiClient(`/mobile/lesson/end/${lessonId}`, {
+        await apiClient(`/lesson/end/${lessonId}`, {
             method: 'POST',
             body: JSON.stringify({})
         });

@@ -61,6 +61,14 @@ export default function AppHome() {
         };
     }, [userCourses]);
 
+    // Helper to format activity time (MMd SSs)
+    const formatActivity = (activity: number) => {
+        const totalSeconds = activity || 0;
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes < 10 ? `0${minutes}` : minutes}d ${seconds < 10 ? `0${seconds}` : seconds}s`;
+    };
+
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[70vh] gap-4">
@@ -130,12 +138,11 @@ export default function AppHome() {
                     </div>
                     <div className="flex items-end justify-between">
                         <div className="flex items-center gap-2">
-                            <p className="text-5xl font-black text-gray-900 tracking-tighter">
-                                {rating?.me?.activity || 0}
+                            <p className="text-4xl font-black text-gray-900 tracking-tighter">
+                                {formatActivity(rating?.me?.activity || 0)}
                             </p>
-                            <span className="text-3xl text-yellow-500 drop-shadow-sm">★</span>
                         </div>
-                        <p className="text-xs font-bold text-gray-400 mb-2">ball</p>
+                        <p className="text-xs font-bold text-gray-400 mb-2">o'qish vaqti</p>
                     </div>
                 </div>
             </div>

@@ -10,7 +10,7 @@ export const subjectService = {
      */
     getAll: async (params?: any): Promise<any> => {
         const queryString = params ? buildQueryString(params) : '';
-        const response = await apiClient<any>(`/subject${queryString}`);
+        const response = await apiClient<any>(`/subject${queryString}`, { requiresAuth: false });
 
         const subjects = (response.data || []).map((s: any) => ({
             ...s,
