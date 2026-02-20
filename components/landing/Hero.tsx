@@ -1,6 +1,9 @@
-'use client';
+import { useAuth } from '@/lib/auth-context';
+import Link from 'next/link';
 
 export default function Hero() {
+    const { isAuthenticated } = useAuth();
+    const authPath = isAuthenticated ? '/dashboard' : '/auth/login';
     return (
         <section id="home" className="relative overflow-hidden pt-20 pb-10 lg:pt-32 lg:pb-16">
             <div className="absolute inset-0 -z-10 overflow-hidden">
@@ -29,12 +32,19 @@ export default function Hero() {
                         Istalgan joyda va istalgan vaqtda bilim oling.
                     </p>
 
-                    <div className="mt-12 flex flex-wrap gap-6">
+                    <div className="mt-12 flex flex-col sm:flex-row flex-wrap gap-6">
+                        <Link
+                            href={authPath}
+                            className="inline-flex items-center justify-center px-10 py-5 rounded-2xl bg-primary text-white text-lg font-black hover:bg-primary/90 transition-all shadow-2xl shadow-primary/20 active:scale-95 whitespace-nowrap"
+                        >
+                            {isAuthenticated ? 'Kabinetga o‘tish' : 'Platformaga kirish'}
+                        </Link>
+
                         <a
                             href="https://apps.apple.com/uz/app/imed-team/id6745555493"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="group relative px-8 py-5 bg-slate-900 text-white rounded-2xl font-bold flex items-center gap-4 hover:bg-primary transition-all duration-300 shadow-2xl shadow-slate-900/20 active:scale-95"
+                            className="group relative px-8 py-5 bg-slate-900 text-white rounded-2xl font-bold flex items-center gap-4 hover:bg-slate-800 transition-all duration-300 shadow-2xl shadow-slate-900/20 active:scale-95"
                         >
                             <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="iOS" className="w-6 h-6 brightness-0 invert" />
                             <div className="flex flex-col items-start leading-none text-left">

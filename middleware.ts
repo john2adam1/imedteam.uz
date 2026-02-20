@@ -7,8 +7,8 @@ export function middleware(request: NextRequest) {
     // Get token from cookies
     const token = request.cookies.get('auth_token')?.value;
 
-    // Landing page is public
-    if (pathname === '/') {
+    // Landing page and assets are public
+    if (pathname === '/' || pathname.startsWith('/assets/')) {
         return NextResponse.next();
     }
 
