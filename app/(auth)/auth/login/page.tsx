@@ -8,7 +8,7 @@ type AuthMode = 'login' | 'register';
 
 export default function LoginPage() {
   const [mode, setMode] = useState<AuthMode>('login');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('+');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -69,6 +69,19 @@ export default function LoginPage() {
     }
   };
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+
+    // If empty or doesn't start with +, ensure it does
+    if (!value.startsWith('+')) {
+      // Remove any + characters elsewhere and add it to the start
+      value = '+' + value.replace(/\+/g, '');
+    }
+
+    // If just '+', it's allowed
+    setPhoneNumber(value);
+  };
+
   return (
     <div className="w-full">
       <h1 className="text-3xl font-bold text-center text-gray-900 mb-8">
@@ -109,7 +122,7 @@ export default function LoginPage() {
             type="tel"
             required
             value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
+            onChange={handlePhoneChange}
             className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 outline-none transition-all text-gray-900 placeholder-gray-400 bg-gray-50 focus:bg-white"
             placeholder="+998"
           />
