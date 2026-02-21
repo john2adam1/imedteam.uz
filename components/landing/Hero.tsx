@@ -32,26 +32,45 @@ export default function Hero() {
                         Istalgan joyda va istalgan vaqtda bilim oling.
                     </p>
 
-                    <div className="mt-12 flex flex-col sm:flex-row flex-wrap gap-6">
+                    <h3>Ilovamizni yuklab oling!</h3>
+
+                    <div className="mt-12 flex flex-col sm:flex-row flex-wrap gap-5 items-center">
                         <Link
                             href={authPath}
-                            className="inline-flex items-center justify-center px-10 py-5 rounded-2xl bg-primary text-white text-lg font-black hover:bg-primary/90 transition-all shadow-2xl shadow-primary/20 active:scale-95 whitespace-nowrap"
+                            className="w-full sm:w-auto inline-flex items-center justify-center px-10 py-5 rounded-2xl bg-primary text-white text-lg font-black hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/40 transition-all shadow-2xl shadow-primary/20 active:scale-95 whitespace-nowrap"
                         >
                             {isAuthenticated ? 'Kabinetga o‘tish' : 'Platformaga kirish'}
                         </Link>
 
-                        <a
-                            href="https://apps.apple.com/uz/app/imed-team/id6745555493"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="group relative px-8 py-5 bg-slate-900 text-white rounded-2xl font-bold flex items-center gap-4 hover:bg-slate-800 transition-all duration-300 shadow-2xl shadow-slate-900/20 active:scale-95"
-                        >
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="iOS" className="w-6 h-6 brightness-0 invert" />
-                            <div className="flex flex-col items-start leading-none text-left">
-                                <span className="text-[10px] uppercase tracking-widest opacity-60">Download on</span>
-                                <span className="text-lg">App Store</span>
-                            </div>
-                        </a>
+                        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                            <a
+                                href="https://apps.apple.com/uz/app/imed-team/id6745555493"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full sm:w-auto group relative px-7 py-4 bg-slate-950 text-white rounded-2xl font-bold flex items-center justify-center sm:justify-start gap-4 hover:bg-slate-900 transition-all duration-300 shadow-xl hover:shadow-slate-950/40 active:scale-95 border border-white/5 overflow-hidden"
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="iOS" className="w-7 h-7 brightness-0 invert" />
+                                <div className="flex flex-col items-start leading-none text-left relative z-10">
+                                    <span className="text-[10px] uppercase tracking-widest opacity-50 mb-1">Download on</span>
+                                    <span className="text-lg font-extrabold tracking-tight">App Store</span>
+                                </div>
+                            </a>
+
+                            <a
+                                href="https://minio.imedteam.uz/imed/imedteam_3.0.0_17.apk"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full sm:w-auto group relative px-7 py-4 bg-slate-950 text-white rounded-2xl font-bold flex items-center justify-center sm:justify-start gap-4 hover:bg-slate-900 transition-all duration-300 shadow-xl hover:shadow-slate-950/40 active:scale-95 border border-white/5 overflow-hidden"
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                <img src="https://www.vectorlogo.zone/logos/android/android-icon.svg" alt="Android" className="w-7 h-7" />
+                                <div className="flex flex-col items-start leading-none text-left relative z-10">
+                                    <span className="text-[10px] uppercase tracking-widest opacity-50 mb-1">Yuklab olish</span>
+                                    <span className="text-lg font-extrabold tracking-tight">Android</span>
+                                </div>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
