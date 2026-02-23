@@ -11,7 +11,7 @@ export const courseService = {
      */
     getCourses: async (params?: CourseQueryParams): Promise<CourseMobileList> => {
         const queryString = params ? buildQueryString(params) : '';
-        const response = await apiClient<any>(`/course${queryString}`, { requiresAuth: false });
+        const response = await apiClient<any>(`/course${queryString}`);
 
         const courses = getArray(response, 'courses').map((c: any) => ({
             ...c,

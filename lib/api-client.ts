@@ -22,6 +22,8 @@ export async function apiClient<T>(
 ): Promise<T> {
     const { requiresAuth = true, namespace = 'mobile', ...fetchOptions } = options;
 
+    const deviceId = getDeviceId();
+
     // Normalize base URL: strip trailing /web or /api if we're adding it via namespace
     let baseUrl = API_BASE_URL.replace(/\/$/, '');
     if (baseUrl.endsWith('/web') || baseUrl.endsWith('/api') || baseUrl.endsWith('/mobile')) {
@@ -55,12 +57,12 @@ export async function apiClient<T>(
             headers,
         });
 
-        if (response.status === 401) {
+        if (response.status === 401 || response.status === 403) {
             removeAuthToken();
             if (typeof window !== 'undefined') {
-                window.location.href = '/login';
+                window.location.href = '/auth/login';
             }
-            throw new Error('Sessiya muddati tugadi');
+            throw new Error('Sessiya muddati tugadi yoki boshqa qurilmada kirilgan');
         }
 
         const text = await response.text();
@@ -104,9 +106,25 @@ export function setAuthToken(token: string): void {
  * Remove authentication token (logout)
  */
 export function removeAuthToken(): void {
-    if (typeof window === 'undefined') return;
-    removeCookie('auth_token');
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('refresh_token');
+    if (typeof window !== 'undefined') {
+        removeCookie('auth_token');
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('refresh_token');
+    }
 }
 
+/**
+ * Get or generate a unique device ID
+ */
+export function getDeviceId(): string | null {
+    if (typeof window === 'undefined') return null;
+
+    let deviceId = localStorage.getItem('device_id');
+
+    if (!deviceId) {
+        deviceId = crypto.randomUUID();
+        localStorage.setItem('device_id', deviceId);
+    }
+
+    return deviceId;
+}
