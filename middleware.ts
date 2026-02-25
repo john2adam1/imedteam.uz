@@ -19,10 +19,12 @@ export function middleware(request: NextRequest) {
     }
 
     // All other routes (student area) require authentication
+    /*
     if (!token) {
         const url = new URL('/auth/login', request.url);
         return NextResponse.redirect(url);
     }
+    */
 
     return NextResponse.next();
 }

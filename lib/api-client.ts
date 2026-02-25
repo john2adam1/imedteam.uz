@@ -59,9 +59,11 @@ export async function apiClient<T>(
 
         if (response.status === 401 || response.status === 403) {
             removeAuthToken();
+            /*
             if (typeof window !== 'undefined') {
                 window.location.href = '/auth/login';
             }
+            */
             throw new Error('Sessiya muddati tugadi yoki boshqa qurilmada kirilgan');
         }
 

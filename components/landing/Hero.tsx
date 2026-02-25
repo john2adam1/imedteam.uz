@@ -35,13 +35,14 @@ export default function Hero() {
                     <h3>Ilovamizni yuklab oling!</h3>
 
                     <div className="mt-12 flex flex-col sm:flex-row flex-wrap gap-5 items-center">
+                        {/*
                         <Link
                             href={authPath}
                             className="w-full sm:w-auto inline-flex items-center justify-center px-10 py-5 rounded-2xl bg-primary text-white text-lg font-black hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/40 transition-all shadow-2xl shadow-primary/20 active:scale-95 whitespace-nowrap"
                         >
                             {isAuthenticated ? 'Kabinetga o‘tish' : 'Platformaga kirish'}
                         </Link>
-
+                        */}
                         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                             <a
                                 href="https://apps.apple.com/uz/app/imed-team/id6745555493"

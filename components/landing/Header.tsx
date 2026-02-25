@@ -31,10 +31,10 @@ export default function Header() {
                         </Link>
 
                         <nav className="hidden lg:flex items-center gap-10">
-                            {['Bosh sahifa', 'Xizmatlar', 'Kurslar', 'Jamoa', 'Yangiliklar', 'Aloqa'].map((item, i) => (
+                            {['Bosh sahifa', 'Xizmatlar', 'Kurslar', 'Jamoa', 'Aloqa'].map((item, i) => (
                                 <a
                                     key={i}
-                                    href={`#${['home', 'services', 'courses', 'team', 'blog', 'contact'][i]}`}
+                                    href={`#${['home', 'services', 'courses', 'team', 'contact'][i]}`}
                                     className="text-sm font-black text-slate-500 hover:text-primary transition-colors uppercase tracking-widest relative group"
                                 >
                                     {item}
@@ -42,7 +42,7 @@ export default function Header() {
                                 </a>
                             ))}
                         </nav>
-
+                        {/*
                         <div className="flex items-center gap-4">
                             <Link
                                 href={authPath}
@@ -50,7 +50,7 @@ export default function Header() {
                             >
                                 {isAuthenticated ? 'Kabinet' : 'Kirish'}
                             </Link>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </header>
