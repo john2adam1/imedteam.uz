@@ -15,8 +15,21 @@ export interface UserCheckRes {
 
 export interface UserLoginReq {
   phone_number: string;
-  password: string;
+  password?: string;
   name?: string;
+}
+
+export interface OtpSendReq {
+  email: string;
+}
+
+export interface OtpConfirmReq {
+  email: string;
+  confirmation_code: string;
+}
+
+export interface OtpRes {
+  token: string;
 }
 
 export interface UserRegisterReq {

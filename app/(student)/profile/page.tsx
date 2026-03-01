@@ -16,10 +16,7 @@ export default function ProfilePage() {
     const [showEditProfileForm, setShowEditProfileForm] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-    // Password Form State
-    const [oldPassword, setOldPassword] = useState('');
-    const [newPassword, setNewPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+    // Password Form State (Removed as per user request)
 
     // Edit Profile State
     const [editName, setEditName] = useState('');
@@ -49,34 +46,7 @@ export default function ProfilePage() {
         }
     };
 
-    const handleChangePassword = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError('');
-        setMessage('');
-
-        if (newPassword !== confirmPassword) {
-            setError('Yangi parollar mos kelmadi');
-            return;
-        }
-
-        try {
-            setLoading(true);
-            await authService.changePassword({
-                old_password: oldPassword,
-                new_password: newPassword,
-                confirm_password: confirmPassword,
-            });
-            setMessage('Parol muvaffaqiyatli o‘zgartirildi');
-            setOldPassword('');
-            setNewPassword('');
-            setConfirmPassword('');
-            setShowPasswordForm(false);
-        } catch (err: any) {
-            setError(err.message || 'Parolni o‘zgartirishda xatolik yuz berdi');
-        } finally {
-            setLoading(false);
-        }
-    };
+    // Password change functionality removed as per user request
 
     const handleUpdateProfile = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -190,18 +160,7 @@ export default function ProfilePage() {
                         />
                     </div>
 
-                    <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-soft">
-                        <h4 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-                            <Shield size={16} /> Xavfsizlik
-                        </h4>
-                        <button
-                            onClick={() => setShowPasswordForm(true)}
-                            className="w-full py-4 px-6 bg-slate-50 border border-gray-100 text-gray-700 rounded-2xl font-bold hover:bg-white hover:border-primary-200 hover:shadow-md transition-all flex items-center justify-between group"
-                        >
-                            <span className="flex items-center gap-3"><Key size={18} className="text-primary" /> Parolni o'zgartirish</span>
-                            <span className="text-gray-300 group-hover:text-primary transition-colors">&rarr;</span>
-                        </button>
-                    </div>
+                    {/* Security section removed as password feature is gone */}
                 </div>
 
                 {/* Right Column: Dynamic Forms & Stats */}
@@ -317,64 +276,7 @@ export default function ProfilePage() {
                 </form>
             </Modal>
 
-            <Modal
-                isOpen={showPasswordForm}
-                onClose={() => setShowPasswordForm(false)}
-                title="Parolni o'zgartirish"
-            >
-                <form onSubmit={handleChangePassword} className="space-y-6">
-                    <div className="space-y-6">
-                        <div>
-                            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Eski parol</label>
-                            <input
-                                type="password"
-                                value={oldPassword}
-                                onChange={(e) => setOldPassword(e.target.value)}
-                                required
-                                className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
-                            />
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Yangi parol</label>
-                                <input
-                                    type="password"
-                                    value={newPassword}
-                                    onChange={(e) => setNewPassword(e.target.value)}
-                                    required
-                                    className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Tasdiqlash</label>
-                                <input
-                                    type="password"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    required
-                                    className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="flex gap-4 pt-4">
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="flex-1 py-4 bg-primary text-white rounded-2xl font-black shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-[0.98] disabled:opacity-50"
-                        >
-                            {loading ? 'Yangilanmoqda...' : 'Parolni yangilash'}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setShowPasswordForm(false)}
-                            className="flex-1 py-4 bg-slate-50 text-gray-500 rounded-2xl font-bold hover:bg-slate-100 transition-all active:scale-[0.98]"
-                        >
-                            Bekor qilish
-                        </button>
-                    </div>
-                </form>
-            </Modal>
+            {/* Password Modal Removed */}
 
             <Modal
                 isOpen={showDeleteConfirm}

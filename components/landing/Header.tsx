@@ -42,7 +42,6 @@ export default function Header() {
                                 </a>
                             ))}
                         </nav>
-                        {/*
                         <div className="flex items-center gap-4">
                             <Link
                                 href={authPath}
@@ -50,7 +49,7 @@ export default function Header() {
                             >
                                 {isAuthenticated ? 'Kabinet' : 'Kirish'}
                             </Link>
-                        </div> */}
+                        </div>
                     </div>
                 </div>
             </header>

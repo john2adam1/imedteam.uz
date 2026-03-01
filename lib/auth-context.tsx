@@ -12,6 +12,8 @@ interface AuthContextType {
     login: (credentials: UserLoginReq) => Promise<void>;
     register: (data: UserRegisterReq) => Promise<void>;
     checkUser: (data: UserCheckReq) => Promise<boolean>;
+    otpSend: (email: string) => Promise<void>;
+    otpConfirm: (email: string, code: string) => Promise<void>;
     logout: () => void;
     refreshUser: () => Promise<void>;
 }
@@ -81,6 +83,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    const otpSend = async (email: string) => {
+        try {
+            await authService.otpSend({ email });
+        } catch (error) {
+            console.error('OTP send failed:', error);
+            throw error;
+        }
+    };
+
+    const otpConfirm = async (email: string, code: string) => {
+        try {
+            await authService.otpConfirm({ email, confirmation_code: code });
+            // Fetch user profile after successful confirmation
+            const userData = await profileService.getUserProfile();
+            setUser(userData);
+        } catch (error) {
+            console.error('OTP confirmation failed:', error);
+            throw error;
+        }
+    };
+
     const logout = () => {
         authService.logout();
         setUser(null);
@@ -103,6 +126,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         register,
         checkUser,
+        otpSend,
+        otpConfirm,
         logout,
         refreshUser,
     };

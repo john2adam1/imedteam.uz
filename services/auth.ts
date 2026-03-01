@@ -2,7 +2,7 @@
 // Handles user login, registration, and password management
 
 import { apiClient, setAuthToken, removeAuthToken } from '@/lib/api-client';
-import { UserCheckReq, UserCheckRes, UserLoginReq, TokenRes, ChangePasswordBody } from '@/types/mobile-api';
+import { UserCheckReq, UserCheckRes, UserLoginReq, TokenRes, ChangePasswordBody, OtpSendReq, OtpConfirmReq, OtpRes } from '@/types/mobile-api';
 
 export const authService = {
     /**
@@ -34,7 +34,35 @@ export const authService = {
     },
 
     /**
-     * Change user password
+     * OTP Send - Sends confirmation code to email
+     */
+    otpSend: async (data: OtpSendReq): Promise<string> => {
+        return apiClient<string>('/auth/user/otp/send', {
+            method: 'POST',
+            body: JSON.stringify(data),
+            requiresAuth: false,
+        });
+    },
+
+    /**
+     * OTP Confirm - Verifies confirmation code
+     */
+    otpConfirm: async (data: OtpConfirmReq): Promise<TokenRes> => {
+        const response = await apiClient<TokenRes>('/auth/user/otp/confirm', {
+            method: 'POST',
+            body: JSON.stringify(data),
+            requiresAuth: false,
+        });
+
+        if (response.access_token) {
+            setAuthToken(response.access_token);
+        }
+
+        return response;
+    },
+
+    /**
+     * Change user password (deprecated)
      */
     changePassword: async (data: ChangePasswordBody): Promise<string> => {
         return apiClient<string>('/auth/password/change', {
