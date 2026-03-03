@@ -97,156 +97,142 @@ export default function CoursesPage() {
     // ===== RENDER =====
     return (
         <div className="">
-            <div className="flex flex-col lg:flex-row gap-10">
-                {/* ===== SIDEBAR - FILTERS ===== */}
-                <aside className="lg:w-72 flex-shrink-0">
-                    <div className="bg-white rounded-3xl border border-gray-100 p-6 sticky top-6 shadow-soft">
-                        <h2 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-3">
-                            <Filter className="w-5 h-5 text-primary" />
-                            Fanlar
-                        </h2>
-
-                        <div className="space-y-2">
-                            {/* All Courses */}
-                            <button
-                                onClick={() => setSelectedSubject(null)}
-                                className={`w-full text-left px-4 py-3 rounded-2xl transition-all duration-200 active:scale-[0.98] ${selectedSubject === null
-                                    ? 'bg-primary text-white shadow-md shadow-primary/20'
-                                    : 'text-gray-600 hover:bg-slate-50 font-medium'
-                                    }`}
-                            >
-                                <div className="flex items-center justify-between">
-                                    <span className="font-bold text-sm">Barcha kurslar</span>
-                                    <span className={`text-xs px-2 py-0.5 rounded-full ${selectedSubject === null
-                                        ? 'bg-white/20 text-white'
-                                        : 'bg-slate-100 text-gray-400'
-                                        }`}>
-                                        {totalCount}
-                                    </span>
-                                </div>
-                            </button>
-
-                            {/* Free Courses */}
-                            <button
-                                onClick={() => setSelectedSubject('free')}
-                                className={`w-full text-left px-4 py-3 rounded-2xl transition-all duration-200 active:scale-[0.98] ${selectedSubject === 'free'
-                                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
-                                    : 'text-gray-600 hover:bg-emerald-50/50 font-medium'
-                                    }`}
-                            >
-                                <div className="flex items-center justify-between">
-                                    <span className="font-bold text-sm">🎁 Bepul kurslar</span>
-                                    <span className={`text-xs px-2 py-0.5 rounded-full ${selectedSubject === 'free'
-                                        ? 'bg-white/20 text-white'
-                                        : 'bg-emerald-100/50 text-emerald-600'
-                                        }`}>
-                                        {selectedSubject === 'free' ? courses.length : getFreeCoursesCount()}
-                                    </span>
-                                </div>
-                            </button>
-
-                            {/* Divider */}
-                            <div className="border-t border-gray-100 my-4"></div>
-
-                            {/* Subject List */}
-                            <div className="space-y-1 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
-                                {subjects.map((subject) => (
-                                    <SubjectFilterButton
-                                        key={subject.id}
-                                        subject={subject}
-                                        isSelected={selectedSubject === subject.id}
-                                        onClick={() => setSelectedSubject(subject.id)}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-
-                        {subjects.length === 0 && !loading && (
-                            <p className="text-sm text-gray-400 text-center py-6 italic">Fanlar topilmadi</p>
-                        )}
-                    </div>
-                </aside>
-
-                {/* ===== MAIN CONTENT ===== */}
-                <main className="flex-1">
-                    {/* Header with Tabs */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10">
-                        <h1 className="text-3xl font-black text-gray-900 tracking-tight">Kurslar</h1>
-
-                        <div className="flex p-1.5 bg-slate-100/80 rounded-2xl w-fit">
-                            <button
-                                onClick={() => {
-                                    setActiveTab('all');
-                                    setSelectedSubject(null);
-                                }}
-                                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'all'
-                                    ? 'bg-white text-gray-900 shadow-sm shadow-black/5'
-                                    : 'text-gray-500 hover:text-gray-700'
-                                    }`}
-                            >
-                                Barcha kurslar
-                            </button>
-                            <button
-                                onClick={() => setActiveTab('my')}
-                                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'my'
-                                    ? 'bg-white text-gray-900 shadow-sm shadow-black/5'
-                                    : 'text-gray-500 hover:text-gray-700'
-                                    }`}
-                            >
-                                Mening kurslarim
-                            </button>
-                        </div>
+            <div className="space-y-10">
+                {/* ===== HEADER & PRIMARY TABS ===== */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                    <div>
+                        <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Kurslar</h1>
+                        <p className="text-gray-400 font-medium italic">Siz uchun tanlangan eng yaxshi kurslar</p>
                     </div>
 
+                    <div className="flex p-1.5 bg-slate-100/80 rounded-2xl w-fit">
+                        <button
+                            onClick={() => {
+                                setActiveTab('all');
+                                setSelectedSubject(null);
+                            }}
+                            className={`px-8 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'all'
+                                ? 'bg-white text-gray-900 shadow-premium'
+                                : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                        >
+                            Barcha kurslar
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('my')}
+                            className={`px-8 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'my'
+                                ? 'bg-white text-gray-900 shadow-premium'
+                                : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                        >
+                            Mening kurslarim
+                        </button>
+                    </div>
+                </div>
+
+                {/* ===== HORIZONTAL SUBJECT FILTERS ===== */}
+                <div className="relative group">
+                    <div className="flex items-center gap-3 overflow-x-auto pb-4 custom-scrollbar no-scrollbar">
+                        {/* All Courses Pill */}
+                        <button
+                            onClick={() => setSelectedSubject(null)}
+                            className={`whitespace-nowrap px-6 py-3 rounded-2xl font-bold text-sm transition-all border-2 active:scale-95 flex items-center gap-2 ${selectedSubject === null
+                                ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20'
+                                : 'bg-white border-gray-100 text-gray-600 hover:border-gray-200'
+                                }`}
+                        >
+                            Barchasi
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full ${selectedSubject === null ? 'bg-white/20' : 'bg-slate-100 text-gray-400'}`}>
+                                {totalCount}
+                            </span>
+                        </button>
+
+                        {/* Free Courses Pill */}
+                        <button
+                            onClick={() => setSelectedSubject('free')}
+                            className={`whitespace-nowrap px-6 py-3 rounded-2xl font-bold text-sm transition-all border-2 active:scale-95 flex items-center gap-2 ${selectedSubject === 'free'
+                                ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-600/20'
+                                : 'bg-white border-gray-100 text-gray-600 hover:border-emerald-100 hover:text-emerald-600'
+                                }`}
+                        >
+                            🎁 Bepul
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full ${selectedSubject === 'free' ? 'bg-white/20' : 'bg-emerald-50 text-emerald-600'}`}>
+                                {selectedSubject === 'free' ? courses.length : getFreeCoursesCount()}
+                            </span>
+                        </button>
+
+                        <div className="h-8 w-[1px] bg-gray-100 mx-2 flex-shrink-0" />
+
+                        {/* Subject Pills */}
+                        {subjects.map((subject) => (
+                            <button
+                                key={subject.id}
+                                onClick={() => setSelectedSubject(subject.id)}
+                                className={`whitespace-nowrap px-6 py-3 rounded-2xl font-bold text-sm transition-all border-2 active:scale-95 ${selectedSubject === subject.id
+                                    ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20'
+                                    : 'bg-white border-gray-100 text-gray-600 hover:border-gray-200 hover:text-primary'
+                                    }`}
+                            >
+                                {subject.name}
+                            </button>
+                        ))}
+                    </div>
+                    {/* Subtle fade effect for scrolling */}
+                    <div className="absolute right-0 top-0 bottom-4 w-12 bg-gradient-to-l from-slate-50 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+
+                {/* ===== MAIN CONTENT GRID ===== */}
+                <main>
                     {/* Loading State */}
                     {loading ? (
-                        <div className="flex flex-col items-center justify-center py-20">
-                            <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4"></div>
-                            <p className="text-gray-400 font-medium">Yuklanmoqda...</p>
+                        <div className="flex flex-col items-center justify-center py-32 bg-white rounded-[3rem] border border-gray-50 shadow-soft">
+                            <div className="w-16 h-16 border-4 border-primary/10 border-t-primary rounded-full animate-spin mb-6"></div>
+                            <p className="text-gray-400 font-bold uppercase tracking-[0.2em] text-xs">Kurslar yuklanmoqda...</p>
                         </div>
                     ) : (
-                        <>
+                        <div className="space-y-12">
                             {/* Title with Count */}
-                            <h2 className="text-xl font-bold text-gray-900 mb-8 flex items-center gap-3">
-                                <span className="w-1.5 h-6 bg-primary rounded-full"></span>
-                                {activeTab === 'all'
-                                    ? selectedSubject === 'free'
-                                        ? `Bepul kurslar (${totalCount})`
-                                        : selectedSubject
-                                            ? `${subjects.find(s => s.id === selectedSubject)?.name || 'Fanlar'} (${totalCount})`
-                                            : `Jami kurslar (${totalCount})`
-                                    : `Siz o'qiyotgan kurslar (${totalCount})`
-                                }
-                            </h2>
+                            <div className="flex items-center gap-4">
+                                <div className="h-10 w-2 bg-primary rounded-full shadow-lg shadow-primary/20" />
+                                <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+                                    {activeTab === 'all'
+                                        ? selectedSubject === 'free'
+                                            ? `Bepul kurslar`
+                                            : selectedSubject
+                                                ? subjects.find(s => s.id === selectedSubject)?.name
+                                                : `Jami kurslar`
+                                        : `Mening kurslarim`
+                                    }
+                                    <span className="ml-3 text-primary/30 text-3xl tabular-nums">/ {totalCount}</span>
+                                </h2>
+                            </div>
 
                             {/* Empty State */}
                             {courses.length === 0 ? (
-                                <div className="text-center py-20 bg-white rounded-[2.5rem] border-2 border-dashed border-gray-100 flex flex-col items-center">
-                                    <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center text-3xl mb-6 opacity-50 grayscale">
+                                <div className="text-center py-32 bg-white rounded-[3rem] border-4 border-dashed border-slate-50 flex flex-col items-center">
+                                    <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center text-5xl mb-8 shadow-inner">
                                         📚
                                     </div>
-                                    <p className="text-gray-400 font-medium text-lg max-w-sm mb-8">
+                                    <h3 className="text-xl font-black text-gray-900 mb-4 px-6 text-center">
                                         {activeTab === 'my'
                                             ? "Siz hali hech qaysi kursga a'zo bo'lmagansiz"
                                             : selectedSubject === 'free'
                                                 ? "Hozircha bepul kurslar mavjud emas"
-                                                : selectedSubject
-                                                    ? "Ushbu yo'nalish bo'yicha hozircha kurslar mavjud emas"
-                                                    : "Hozircha kurslar mavjud emas"
+                                                : "Ushbu yo'nalish bo'yicha hozircha kurslar mavjud emas"
                                         }
-                                    </p>
+                                    </h3>
                                     {activeTab === 'my' && (
                                         <button
                                             onClick={() => setActiveTab('all')}
-                                            className="px-8 py-4 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-95"
+                                            className="px-10 py-4 bg-primary text-white rounded-2xl font-bold shadow-xl shadow-primary/20 hover:bg-primary-600 hover:-translate-y-1 transition-all active:scale-95"
                                         >
                                             Kurslarni ko'rish
                                         </button>
                                     )}
                                 </div>
                             ) : (
-                                /* Course Grid */
-                                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+                                /* Expanded Course Grid */
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 gap-10">
                                     {courses.map((course) => (
                                         <CourseCard
                                             key={course.id || course.course_id}
@@ -258,7 +244,7 @@ export default function CoursesPage() {
                                     ))}
                                 </div>
                             )}
-                        </>
+                        </div>
                     )}
                 </main>
             </div>
@@ -266,22 +252,6 @@ export default function CoursesPage() {
     );
 }
 
-// ===== SUBJECT FILTER BUTTON COMPONENT =====
-function SubjectFilterButton({ subject, isSelected, onClick }: { subject: Subject; isSelected: boolean; onClick: () => void }) {
-    return (
-        <button
-            onClick={onClick}
-            className={`w-full text-left px-4 py-3 rounded-2xl transition-all duration-200 active:scale-[0.98] ${isSelected
-                ? 'bg-primary text-white shadow-md shadow-primary/20'
-                : 'text-gray-600 hover:bg-slate-50 font-medium'
-                }`}
-        >
-            <div className="flex items-center justify-between">
-                <span className="text-sm line-clamp-1">{subject.name}</span>
-            </div>
-        </button>
-    );
-}
 
 // ===== COURSE CARD COMPONENT =====
 function CourseCard({ course, activeTab, isFree, onClick }: { course: any; activeTab: 'all' | 'my'; isFree: boolean; onClick: () => void }) {
@@ -318,7 +288,7 @@ function CourseCard({ course, activeTab, isFree, onClick }: { course: any; activ
             </div>
 
             {/* Course Title */}
-            <h3 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2 leading-tight group-hover:text-primary transition-colors">
+            <h3 className="text-xl font-black text-gray-900 mb-3 line-clamp-2 leading-tight group-hover:text-primary transition-colors">
                 {course.course_name || course.name}
             </h3>
 

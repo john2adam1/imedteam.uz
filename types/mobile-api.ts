@@ -6,8 +6,10 @@
 // ============================================================================
 
 export interface UserCheckReq {
-  phone_number: string;
+  phone_number?: string;
+  email?: string;
 }
+
 
 export interface UserCheckRes {
   has_account: boolean;
@@ -24,7 +26,8 @@ export interface OtpSendReq {
 }
 
 export interface OtpConfirmReq {
-  email: string;
+  email?: string;
+  phone_number?: string;
   confirmation_code: string;
 }
 
@@ -58,6 +61,7 @@ export interface ChangePasswordBody {
 export interface UserRes {
   id: string;
   phone_number: string;
+  email?: string;
   name: string;
   fcm_token?: string;
   image_url?: string;
@@ -69,10 +73,12 @@ export interface UserRes {
 export interface ProfileUpdateBody {
   name?: string;
   phone_number?: string;
+  email?: string;
   fcm_token?: string;
   language?: string;
   image?: File;
 }
+
 
 // ============================================================================
 // Course Types

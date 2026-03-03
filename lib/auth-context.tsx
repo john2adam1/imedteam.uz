@@ -12,8 +12,8 @@ interface AuthContextType {
     login: (credentials: UserLoginReq) => Promise<void>;
     register: (data: UserRegisterReq) => Promise<void>;
     checkUser: (data: UserCheckReq) => Promise<boolean>;
-    otpSend: (email: string) => Promise<void>;
-    otpConfirm: (email: string, code: string) => Promise<void>;
+    otpSend: (identifier: string) => Promise<void>;
+    otpConfirm: (identifier: string, code: string, type?: 'email' | 'phone') => Promise<void>;
     logout: () => void;
     refreshUser: () => Promise<void>;
 }
@@ -83,18 +83,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     };
 
-    const otpSend = async (email: string) => {
+    const otpSend = async (identifier: string) => {
         try {
-            await authService.otpSend({ email });
+            // Check if it looks like an email or phone to decide which field to send
+            // But usually otpSend is for email in this system
+            await authService.otpSend({ email: identifier });
         } catch (error) {
             console.error('OTP send failed:', error);
             throw error;
         }
     };
 
-    const otpConfirm = async (email: string, code: string) => {
+    const otpConfirm = async (identifier: string, code: string, type: 'email' | 'phone' = 'email') => {
         try {
-            await authService.otpConfirm({ email, confirmation_code: code });
+            const payload: any = { confirmation_code: code };
+            if (type === 'phone') {
+                payload.phone_number = identifier.replace(/\D/g, '');
+            } else {
+                payload.email = identifier;
+            }
+
+            await authService.otpConfirm(payload);
             // Fetch user profile after successful confirmation
             const userData = await profileService.getUserProfile();
             setUser(userData);

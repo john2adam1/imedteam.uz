@@ -21,6 +21,7 @@ export default function ProfilePage() {
     // Edit Profile State
     const [editName, setEditName] = useState('');
     const [editPhone, setEditPhone] = useState('');
+    const [editEmail, setEditEmail] = useState('');
     const [editImage, setEditImage] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -33,9 +34,22 @@ export default function ProfilePage() {
         fetchActivityStats();
         if (user) {
             setEditName(user.name || '');
-            setEditPhone(user.phone_number || '');
+            const phone = user.phone_number || '';
+            setEditPhone(phone.startsWith('+') ? phone : (phone ? `+${phone}` : '+'));
+            setEditEmail(user.email || '');
         }
     }, [user]);
+
+    // Reset form when modal opens
+    useEffect(() => {
+        if (showEditProfileForm && user) {
+            setEditName(user.name || '');
+            const phone = user.phone_number || '';
+            setEditPhone(phone.startsWith('+') ? phone : (phone ? `+${phone}` : '+'));
+            setEditEmail(user.email || '');
+            setError('');
+        }
+    }, [showEditProfileForm, user]);
 
     const fetchActivityStats = async () => {
         try {
@@ -55,17 +69,78 @@ export default function ProfilePage() {
         setLoading(true);
 
         try {
-            await profileService.updateProfile({
-                name: editName,
-                phone_number: editPhone,
-                image: editImage || undefined,
-            });
+            const numericPhone = editPhone.replace(/\D/g, '');
+            const currentUserPhone = user?.phone_number?.replace(/\D/g, '') || '';
+
+            // Only check if phone explicitly changed
+            if (numericPhone !== currentUserPhone && numericPhone.length > 0) {
+                try {
+                    const checkRes = await authService.checkUser({ phone_number: numericPhone });
+                    if (checkRes.has_account) {
+                        setError('Bu nomerda allaqachon akkount mavjud.');
+                        setLoading(false);
+                        return;
+                    }
+                } catch (checkErr: any) {
+                    console.warn('Check user failed:', checkErr);
+                    // Pass through the actual error message instead of assuming duplicate
+                    setError(checkErr.message || 'Telefon raqamini tekshirishda xatolik');
+                    setLoading(false);
+                    return;
+                }
+            }
+
+            // Only check if email explicitly changed
+            const currentEmail = user?.email || '';
+            if (editEmail !== currentEmail && editEmail.length > 0) {
+                try {
+                    const checkRes = await authService.checkUser({ email: editEmail });
+                    if (checkRes.has_account) {
+                        setError('Bu emailda allaqachon akkount mavjud.');
+                        setLoading(false);
+                        return;
+                    }
+                } catch (checkErr: any) {
+                    // Backend doesn't support email check yet, ignore "phone number not valid"
+                    const msg = checkErr.message || '';
+                    if (!msg.includes('phone') && !msg.includes('not valid')) {
+                        console.warn('Check email failed:', checkErr);
+                    }
+                }
+            }
+
+            try {
+                await profileService.updateProfile({
+                    name: editName,
+                    phone_number: editPhone.startsWith('+') ? editPhone : `+${editPhone}`,
+                    email: editEmail || undefined,
+                    image: editImage || undefined,
+                });
+            } catch (updateErr: any) {
+                // If backend fails because of email field (e.g., "phone number not valid" error incorrectly triggered)
+                // or any validator failure related to missing fields, try fallback without it
+                if (updateErr.message?.includes('phone') || updateErr.message?.includes('valid')) {
+                    await profileService.updateProfile({
+                        name: editName,
+                        phone_number: editPhone.startsWith('+') ? editPhone : `+${editPhone}`,
+                        image: editImage || undefined,
+                    });
+                } else {
+                    throw updateErr;
+                }
+            }
 
             await refreshUser();
             setMessage('Profil muvaffaqiyatli yangilandi');
             setShowEditProfileForm(false);
         } catch (err: any) {
-            setError(err.message || 'Profilni yangilashda xatolik yuz berdi');
+            console.error('Profile update error:', err);
+            const errorMsg = err.message || '';
+            if (errorMsg.includes('duplicate key value violates unique constraint') || errorMsg.includes('phone_number_deleted_at_key')) {
+                setError('Bu nomerda allaqachon akkount mavjud.');
+            } else {
+                setError(errorMsg || 'Profilni yangilashda xatolik yuz berdi');
+            }
         } finally {
             setLoading(false);
         }
@@ -129,13 +204,18 @@ export default function ProfilePage() {
                         </div>
 
                         <h3 className="text-2xl font-black text-gray-900 mb-1">{user?.name}</h3>
-                        <p className="text-gray-400 font-medium mb-8 flex items-center justify-center gap-2">
-                            <Phone size={14} /> {user?.phone_number}
+                        <p className="text-gray-400 font-medium mb-8 flex flex-col items-center justify-center gap-1">
+                            <span className="flex items-center gap-2"><Phone size={14} /> {user?.phone_number}</span>
+                            {user?.email && <span className="flex items-center gap-2 text-xs opacity-75">{user.email}</span>}
                         </p>
+
 
                         <div className="grid grid-cols-1 gap-3">
                             <button
-                                onClick={() => setShowEditProfileForm(true)}
+                                onClick={() => {
+                                    setError('');
+                                    setShowEditProfileForm(true);
+                                }}
                                 className="w-full py-4 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-[0.98]"
                             >
                                 Profilni tahrirlash
@@ -233,47 +313,84 @@ export default function ProfilePage() {
             {/* Modals */}
             <Modal
                 isOpen={showEditProfileForm}
-                onClose={() => setShowEditProfileForm(false)}
+                onClose={() => {
+                    setShowEditProfileForm(false);
+                    setError('');
+                }}
                 title="Profilni tahrirlash"
             >
-                <form onSubmit={handleUpdateProfile} className="space-y-6">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="space-y-6">
+                    {error && (
+                        <div className="p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-sm font-medium flex items-center gap-3 animate-shake">
+                            <span className="text-lg">⚠️</span> {error}
+                        </div>
+                    )}
+                    <form onSubmit={handleUpdateProfile} className="space-y-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Ism familingiz</label>
+                                <input
+                                    type="text"
+                                    value={editName}
+                                    onChange={(e) => setEditName(e.target.value)}
+                                    className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Telefon raqam</label>
+                                <input
+                                    type="tel"
+                                    value={editPhone}
+                                    maxLength={13}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        if (val === '' || val === '+') {
+                                            setEditPhone('+');
+                                        } else {
+                                            // Allow only + and digits
+                                            const cleanVal = val.startsWith('+') ? '+' + val.slice(1).replace(/\D/g, '') : '+' + val.replace(/\D/g, '');
+                                            setEditPhone(cleanVal.slice(0, 13));
+                                        }
+                                    }}
+                                    onFocus={(e) => {
+                                        if (!editPhone) setEditPhone('+');
+                                    }}
+                                    className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
+                                />
+                            </div>
+                        </div>
+
                         <div>
-                            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Ism familingiz</label>
+                            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Email manzil</label>
                             <input
-                                type="text"
-                                value={editName}
-                                onChange={(e) => setEditName(e.target.value)}
+                                type="email"
+                                value={editEmail}
+                                onChange={(e) => setEditEmail(e.target.value)}
+                                placeholder="example@mail.com"
                                 className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
                             />
                         </div>
-                        <div>
-                            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Telefon raqam</label>
-                            <input
-                                type="tel"
-                                value={editPhone}
-                                onChange={(e) => setEditPhone(e.target.value)}
-                                className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
-                            />
+                        <div className="flex gap-4 pt-4">
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="flex-1 py-4 bg-primary text-white rounded-2xl font-black shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-[0.98] disabled:opacity-50"
+                            >
+                                {loading ? 'Saqlanmoqda...' : 'Saqlash'}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setShowEditProfileForm(false);
+                                    setError('');
+                                }}
+                                className="flex-1 py-4 bg-slate-50 text-gray-500 rounded-2xl font-bold hover:bg-slate-100 transition-all active:scale-[0.98]"
+                            >
+                                Bekor qilish
+                            </button>
                         </div>
-                    </div>
-                    <div className="flex gap-4 pt-4">
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="flex-1 py-4 bg-primary text-white rounded-2xl font-black shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-[0.98] disabled:opacity-50"
-                        >
-                            {loading ? 'Saqlanmoqda...' : 'Saqlash'}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setShowEditProfileForm(false)}
-                            className="flex-1 py-4 bg-slate-50 text-gray-500 rounded-2xl font-bold hover:bg-slate-100 transition-all active:scale-[0.98]"
-                        >
-                            Bekor qilish
-                        </button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </Modal>
 
             {/* Password Modal Removed */}

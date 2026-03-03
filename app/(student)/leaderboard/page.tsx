@@ -124,7 +124,7 @@ export default function LeaderboardPage() {
                                                 isSecond ? 'border-gray-300' : 'border-orange-300'} 
                                             transition-transform duration-500 hover:scale-110 shadow-lg`}>
                                             {user.image_url ? (
-                                                <Image src={user.image_url} alt={user.name} width={80} height={80} className="object-cover" />
+                                                <img src={user.image_url} alt={user.name} className="w-full h-full object-cover" />
                                             ) : (
                                                 <span className="text-2xl font-black text-gray-200">{user.name.charAt(0)}</span>
                                             )}
@@ -214,7 +214,7 @@ export default function LeaderboardPage() {
                                     </div>
                                     <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center overflow-hidden border border-gray-100 shadow-sm group-hover:scale-110 transition-transform">
                                         {user.image_url ? (
-                                            <Image src={user.image_url} alt={user.name} width={48} height={48} className="object-cover" />
+                                            <img src={user.image_url} alt={user.name} className="w-full h-full object-cover" />
                                         ) : (
                                             <span className="text-lg font-black text-gray-200 group-hover:text-primary">{user.name.charAt(0)}</span>
                                         )}

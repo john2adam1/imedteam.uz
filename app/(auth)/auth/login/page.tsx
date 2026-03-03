@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { authService, profileService } from '@/services';
 import { Mail, Phone, ArrowRight, CheckCircle2, RefreshCw, Send, Layout, User, MessageCircle } from 'lucide-react';
 
@@ -18,6 +19,8 @@ function LoginContent() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [hasAccount, setHasAccount] = useState<boolean | null>(null);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [loginMethod, setLoginMethod] = useState<'email' | 'phone'>('phone');
 
   const { otpSend, otpConfirm, checkUser, refreshUser } = useAuth();
   const router = useRouter();
@@ -27,7 +30,15 @@ function LoginContent() {
   useEffect(() => {
     setMounted(true);
     const savedIdentifier = localStorage.getItem('auth_identifier');
-    if (savedIdentifier) setIdentifier(savedIdentifier);
+    if (savedIdentifier && !savedIdentifier.includes('@')) {
+      // Prioritize phone: only auto-fill if it's a phone number
+      setIdentifier(savedIdentifier);
+      setLoginMethod('phone');
+    } else {
+      // Default to empty phone input for everyone else (email users will choose to switch)
+      setIdentifier('+');
+      setLoginMethod('phone');
+    }
 
     // Set step from URL on mount
     const stepParam = searchParams.get('step') as Step;
@@ -50,35 +61,44 @@ function LoginContent() {
     const cleanIdentifier = identifier.trim();
 
     if (!cleanIdentifier) {
-      setError('Iltimos, email yoki telefon raqamingizni kiriting');
+      setError(loginMethod === 'email' ? 'Iltimos, email manzilingizni kiriting' : 'Iltimos, telefon raqamingizni kiriting');
       return;
     }
 
-    setIsLoading(false); // Reset just in case, though true below
+    if (!acceptedTerms) {
+      setError('Iltimos, ommaviy oferta shartlarini qabul qiling');
+      return;
+    }
+
     setIsLoading(true);
     localStorage.setItem('auth_identifier', cleanIdentifier);
 
     try {
-      const isPhone = /^\+?[\d\s-]{7,15}$/.test(cleanIdentifier);
-      const isEmailLike = cleanIdentifier.includes('@');
-
-      if (isEmailLike) {
-        // For Emails: Send OTP immediately, don't call phone-only checkUser
-        setHasAccount(null); // Will assume needs registration if backend says so or use existing
+      if (loginMethod === 'email') {
+        const isEmailLike = cleanIdentifier.includes('@');
+        if (!isEmailLike) {
+          setError('Iltimos, email manzilingizni to\'g\'ri formatda kiriting');
+          setIsLoading(false);
+          return;
+        }
+        setHasAccount(null);
         await otpSend(cleanIdentifier);
         setStep('otp');
-      } else if (isPhone) {
-        // For Phone Numbers: Clean for backend and check if user exists
+      } else {
         const numericPhone = cleanIdentifier.replace(/\D/g, '');
+        if (numericPhone.length < 9) {
+          setError('Iltimos, telefon raqamingizni to\'g\'ri formatda kiriting');
+          setIsLoading(false);
+          return;
+        }
+
         try {
-          const exists = await checkUser({ phone_number: numericPhone });
-          setHasAccount(exists);
+          const res = await checkUser({ phone_number: numericPhone });
+          setHasAccount(!!res);
         } catch (e) {
           console.warn('User check failed for phone, continuing anyway');
         }
         setStep('telegram');
-      } else {
-        setError('Iltimos, email yoki telefon raqamingizni to\'g\'ri formatda kiriting');
       }
     } catch (err: any) {
       console.error('Identifier submit error:', err);
@@ -94,7 +114,7 @@ function LoginContent() {
     setIsLoading(true);
 
     try {
-      await otpConfirm(identifier.trim(), otp);
+      await otpConfirm(identifier.trim(), otp, loginMethod);
 
       if (hasAccount === false) {
         setStep('register');
@@ -155,14 +175,18 @@ function LoginContent() {
           {step === 'register' && <Layout size={40} />}
         </div>
         <h1 className="text-4xl font-black text-gray-900 mb-3 tracking-tight">
-          {step === 'identifier' && 'Xush kelibsiz!'}
+          {step === 'identifier' && 'Kirish'}
           {step === 'otp' && 'Tasdiqlash kodi'}
           {step === 'telegram' && 'Telegram Bot'}
           {step === 'register' && 'Ma\'lumotlar'}
         </h1>
         <p className="text-gray-500 font-medium whitespace-pre-line px-4">
-          {step === 'identifier' && 'Kirish uchun email yoki telefon raqamingizni kiriting'}
-          {step === 'otp' && `${identifier}\npochtasiga yuborilgan kodni kiriting`}
+          {step === 'identifier' && ''}
+          {step === 'otp' && (
+            loginMethod === 'email'
+              ? `${identifier}\npochtasiga yuborilgan kodni kiriting`
+              : `${identifier}\nraqamiga yuborilgan kodni kiriting`
+          )}
           {step === 'telegram' && `Kodni @imedteam_bot botidan oling\nva platformaga qayting`}
           {step === 'register' && 'Platformaga xush kelibsiz!\nIsm-familiyangiz qanday?'}
         </p>
@@ -177,36 +201,98 @@ function LoginContent() {
       {step === 'identifier' && (
         <form onSubmit={handleIdentifierSubmit} className="space-y-6">
           <div className="relative group">
-            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Email yoki Telefon</label>
             <div className="relative">
               <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-gray-400 group-focus-within:text-primary transition-colors">
-                {identifier.includes('@') ? <Mail size={20} /> : <Phone size={20} />}
+                {loginMethod === 'email' ? <Mail size={20} /> : <Phone size={20} />}
               </div>
               <input
                 type="text"
                 required
                 value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (loginMethod === 'phone') {
+                    if (val === '' || val === '+') {
+                      setIdentifier('+');
+                    } else {
+                      const cleanVal = val.startsWith('+') ? '+' + val.slice(1).replace(/\D/g, '') : '+' + val.replace(/\D/g, '');
+                      setIdentifier(cleanVal);
+                    }
+                  } else {
+                    setIdentifier(val);
+                  }
+                }}
                 className="w-full pl-14 pr-6 py-5 rounded-3xl border-2 border-slate-100 focus:border-primary/20 focus:ring-8 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 bg-slate-50 focus:bg-white text-lg placeholder:text-gray-300 placeholder:font-medium"
-                placeholder="example@mail.com yoki +998..."
+                placeholder={loginMethod === 'email' ? 'Email manzil' : '+998...'}
               />
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={isLoading || !identifier.trim()}
-            className="group w-full py-5 bg-primary text-white rounded-3xl font-black shadow-2xl shadow-primary/30 hover:bg-primary-600 active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg"
-          >
-            {isLoading ? (
-              <RefreshCw className="animate-spin" size={24} />
+          <div className="space-y-4">
+            {loginMethod === 'phone' ? (
+              <>
+                <button
+                  type="submit"
+                  disabled={isLoading || identifier.length < 5 || !acceptedTerms}
+                  className="group w-full py-5 bg-[#0088cc] text-white rounded-3xl font-black shadow-2xl shadow-[#0088cc]/30 hover:bg-[#0077b5] active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg"
+                >
+                  {isLoading ? <RefreshCw className="animate-spin" size={24} /> : (
+                    <>
+                      Kodni yuborish (Telegram)
+                      <Send size={20} />
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLoginMethod('email');
+                    setError('');
+                    setIdentifier('');
+                  }}
+                  className="w-full py-5 bg-white border-2 border-slate-100 text-gray-500 rounded-3xl font-black hover:border-primary/20 hover:bg-slate-50 transition-all text-lg flex items-center justify-center gap-2"
+                >
+                  <Mail size={20} />
+                  Email orqali kirish
+                </button>
+              </>
             ) : (
               <>
-                Kodni yuborish
-                <Send size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                <button
+                  type="submit"
+                  disabled={isLoading || !identifier.trim() || !acceptedTerms}
+                  className="group w-full py-5 bg-primary text-white rounded-3xl font-black shadow-2xl shadow-primary/30 hover:bg-primary-600 active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg"
+                >
+                  {isLoading ? <RefreshCw className="animate-spin" size={24} /> : 'Kodni olish'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLoginMethod('phone');
+                    setError('');
+                    setIdentifier('+');
+                  }}
+                  className="w-full py-5 bg-white border-2 border-slate-100 text-[#0088cc] rounded-3xl font-black hover:border-primary/20 hover:bg-slate-50 transition-all text-lg flex items-center justify-center gap-2"
+                >
+                  <MessageCircle size={20} fill="currentColor" />
+                  Telegram orqali kirishga qaytish
+                </button>
               </>
             )}
-          </button>
+          </div>
+
+          <div className="flex items-center gap-3 px-2">
+            <input
+              type="checkbox"
+              id="terms"
+              checked={acceptedTerms}
+              onChange={(e) => setAcceptedTerms(e.target.checked)}
+              className="w-5 h-5 rounded border-2 border-slate-200 text-primary focus:ring-primary h-5 w-5 bg-white rounded border-gray-300 focus:ring-2 focus:ring-primary"
+            />
+            <label htmlFor="terms" className="text-sm font-medium text-gray-500 cursor-pointer select-none">
+              Men <Link href="/offerta" className="underline decoration-primary/30 underline-offset-4 decoration-2 hover:text-primary transition-colors">ommaviy oferta</Link> shartlarini qabul qilaman
+            </label>
+          </div>
         </form>
       )}
 
