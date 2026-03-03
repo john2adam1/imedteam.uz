@@ -204,6 +204,7 @@ export interface Subject {
   description?: string;
   image_url?: string;
   is_active: boolean;
+  total_courses?: number;
   created_at: string;
   updated_at: string;
 }

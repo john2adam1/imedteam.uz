@@ -1,18 +1,22 @@
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { ArrowLeft as ArrowLeftIcon } from 'lucide-react';
 
 export default function OffertaPage() {
+    const router = useRouter();
+
     return (
         <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
                 <div className="px-8 py-10 sm:px-12 sm:py-16">
-                    <Link
-                        href="/auth/login"
+                    <button
+                        onClick={() => router.back()}
                         className="inline-flex items-center gap-2 text-primary font-bold mb-8 hover:opacity-80 transition-opacity"
                     >
-                        <ArrowLeft size={20} />
+                        <ArrowLeftIcon size={20} />
                         Ortga qaytish
-                    </Link>
+                    </button>
 
                     <h1 className="text-3xl sm:text-4xl font-black text-gray-900 mb-8 leading-tight">
                         Foydalanuvchi shartnomasi

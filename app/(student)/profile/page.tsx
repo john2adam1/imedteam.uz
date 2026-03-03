@@ -2,9 +2,10 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/lib/auth-context';
+import Link from 'next/link';
 import { authService, activityService, profileService } from '@/services';
 import { ActivityStatsResponse } from '@/types/mobile-api';
-import { User, Phone, Shield, BarChart3, Trash2, Camera, LogOut, Key } from 'lucide-react';
+import { User, Phone, Shield, BarChart3, Trash2, Camera, LogOut, Key, MessageSquare, HelpCircle, FileText, ExternalLink, MessageCircle, ChevronRight, PlayCircle, BookOpen, GraduationCap } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
 
 export default function ProfilePage() {
@@ -15,6 +16,7 @@ export default function ProfilePage() {
     const [showPasswordForm, setShowPasswordForm] = useState(false);
     const [showEditProfileForm, setShowEditProfileForm] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [showGuideModal, setShowGuideModal] = useState(false);
 
     // Password Form State (Removed as per user request)
 
@@ -271,6 +273,75 @@ export default function ProfilePage() {
                         </div>
                     )}
 
+                    {/* Yordam va Ma'lumotlar */}
+                    <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-soft">
+                        <h3 className="text-xl font-black text-gray-900 mb-8 flex items-center gap-3">
+                            <HelpCircle className="text-primary" />
+                            Yordam va ma'lumotlar
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <a
+                                href="https://t.me/imedteam_feedback"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-6 bg-slate-50 hover:bg-primary/5 border border-slate-100 rounded-3xl transition-all group"
+                            >
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center text-primary shadow-sm">
+                                        <MessageSquare size={20} />
+                                    </div>
+                                    <ExternalLink size={16} className="text-gray-300 group-hover:text-primary transition-colors" />
+                                </div>
+                                <p className="font-black text-gray-900 leading-tight">Fikr bildirish</p>
+                                <p className="text-gray-400 text-xs font-medium mt-1">Telegram orqali murojaat</p>
+                            </a>
+
+                            <a
+                                href="https://t.me/manager_iMedteam"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-6 bg-slate-50 hover:bg-primary/5 border border-slate-100 rounded-3xl transition-all group"
+                            >
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center text-primary shadow-sm">
+                                        <MessageCircle size={20} />
+                                    </div>
+                                    <ExternalLink size={16} className="text-gray-300 group-hover:text-primary transition-colors" />
+                                </div>
+                                <p className="font-black text-gray-900 leading-tight">Admin bilan aloqa</p>
+                                <p className="text-gray-400 text-xs font-medium mt-1">Savollar bo'yicha yozing</p>
+                            </a>
+
+                            <button
+                                onClick={() => setShowGuideModal(true)}
+                                className="p-6 bg-slate-50 hover:bg-primary/5 border border-slate-100 rounded-3xl transition-all group text-left"
+                            >
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center text-primary shadow-sm">
+                                        <HelpCircle size={20} />
+                                    </div>
+                                    <ChevronRight size={16} className="text-gray-300 group-hover:text-primary transition-colors" />
+                                </div>
+                                <p className="font-black text-gray-900 leading-tight">Qo'llanma</p>
+                                <p className="text-gray-400 text-xs font-medium mt-1">Platformadan foydalanish</p>
+                            </button>
+
+                            <Link
+                                href="/offerta"
+                                className="p-6 bg-slate-50 hover:bg-primary/5 border border-slate-100 rounded-3xl transition-all group text-left"
+                            >
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center text-primary shadow-sm">
+                                        <FileText size={20} />
+                                    </div>
+                                    <ExternalLink size={16} className="text-gray-300 group-hover:text-primary transition-colors" />
+                                </div>
+                                <p className="font-black text-gray-900 leading-tight">Ommaviy oferta</p>
+                                <p className="text-gray-400 text-xs font-medium mt-1">Shartnoma va qoidalar</p>
+                            </Link>
+                        </div>
+                    </div>
+
                     {/* Danger Zone */}
                     <div className="bg-red-50/50 p-8 rounded-[2.5rem] border border-red-100">
                         <h3 className="text-xl font-black text-red-700 mb-2 flex items-center gap-2">
@@ -424,6 +495,56 @@ export default function ProfilePage() {
                             className="w-full py-4 bg-slate-50 text-gray-500 rounded-2xl font-bold hover:bg-slate-100 transition-all active:scale-[0.98]"
                         >
                             Yo'q, qolsin
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+
+            <Modal
+                isOpen={showGuideModal}
+                onClose={() => setShowGuideModal(false)}
+                title="Platformadan foydalanish bo'yicha qo'llanma"
+                className="max-w-2xl"
+            >
+                <div className="space-y-8 py-2">
+                    <div className="relative pl-14 group">
+                        <div className="absolute left-0 top-0 w-10 h-10 bg-primary/10 rounded-2xl flex items-center justify-center text-primary font-black">1</div>
+                        <div className="absolute left-5 top-10 w-0.5 h-12 bg-slate-100"></div>
+                        <h4 className="text-lg font-black text-gray-900 mb-2 flex items-center gap-2">
+                            <GraduationCap size={20} className="text-primary" /> Kurslarni tanlash
+                        </h4>
+                        <p className="text-gray-500 font-medium leading-relaxed">
+                            "Kurslar" bo'limiga o'ting va o'zingizga ma'qul bo'lgan mutaxassislik yoki fanni tanlang. Har bir kurs zamonaviy tibbiyot standartlari asosida tayyorlangan.
+                        </p>
+                    </div>
+
+                    <div className="relative pl-14 group">
+                        <div className="absolute left-0 top-0 w-10 h-10 bg-primary/10 rounded-2xl flex items-center justify-center text-primary font-black">2</div>
+                        <div className="absolute left-5 top-10 w-0.5 h-12 bg-slate-100"></div>
+                        <h4 className="text-lg font-black text-gray-900 mb-2 flex items-center gap-2">
+                            <PlayCircle size={20} className="text-primary" /> Darslarni ko'rish
+                        </h4>
+                        <p className="text-gray-500 font-medium leading-relaxed">
+                            Video darslarni istalgan qurilmada ko'rishingiz mumkin. Dars davomida kerakli materiallarni yuklab olish va saqlab qo'yish imkoniyati mavjud.
+                        </p>
+                    </div>
+
+                    <div className="relative pl-14 group">
+                        <div className="absolute left-0 top-0 w-10 h-10 bg-primary/10 rounded-2xl flex items-center justify-center text-primary font-black">3</div>
+                        <h4 className="text-lg font-black text-gray-900 mb-2 flex items-center gap-2">
+                            <BookOpen size={20} className="text-primary" /> Bilimlarni sinash
+                        </h4>
+                        <p className="text-gray-500 font-medium leading-relaxed">
+                            Har bir mavzudan so'ng interaktiv testlarni topshirib, o'z bilimingizni tekshiring. Natijalaringiz shaxsiy kabinetda saqlanib boriladi.
+                        </p>
+                    </div>
+
+                    <div className="pt-6 border-t border-slate-100 mt-8">
+                        <button
+                            onClick={() => setShowGuideModal(false)}
+                            className="w-full py-4 bg-primary text-white rounded-2xl font-black shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-[0.98]"
+                        >
+                            Tushunarli, rahmat!
                         </button>
                     </div>
                 </div>

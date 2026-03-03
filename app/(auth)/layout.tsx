@@ -25,12 +25,6 @@ export default function AuthLayout({
                 <div className="bg-white py-12 px-10 shadow-2xl shadow-slate-200/50 rounded-[3rem] border border-slate-100">
                     {children}
                 </div>
-
-                <div className="mt-8 text-center px-4">
-                    <p className="text-slate-500 text-sm leading-relaxed font-medium">
-                        <span className="text-primary font-bold">Eslatma!</span> Agar siz avval imedteam.uz sayti yoki ilovasida akkaunt yaratgan bo'lsangiz, tizimga kirishingiz kerak, ammo agar siz avval akkaunt yaratmagan bo'lsangiz, ro'yxatdan o'tish bo'limidan akkaunt yaratishingiz kerak bo'ladi.
-                    </p>
-                </div>
             </div>
         </div>
     );

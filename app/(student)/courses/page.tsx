@@ -163,17 +163,21 @@ export default function CoursesPage() {
 
                         <div className="h-8 w-[1px] bg-gray-100 mx-2 flex-shrink-0" />
 
-                        {/* Subject Pills */}
                         {subjects.map((subject) => (
                             <button
                                 key={subject.id}
                                 onClick={() => setSelectedSubject(subject.id)}
-                                className={`whitespace-nowrap px-6 py-3 rounded-2xl font-bold text-sm transition-all border-2 active:scale-95 ${selectedSubject === subject.id
+                                className={`whitespace-nowrap px-6 py-3 rounded-2xl font-bold text-sm transition-all border-2 active:scale-95 flex items-center gap-2 ${selectedSubject === subject.id
                                     ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20'
                                     : 'bg-white border-gray-100 text-gray-600 hover:border-gray-200 hover:text-primary'
                                     }`}
                             >
                                 {subject.name}
+                                {subject.total_courses !== undefined && (
+                                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${selectedSubject === subject.id ? 'bg-white/20' : 'bg-slate-100 text-gray-400'}`}>
+                                        {subject.total_courses}
+                                    </span>
+                                )}
                             </button>
                         ))}
                     </div>

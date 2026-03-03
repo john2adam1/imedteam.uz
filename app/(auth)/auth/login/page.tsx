@@ -7,12 +7,12 @@ import Link from 'next/link';
 import { authService, profileService } from '@/services';
 import { Mail, Phone, ArrowRight, CheckCircle2, RefreshCw, Send, Layout, User, MessageCircle } from 'lucide-react';
 
-type Step = 'identifier' | 'otp' | 'telegram' | 'register';
+type Step = 'choice' | 'identifier' | 'otp' | 'telegram' | 'register';
 
 function LoginContent() {
   const searchParams = useSearchParams();
   const [mounted, setMounted] = useState(false);
-  const [step, setStep] = useState<Step>('identifier');
+  const [step, setStep] = useState<Step>('choice');
   const [identifier, setIdentifier] = useState(''); // Email or Phone
   const [otp, setOtp] = useState('');
   const [fullName, setFullName] = useState('');
@@ -42,7 +42,11 @@ function LoginContent() {
 
     // Set step from URL on mount
     const stepParam = searchParams.get('step') as Step;
-    if (stepParam) setStep(stepParam);
+    if (stepParam) {
+      setStep(stepParam);
+    } else {
+      setStep('choice');
+    }
   }, [searchParams]);
 
   // Auto-focus logic
@@ -175,13 +179,13 @@ function LoginContent() {
           {step === 'register' && <Layout size={40} />}
         </div>
         <h1 className="text-4xl font-black text-gray-900 mb-3 tracking-tight">
-          {step === 'identifier' && 'Kirish'}
+          {(step === 'choice' || step === 'identifier') && 'Kirish'}
           {step === 'otp' && 'Tasdiqlash kodi'}
           {step === 'telegram' && 'Telegram Bot'}
           {step === 'register' && 'Ma\'lumotlar'}
         </h1>
         <p className="text-gray-500 font-medium whitespace-pre-line px-4">
-          {step === 'identifier' && ''}
+          {step === 'choice' && 'Qaysi usulda kirmoqchisiz?'}
           {step === 'otp' && (
             loginMethod === 'email'
               ? `${identifier}\npochtasiga yuborilgan kodni kiriting`
@@ -198,6 +202,50 @@ function LoginContent() {
         </div>
       )}
 
+      {step === 'choice' && (
+        <div className="space-y-6">
+          <div className="space-y-4">
+            <button
+              onClick={() => {
+                setLoginMethod('phone');
+                setIdentifier('+');
+                setStep('identifier');
+              }}
+              disabled={!acceptedTerms}
+              className="w-full py-5 bg-[#0088cc] text-white rounded-3xl font-black shadow-2xl shadow-[#0088cc]/30 hover:bg-[#0077b5] active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg"
+            >
+              <MessageCircle size={24} fill="currentColor" />
+              Telegram orqali kirish
+            </button>
+            <button
+              onClick={() => {
+                setLoginMethod('email');
+                setIdentifier('');
+                setStep('identifier');
+              }}
+              disabled={!acceptedTerms}
+              className="w-full py-5 bg-white border-2 border-slate-100 text-gray-500 rounded-3xl font-black hover:border-primary/20 hover:bg-slate-50 transition-all text-lg flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              <Mail size={22} />
+              Email orqali kirish
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3 px-2">
+            <input
+              type="checkbox"
+              id="terms"
+              checked={acceptedTerms}
+              onChange={(e) => setAcceptedTerms(e.target.checked)}
+              className="w-5 h-5 rounded border-2 border-slate-200 text-primary focus:ring-primary h-5 w-5 bg-white rounded border-gray-300 focus:ring-2 focus:ring-primary"
+            />
+            <label htmlFor="terms" className="text-sm font-medium text-gray-500 cursor-pointer select-none">
+              Men <Link href="/offerta" className="underline decoration-primary/30 underline-offset-4 decoration-2 hover:text-primary transition-colors">ommaviy oferta</Link> shartlarini qabul qilaman
+            </label>
+          </div>
+        </div>
+      )}
+
       {step === 'identifier' && (
         <form onSubmit={handleIdentifierSubmit} className="space-y-6">
           <div className="relative group">
@@ -208,6 +256,7 @@ function LoginContent() {
               <input
                 type="text"
                 required
+                autoFocus
                 value={identifier}
                 onChange={(e) => {
                   const val = e.target.value;
@@ -229,69 +278,28 @@ function LoginContent() {
           </div>
 
           <div className="space-y-4">
-            {loginMethod === 'phone' ? (
-              <>
-                <button
-                  type="submit"
-                  disabled={isLoading || identifier.length < 5 || !acceptedTerms}
-                  className="group w-full py-5 bg-[#0088cc] text-white rounded-3xl font-black shadow-2xl shadow-[#0088cc]/30 hover:bg-[#0077b5] active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg"
-                >
-                  {isLoading ? <RefreshCw className="animate-spin" size={24} /> : (
-                    <>
-                      Kodni yuborish (Telegram)
-                      <Send size={20} />
-                    </>
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setLoginMethod('email');
-                    setError('');
-                    setIdentifier('');
-                  }}
-                  className="w-full py-5 bg-white border-2 border-slate-100 text-gray-500 rounded-3xl font-black hover:border-primary/20 hover:bg-slate-50 transition-all text-lg flex items-center justify-center gap-2"
-                >
-                  <Mail size={20} />
-                  Email orqali kirish
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  type="submit"
-                  disabled={isLoading || !identifier.trim() || !acceptedTerms}
-                  className="group w-full py-5 bg-primary text-white rounded-3xl font-black shadow-2xl shadow-primary/30 hover:bg-primary-600 active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg"
-                >
-                  {isLoading ? <RefreshCw className="animate-spin" size={24} /> : 'Kodni olish'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setLoginMethod('phone');
-                    setError('');
-                    setIdentifier('+');
-                  }}
-                  className="w-full py-5 bg-white border-2 border-slate-100 text-[#0088cc] rounded-3xl font-black hover:border-primary/20 hover:bg-slate-50 transition-all text-lg flex items-center justify-center gap-2"
-                >
-                  <MessageCircle size={20} fill="currentColor" />
-                  Telegram orqali kirishga qaytish
-                </button>
-              </>
-            )}
-          </div>
-
-          <div className="flex items-center gap-3 px-2">
-            <input
-              type="checkbox"
-              id="terms"
-              checked={acceptedTerms}
-              onChange={(e) => setAcceptedTerms(e.target.checked)}
-              className="w-5 h-5 rounded border-2 border-slate-200 text-primary focus:ring-primary h-5 w-5 bg-white rounded border-gray-300 focus:ring-2 focus:ring-primary"
-            />
-            <label htmlFor="terms" className="text-sm font-medium text-gray-500 cursor-pointer select-none">
-              Men <Link href="/offerta" className="underline decoration-primary/30 underline-offset-4 decoration-2 hover:text-primary transition-colors">ommaviy oferta</Link> shartlarini qabul qilaman
-            </label>
+            <button
+              type="submit"
+              disabled={isLoading || (loginMethod === 'phone' ? identifier.length < 5 : !identifier.trim())}
+              className={`w-full py-5 rounded-3xl font-black shadow-2xl transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg ${loginMethod === 'phone'
+                ? 'bg-[#0088cc] shadow-[#0088cc]/30 hover:bg-[#0077b5] text-white'
+                : 'bg-primary shadow-primary/30 hover:bg-primary-600 text-white'
+                }`}
+            >
+              {isLoading ? <RefreshCw className="animate-spin" size={24} /> : (
+                <>
+                  {loginMethod === 'phone' ? 'Kodni yuborish (Telegram)' : 'Kodni olish'}
+                  <Send size={20} />
+                </>
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => setStep('choice')}
+              className="w-full py-4 text-gray-400 font-bold hover:text-gray-600 transition-colors text-center"
+            >
+              Ortga qaytish
+            </button>
           </div>
         </form>
       )}
@@ -366,7 +374,7 @@ function LoginContent() {
               onClick={() => setStep('otp')}
               className="w-full py-5 bg-white border-2 border-slate-100 text-gray-700 rounded-3xl font-black hover:border-primary/20 hover:bg-slate-50 transition-all text-lg"
             >
-              Kodni qo'lda kiritish
+              Kodni kiritish
             </button>
           </div>
 
