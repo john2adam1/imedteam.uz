@@ -2,7 +2,7 @@
 // Handles user login, registration, and password management
 
 import { apiClient, setAuthToken, removeAuthToken } from '@/lib/api-client';
-import { UserCheckReq, UserCheckRes, UserLoginReq, TokenRes, ChangePasswordBody, OtpSendReq, OtpConfirmReq, OtpRes } from '@/types/mobile-api';
+import { UserCheckReq, UserCheckRes, UserLoginReq, TokenRes, ChangePasswordBody, OtpSendReq, OtpConfirmReq } from '@/types/mobile-api';
 
 export const authService = {
     /**
@@ -34,7 +34,7 @@ export const authService = {
     },
 
     /**
-     * OTP Send - Sends confirmation code to email
+     * OTP Send - Sends confirmation code to email or telegram
      */
     otpSend: async (data: OtpSendReq): Promise<string> => {
         return apiClient<string>('/auth/user/otp/send', {

@@ -20,7 +20,7 @@ function LoginContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [hasAccount, setHasAccount] = useState<boolean | null>(null);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [loginMethod, setLoginMethod] = useState<'email' | 'phone'>('phone');
+  const [loginMethod, setLoginMethod] = useState<'email' | 'phone'>('email');
 
   const { otpSend, otpConfirm, checkUser, refreshUser } = useAuth();
   const router = useRouter();
@@ -30,14 +30,14 @@ function LoginContent() {
   useEffect(() => {
     setMounted(true);
     const savedIdentifier = localStorage.getItem('auth_identifier');
-    if (savedIdentifier && !savedIdentifier.includes('@')) {
-      // Prioritize phone: only auto-fill if it's a phone number
+    if (savedIdentifier && savedIdentifier.includes('@')) {
+      // Only auto-fill if it's an email
       setIdentifier(savedIdentifier);
-      setLoginMethod('phone');
+      setLoginMethod('email');
     } else {
-      // Default to empty phone input for everyone else (email users will choose to switch)
-      setIdentifier('+');
-      setLoginMethod('phone');
+      // Default to empty email input
+      setIdentifier('');
+      setLoginMethod('email');
     }
 
     // Set step from URL on mount
@@ -96,13 +96,16 @@ function LoginContent() {
           return;
         }
 
-        try {
-          const res = await checkUser({ phone_number: numericPhone });
-          setHasAccount(!!res);
-        } catch (e) {
-          console.warn('User check failed for phone, continuing anyway');
+        // Additional validation: ensure we have more than just the + symbol
+        if (numericPhone.length === 0) {
+          setError('Iltimos, telefon raqamingizni to\'g\'ri formatda kiriting');
+          setIsLoading(false);
+          return;
         }
-        setStep('telegram');
+
+        // Directly send OTP for phone numbers (like email)
+        await otpSend(cleanIdentifier, 'telegram'); // Use 'telegram' type for phone OTP
+        setStep('otp');
       }
     } catch (err: any) {
       console.error('Identifier submit error:', err);
@@ -118,7 +121,7 @@ function LoginContent() {
     setIsLoading(true);
 
     try {
-      await otpConfirm(identifier.trim(), otp, loginMethod);
+      await otpConfirm(identifier.trim(), otp, loginMethod === 'phone' ? 'telegram' : loginMethod);
 
       if (hasAccount === false) {
         setStep('register');
@@ -184,16 +187,23 @@ function LoginContent() {
           {step === 'telegram' && 'Telegram Bot'}
           {step === 'register' && 'Ma\'lumotlar'}
         </h1>
-        <p className="text-gray-500 font-medium whitespace-pre-line px-4">
+        <div className="text-gray-500 font-medium whitespace-pre-line px-4">
           {step === 'choice' && 'Qaysi usulda kirmoqchisiz?'}
           {step === 'otp' && (
             loginMethod === 'email'
               ? `${identifier}\npochtasiga yuborilgan kodni kiriting`
-              : `${identifier}\nraqamiga yuborilgan kodni kiriting`
+              : (
+                <div className="space-y-1">
+                  <div>{identifier} raqamiga yuborilgan kodni kiriting</div>
+                  <div className="text-sm">
+                    Kodni <a href="https://t.me/imedteam_bot" target="_blank" rel="noopener noreferrer" className="text-primary underline decoration-primary/30 hover:decoration-primary transition-all font-bold">@imedteam_bot</a> botidan oling
+                  </div>
+                </div>
+              )
           )}
           {step === 'telegram' && `Kodni @imedteam_bot botidan oling\nva platformaga qayting`}
           {step === 'register' && 'Platformaga xush kelibsiz!\nIsm-familiyangiz qanday?'}
-        </p>
+        </div>
       </div>
 
       {error && (
@@ -280,7 +290,7 @@ function LoginContent() {
           <div className="space-y-4">
             <button
               type="submit"
-              disabled={isLoading || (loginMethod === 'phone' ? identifier.length < 5 : !identifier.trim())}
+              disabled={isLoading || (loginMethod === 'phone' ? identifier.length < 10 : !identifier.trim())}
               className={`w-full py-5 rounded-3xl font-black shadow-2xl transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg ${loginMethod === 'phone'
                 ? 'bg-[#0088cc] shadow-[#0088cc]/30 hover:bg-[#0077b5] text-white'
                 : 'bg-primary shadow-primary/30 hover:bg-primary-600 text-white'

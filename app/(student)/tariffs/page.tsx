@@ -212,49 +212,62 @@ function TariffsContent() {
                 )}
             </div>
 
-            {/* Tariff Cards Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
-                {displayedTariffs.map((tariff: any) => {
+            {/* Tariff Cards Grid - Optimized for 2 Plans */}
+            <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-12 max-w-5xl mx-auto mt-8">
+                {displayedTariffs.map((tariff: any, index: number) => {
                     const basePrice = selectedCourse?.price?.find((p: any) => p.tariff_id === tariff.id)?.price ?? tariff.price;
+                    const isPopular = index === 0; // Make first plan popular
 
                     return (
                         <div
                             key={tariff.id}
-                            className="bg-white rounded-[2.5rem] border border-gray-100 p-10 flex flex-col hover:shadow-premium hover:-translate-y-2 transition-all duration-500 group relative"
+                            className={`bg-white rounded-[3rem] border-2 ${isPopular ? 'border-primary shadow-premium' : 'border-gray-100 shadow-soft'} p-12 flex flex-col hover:shadow-premium hover:-translate-y-1 transition-all duration-500 group relative ${isPopular ? 'lg:scale-105' : ''}`}
                         >
-                            {/* Tariff Name & Duration */}
-                            <div className="flex flex-col items-center text-center mb-8">
-                                <div className="w-20 h-20 bg-slate-50 rounded-[2rem] flex items-center justify-center mb-6 group-hover:bg-primary/5 transition-colors group-hover:scale-110 duration-500">
-                                    <Clock className="w-10 h-10 text-primary" />
+                            {/* Popular Badge */}
+                            {isPopular && (
+                                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                                    <div className="px-6 py-2 bg-gradient-to-r from-primary to-primary-600 text-white rounded-full text-sm font-black uppercase tracking-widest shadow-lg">
+                                        ⭐ OMMABOP
+                                    </div>
                                 </div>
-                                <h3 className="text-2xl font-black text-gray-900 mb-2">{tariff.name}</h3>
-                                <div className="px-4 py-1.5 bg-emerald-50 text-emerald-600 rounded-full text-xs font-black uppercase tracking-widest">
+                            )}
+
+                            {/* Tariff Name & Duration */}
+                            <div className="flex flex-col items-center text-center mb-10">
+                                <div className={`w-24 h-24 ${isPopular ? 'bg-primary/10' : 'bg-slate-50'} rounded-[2.5rem] flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500`}>
+                                    <Clock className={`w-12 h-12 ${isPopular ? 'text-primary' : 'text-primary'}`} />
+                                </div>
+                                <h3 className="text-3xl font-black text-gray-900 mb-3">{tariff.name}</h3>
+                                <div className={`px-6 py-3 ${isPopular ? 'bg-primary/10 text-primary' : 'bg-emerald-50 text-emerald-600'} rounded-full text-sm font-black uppercase tracking-widest`}>
                                     {tariff.duration} oylik kirish
                                 </div>
                             </div>
 
                             {/* Description */}
                             {tariff.description && (
-                                <p className="text-gray-400 text-sm font-medium mb-10 text-center flex-grow leading-relaxed">
+                                <p className="text-gray-400 text-base font-medium mb-12 text-center flex-grow leading-relaxed">
                                     {tariff.description}
                                 </p>
                             )}
 
                             {/* Price Section */}
-                            <div className="mb-10 text-center">
-                                <div className="text-[10px] text-gray-300 font-black uppercase tracking-[0.2em] mb-2">Obuna narxi</div>
-                                <div className="text-4xl font-black text-gray-900 tracking-tight">
+                            <div className="mb-12 text-center">
+                                <div className="text-[11px] text-gray-300 font-black uppercase tracking-[0.3em] mb-3">Obuna narxi</div>
+                                <div className={`text-5xl font-black ${isPopular ? 'text-primary' : 'text-gray-900'} tracking-tight mb-2`}>
                                     {formatPrice(basePrice)}
                                 </div>
+                                {isPopular && (
+                                    <div className="text-sm text-emerald-600 font-bold">Eng yaxshi tanlov!</div>
+                                )}
                             </div>
 
                             {/* CTA Button */}
                             <button
                                 onClick={() => handlePurchase(tariff)}
-                                className="w-full py-5 px-8 rounded-2xl font-black bg-primary text-white hover:bg-primary-600 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-3 active:scale-[0.98]"
+                                className={`w-full py-6 px-8 rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-3 active:scale-[0.98] ${isPopular ? 'bg-gradient-to-r from-primary to-primary-600 text-white shadow-lg shadow-primary/30 hover:shadow-xl hover:from-primary-600 hover:to-primary' : 'bg-slate-900 text-white hover:bg-slate-800 shadow-lg'}`}
                             >
                                 <CreditCard className="w-6 h-6" />
-                                <span className="text-lg">Sotib olish</span>
+                                <span>Sotib olish</span>
                             </button>
                         </div>
                     );

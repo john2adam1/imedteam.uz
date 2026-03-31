@@ -1,9 +1,38 @@
 import { useAuth } from '@/lib/auth-context';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { appRouteService } from '@/services';
+import { AppRouteRes } from '@/types/mobile-api';
 
 export default function Hero() {
     const { isAuthenticated } = useAuth();
     const authPath = isAuthenticated ? '/dashboard' : '/auth/login';
+    const [appLinks, setAppLinks] = useState<{ apple?: string; google?: string; }>({});
+
+    useEffect(() => {
+        const fetchRoutes = async () => {
+            try {
+                const response: any = await appRouteService.getAll();
+                let routeData = null;
+                if (response && response.data && Array.isArray(response.data) && response.data.length > 0) {
+                    routeData = response.data[0];
+                } else if (Array.isArray(response) && response.length > 0) {
+                    routeData = response[0];
+                }
+
+                if (routeData && routeData.app_links) {
+                    setAppLinks(routeData.app_links);
+                }
+            } catch (error) {
+                console.error("Failed to fetch app routes", error);
+            }
+        };
+        fetchRoutes();
+    }, []);
+
+    const iosAppUrl = appLinks?.apple || "https://apps.apple.com/uz/app/imed-team/id6745555493";
+    const androidAppUrl = appLinks?.google || "https://minio.imedteam.uz/imed/imedteam_3.0.0_17.apk";
+
     return (
         <section id="home" className="relative overflow-hidden pt-20 pb-10 lg:pt-32 lg:pb-16">
             <div className="absolute inset-0 -z-10 overflow-hidden">
@@ -43,7 +72,7 @@ export default function Hero() {
                         </Link>
                         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                             <a
-                                href="https://apps.apple.com/uz/app/imed-team/id6745555493"
+                                href={iosAppUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-full sm:w-auto group relative px-7 py-4 bg-slate-950 text-white rounded-2xl font-bold flex items-center justify-center sm:justify-start gap-4 hover:bg-slate-900 transition-all duration-300 shadow-xl hover:shadow-slate-950/40 active:scale-95 border border-white/5 overflow-hidden"
@@ -57,7 +86,7 @@ export default function Hero() {
                             </a>
 
                             <a
-                                href="https://minio.imedteam.uz/imed/imedteam_3.0.0_17.apk"
+                                href={androidAppUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-full sm:w-auto group relative px-7 py-4 bg-slate-950 text-white rounded-2xl font-bold flex items-center justify-center sm:justify-start gap-4 hover:bg-slate-900 transition-all duration-300 shadow-xl hover:shadow-slate-950/40 active:scale-95 border border-white/5 overflow-hidden"

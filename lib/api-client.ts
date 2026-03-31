@@ -4,8 +4,8 @@
 
 import { getCookie, setCookie, removeCookie } from './cookies';
 
-// Base URL: Try environment variable first, then fallback to dev
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://dev.axadjonovsardorbek.uz/web';
+// Base URL: Try environment variable first, then fallback to production
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://prod.axadjonovsardorbek.uz/web';
 
 export interface ApiClientOptions extends RequestInit {
     requiresAuth?: boolean;

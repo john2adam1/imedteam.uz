@@ -1,5 +1,5 @@
 // TypeScript interfaces for Mobile API endpoints
-// Based on Swagger documentation at https://dev.axadjonovsardorbek.uz/api/swagger/index.html
+// Based on Swagger documentation at https://prod.axadjonovsardorbek.uz/api/swagger/index.html
 
 // ============================================================================
 // Authentication Types
@@ -16,19 +16,19 @@ export interface UserCheckRes {
 }
 
 export interface UserLoginReq {
-  phone_number: string;
-  password?: string;
-  name?: string;
+  login: string;
+  password: string;
 }
 
 export interface OtpSendReq {
-  email: string;
+  identifier: string;
+  type: "email" | "telegram";
 }
 
 export interface OtpConfirmReq {
-  email?: string;
-  phone_number?: string;
+  identifier: string;
   confirmation_code: string;
+  type: "email" | "telegram";
 }
 
 export interface OtpRes {
@@ -106,6 +106,7 @@ export interface MobileCourseRes {
   description: string;
   image_url?: string;
   is_public?: boolean;
+  can_buy?: boolean;
   documents: number;
   duration: number;
   has_access: boolean;
@@ -204,6 +205,7 @@ export interface Subject {
   description?: string;
   image_url?: string;
   is_active: boolean;
+  order_num?: number;
   total_courses?: number;
   created_at: string;
   updated_at: string;
@@ -266,8 +268,9 @@ export interface AboutMobileList {
 export interface AboutMobileRes {
   id: string;
   title: string;
-  content: string;
-  image_url?: string;
+  description: string;
+  link_url?: string;
+  order_num: number;
   created_at: string;
   updated_at: string;
 }
@@ -322,6 +325,30 @@ export interface ActivityStatsResponse {
   type: string;
   total: number;
   items: ActivityStatItem[];
+}
+
+export interface DashboardRes {
+  active_promocodes: number;
+  active_user_courses: number;
+  active_users: number;
+  admin_orders: number;
+  cancelled_orders: number;
+  click_orders: number;
+  courses: number;
+  deleted_user_courses: number;
+  documents: number;
+  inactive_user_courses: number;
+  lessons: number;
+  modules: number;
+  paid_orders: number;
+  promocodes: number;
+  subjects: number;
+  tariffs: number;
+  teachers: number;
+  tests: number;
+  user_courses: number;
+  users: number;
+  videos: number;
 }
 
 export interface RatingUser {
@@ -428,6 +455,8 @@ export interface AppRouteRes {
   id: string;
   key: string;
   value: string;
+  buy_course?: boolean;
+  feedback_url?: string;
   created_at: string;
   updated_at: string;
 }

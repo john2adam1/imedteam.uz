@@ -25,6 +25,7 @@ export const profileService = {
         const formData = new FormData();
         if (data.name) formData.append('name', data.name);
         if (data.phone_number) formData.append('phone_number', data.phone_number);
+        if (data.email) formData.append('email', data.email);
         if (data.fcm_token) formData.append('fcm_token', data.fcm_token);
         if (data.language) formData.append('language', data.language);
         if (data.image) formData.append('image', data.image);

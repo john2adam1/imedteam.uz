@@ -12,8 +12,8 @@ interface AuthContextType {
     login: (credentials: UserLoginReq) => Promise<void>;
     register: (data: UserRegisterReq) => Promise<void>;
     checkUser: (data: UserCheckReq) => Promise<boolean>;
-    otpSend: (identifier: string) => Promise<void>;
-    otpConfirm: (identifier: string, code: string, type?: 'email' | 'phone') => Promise<void>;
+    otpSend: (identifier: string, type?: 'email' | 'telegram') => Promise<void>;
+    otpConfirm: (identifier: string, code: string, type?: 'email' | 'telegram') => Promise<void>;
     logout: () => void;
     refreshUser: () => Promise<void>;
 }
@@ -68,42 +68,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const register = async (data: UserRegisterReq) => {
         try {
-            // Use login endpoint with name for registration
+            // Use login endpoint with phone number as login for registration
             await authService.login({
-                phone_number: data.phone_number,
+                login: data.phone_number,
                 password: data.password,
-                name: data.full_name,
             });
             // Fetch user profile after successful registration
             const userData = await profileService.getUserProfile();
             setUser(userData);
         } catch (error) {
-            console.error('Registration failed:', error);
             throw error;
         }
     };
 
-    const otpSend = async (identifier: string) => {
+    const otpSend = async (identifier: string, type: 'email' | 'telegram' = 'email') => {
         try {
-            // Check if it looks like an email or phone to decide which field to send
-            // But usually otpSend is for email in this system
-            await authService.otpSend({ email: identifier });
+            await authService.otpSend({ identifier, type });
         } catch (error) {
-            console.error('OTP send failed:', error);
             throw error;
         }
     };
 
-    const otpConfirm = async (identifier: string, code: string, type: 'email' | 'phone' = 'email') => {
+    const otpConfirm = async (identifier: string, code: string, type: 'email' | 'telegram' = 'email') => {
         try {
-            const payload: any = { confirmation_code: code };
-            if (type === 'phone') {
-                payload.phone_number = identifier.replace(/\D/g, '');
-            } else {
-                payload.email = identifier;
-            }
-
-            await authService.otpConfirm(payload);
+            await authService.otpConfirm({ identifier, confirmation_code: code, type });
             // Fetch user profile after successful confirmation
             const userData = await profileService.getUserProfile();
             setUser(userData);
