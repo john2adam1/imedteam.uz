@@ -106,6 +106,7 @@ function LoginContent() {
         // Directly send OTP for phone numbers (like email)
         await otpSend(cleanIdentifier, 'telegram'); // Use 'telegram' type for phone OTP
         setStep('otp');
+        window.open('https://t.me/imedteam_bot', '_blank');
       }
     } catch (err: any) {
       console.error('Identifier submit error:', err);

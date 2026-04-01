@@ -14,7 +14,7 @@ export default function PDFViewer({ url, name, onClose }: PDFViewerProps) {
 
     useEffect(() => {
         if (url) {
-            setProxyUrl(`/api/pdf-proxy?url=${encodeURIComponent(url)}`);
+            setProxyUrl(`/api/pdf-proxy?url=${encodeURIComponent(url)}#toolbar=0&navpanes=0`);
         }
     }, [url]);
 

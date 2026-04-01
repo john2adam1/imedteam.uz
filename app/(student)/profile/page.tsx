@@ -397,7 +397,7 @@ export default function ProfilePage() {
                         </div>
                     )}
                     <form onSubmit={handleUpdateProfile} className="space-y-6">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div className="space-y-6">
                             <div>
                                 <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Ism familingiz</label>
                                 <input
@@ -407,39 +407,44 @@ export default function ProfilePage() {
                                     className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
                                 />
                             </div>
-                            <div>
-                                <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Telefon raqam</label>
-                                <input
-                                    type="tel"
-                                    value={editPhone}
-                                    maxLength={13}
-                                    onChange={(e) => {
-                                        const val = e.target.value;
-                                        if (val === '' || val === '+') {
-                                            setEditPhone('+');
-                                        } else {
-                                            // Allow only + and digits
-                                            const cleanVal = val.startsWith('+') ? '+' + val.slice(1).replace(/\D/g, '') : '+' + val.replace(/\D/g, '');
-                                            setEditPhone(cleanVal.slice(0, 13));
-                                        }
-                                    }}
-                                    onFocus={(e) => {
-                                        if (!editPhone) setEditPhone('+');
-                                    }}
-                                    className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
-                                />
-                            </div>
-                        </div>
 
-                        <div>
-                            <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Email manzil</label>
-                            <input
-                                type="email"
-                                value={editEmail}
-                                onChange={(e) => setEditEmail(e.target.value)}
-                                placeholder="example@mail.com"
-                                className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
-                            />
+                            {user?.phone_number && (
+                                <div>
+                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Telefon raqam</label>
+                                    <input
+                                        type="tel"
+                                        value={editPhone}
+                                        maxLength={13}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            if (val === '' || val === '+') {
+                                                setEditPhone('+');
+                                            } else {
+                                                // Allow only + and digits
+                                                const cleanVal = val.startsWith('+') ? '+' + val.slice(1).replace(/\D/g, '') : '+' + val.replace(/\D/g, '');
+                                                setEditPhone(cleanVal.slice(0, 13));
+                                            }
+                                        }}
+                                        onFocus={(e) => {
+                                            if (!editPhone) setEditPhone('+');
+                                        }}
+                                        className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
+                                    />
+                                </div>
+                            )}
+
+                            {user?.email && (
+                                <div>
+                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Email manzil</label>
+                                    <input
+                                        type="email"
+                                        value={editEmail}
+                                        onChange={(e) => setEditEmail(e.target.value)}
+                                        placeholder="example@mail.com"
+                                        className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
+                                    />
+                                </div>
+                            )}
                         </div>
                         <div className="flex gap-4 pt-4">
                             <button

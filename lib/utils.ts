@@ -35,7 +35,7 @@ export function getYoutubeEmbedUrl(url: string = ''): string {
   } catch (e) {
     console.error('Error parsing YouTube URL:', e);
   }
-  return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
+  return videoId ? `https://www.youtube.com/embed/${videoId}?modestbranding=1&rel=0&showinfo=0` : url;
 }
 
 /**

@@ -5,9 +5,26 @@ import { lessonService, activityService } from '@/services';
 import { SourceLessonMobileRes } from '@/types/mobile-api';
 import { useRouter, useParams } from 'next/navigation';
 import { Play, FileText, ClipboardList, ArrowLeft, CheckCircle2 } from 'lucide-react';
-import { getYoutubeEmbedUrl, getMediaUrl } from '@/lib/utils';
+import { getMediaUrl } from '@/lib/utils';
 import PDFViewer from '@/components/ui/PDFViewer';
 import confetti from 'canvas-confetti';
+import dynamic from 'next/dynamic';
+import 'plyr-react/plyr.css';
+
+const Plyr = dynamic<any>(() => import('plyr-react').then((mod) => mod.Plyr as any), { ssr: false });
+
+const getYoutubeId = (url: string = '') => {
+    if (!url) return '';
+    let videoId = url;
+    try {
+        if (url.includes('youtu.be/')) videoId = url.split('youtu.be/')[1].split(/[?#]/)[0];
+        else if (url.includes('youtube.com/watch')) videoId = new URL(url).searchParams.get('v') || url;
+        else if (url.includes('youtube.com/shorts/')) videoId = url.split('shorts/')[1].split(/[?#]/)[0];
+        else if (url.includes('m.youtube.com/watch')) videoId = new URL(url).searchParams.get('v') || url;
+        else if (url.includes('youtube.com/embed/')) videoId = url.split('embed/')[1].split(/[?#]/)[0];
+    } catch (e) { }
+    return videoId;
+};
 
 export default function LessonPage() {
     const params = useParams();
@@ -163,11 +180,19 @@ export default function LessonPage() {
                                             {lesson.videos.length > 1 ? `${idx + 1}-video lavha` : 'Video darslik'}
                                         </h3>
                                     </div>
-                                    <div className="aspect-video bg-black rounded-[2rem] overflow-hidden shadow-2xl ring-1 ring-white/10 group-hover:ring-primary/20 transition-all duration-500">
-                                        <iframe
-                                            src={getYoutubeEmbedUrl(v.url)}
-                                            className="w-full h-full border-none"
-                                            allowFullScreen
+                                    <div
+                                        className="aspect-video bg-black rounded-[2rem] overflow-hidden shadow-2xl ring-1 ring-white/10 group-hover:ring-primary/20 transition-all duration-500 relative [&_.plyr]:h-full [&_.plyr]:w-full [&_.plyr__video-wrapper]:h-full [&_iframe]:pointer-events-none"
+                                        onContextMenu={(e) => e.preventDefault()}
+                                    >
+                                        {/* @ts-ignore */}
+                                        <Plyr
+                                            source={{
+                                                type: 'video',
+                                                sources: [{ src: getYoutubeId(v.url), provider: 'youtube' }],
+                                            }}
+                                            options={{
+                                                youtube: { noCookie: false, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1 }
+                                            }}
                                         />
                                     </div>
                                 </div>
