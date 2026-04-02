@@ -14,12 +14,27 @@ export default function PDFViewer({ url, name, onClose }: PDFViewerProps) {
 
     useEffect(() => {
         if (url) {
-            setProxyUrl(`/api/pdf-proxy?url=${encodeURIComponent(url)}#toolbar=0&navpanes=0`);
+            setProxyUrl(`/api/pdf-proxy?url=${encodeURIComponent(url)}#toolbar=0&navpanes=0&scrollbar=0`);
         }
     }, [url]);
 
+    // Block keyboard shortcuts: Ctrl+S, Ctrl+P, Ctrl+U
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const ctrl = e.ctrlKey || e.metaKey;
+            if (ctrl && ['s', 'p', 'u'].includes(e.key.toLowerCase())) {
+                e.preventDefault();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown, { capture: true });
+        return () => window.removeEventListener('keydown', handleKeyDown, { capture: true });
+    }, []);
+
     return (
-        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col animate-in fade-in duration-200">
+        <div
+            className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col animate-in fade-in duration-200"
+            onContextMenu={(e) => e.preventDefault()}
+        >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-white/10 bg-black/50">
                 <h3 className="text-white font-bold line-clamp-1 max-w-md">{name}</h3>
@@ -40,6 +55,13 @@ export default function PDFViewer({ url, name, onClose }: PDFViewerProps) {
                         title={name}
                     />
                 )}
+                {/* Transparent overlay — blocks context menu outside iframe area;
+                    pointer-events: none lets scroll/wheel events pass through to the iframe */}
+                <div
+                    className="absolute inset-0"
+                    style={{ pointerEvents: 'none' }}
+                    onContextMenu={(e) => e.preventDefault()}
+                />
             </div>
         </div>
     );

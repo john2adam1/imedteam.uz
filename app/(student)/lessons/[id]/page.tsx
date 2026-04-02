@@ -36,6 +36,11 @@ export default function LessonPage() {
     const [error, setError] = useState('');
     const [startTime] = useState(Date.now());
     const [viewPdf, setViewPdf] = useState<{ url: string; name: string } | null>(null);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     useEffect(() => {
         if (!id) return;
@@ -184,16 +189,19 @@ export default function LessonPage() {
                                         className="aspect-video bg-black rounded-[2rem] overflow-hidden shadow-2xl ring-1 ring-white/10 group-hover:ring-primary/20 transition-all duration-500 relative [&_.plyr]:h-full [&_.plyr]:w-full [&_.plyr__video-wrapper]:h-full [&_iframe]:pointer-events-none"
                                         onContextMenu={(e) => e.preventDefault()}
                                     >
-                                        {/* @ts-ignore */}
-                                        <Plyr
-                                            source={{
-                                                type: 'video',
-                                                sources: [{ src: getYoutubeId(v.url), provider: 'youtube' }],
-                                            }}
-                                            options={{
-                                                youtube: { noCookie: false, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1 }
-                                            }}
-                                        />
+                                        {isMounted && (
+                                            // @ts-ignore
+                                            <Plyr
+                                                key={`${v.id}-${getYoutubeId(v.url)}`}
+                                                source={{
+                                                    type: 'video',
+                                                    sources: [{ src: getYoutubeId(v.url), provider: 'youtube' }],
+                                                }}
+                                                options={{
+                                                    youtube: { noCookie: false, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1 }
+                                                }}
+                                            />
+                                        )}
                                     </div>
                                 </div>
                             ))}
