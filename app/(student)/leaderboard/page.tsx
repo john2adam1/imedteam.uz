@@ -61,11 +61,15 @@ export default function LeaderboardPage() {
 
     const formatActivity = (activity: number) => {
         // activity is in seconds from activityService
-        const minutes = Math.floor(activity / 60);
+        const hours = Math.floor(activity / 3600);
+        const minutes = Math.floor((activity % 3600) / 60);
         const seconds = activity % 60;
 
         const pad = (num: number) => num < 10 ? `0${num}` : num;
 
+        if (hours > 0) {
+            return `${hours}s ${pad(minutes)}d`;
+        }
         return `${pad(minutes)}d ${pad(seconds)}s`;
     };
 

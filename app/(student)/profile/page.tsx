@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import Link from 'next/link';
-import { authService, activityService, profileService } from '@/services';
+import { activityService, profileService } from '@/services';
 import { ActivityStatsResponse } from '@/types/mobile-api';
 import { User, Phone, Shield, BarChart3, Trash2, Camera, LogOut, Key, MessageSquare, HelpCircle, FileText, ExternalLink, MessageCircle, ChevronRight, PlayCircle, BookOpen, GraduationCap } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
@@ -71,46 +71,6 @@ export default function ProfilePage() {
         setLoading(true);
 
         try {
-            const numericPhone = editPhone.replace(/\D/g, '');
-            const currentUserPhone = user?.phone_number?.replace(/\D/g, '') || '';
-
-            // Only check if phone explicitly changed
-            if (numericPhone !== currentUserPhone && numericPhone.length > 0) {
-                try {
-                    const checkRes = await authService.checkUser({ phone_number: numericPhone });
-                    if (checkRes.has_account) {
-                        setError('Bu nomerda allaqachon akkount mavjud.');
-                        setLoading(false);
-                        return;
-                    }
-                } catch (checkErr: any) {
-                    console.warn('Check user failed:', checkErr);
-                    // Pass through the actual error message instead of assuming duplicate
-                    setError(checkErr.message || 'Telefon raqamini tekshirishda xatolik');
-                    setLoading(false);
-                    return;
-                }
-            }
-
-            // Only check if email explicitly changed
-            const currentEmail = user?.email || '';
-            if (editEmail !== currentEmail && editEmail.length > 0) {
-                try {
-                    const checkRes = await authService.checkUser({ email: editEmail });
-                    if (checkRes.has_account) {
-                        setError('Bu emailda allaqachon akkount mavjud.');
-                        setLoading(false);
-                        return;
-                    }
-                } catch (checkErr: any) {
-                    // Backend doesn't support email check yet, ignore "phone number not valid"
-                    const msg = checkErr.message || '';
-                    if (!msg.includes('phone') && !msg.includes('not valid')) {
-                        console.warn('Check email failed:', checkErr);
-                    }
-                }
-            }
-
             try {
                 await profileService.updateProfile({
                     name: editName,
@@ -163,7 +123,10 @@ export default function ProfilePage() {
     const formatTime = (seconds: number) => {
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
-        return `${hours}s ${minutes}d`;
+        if (hours > 0) {
+            return `${hours}s ${minutes}d`;
+        }
+        return `${minutes}d`;
     };
 
     return (
