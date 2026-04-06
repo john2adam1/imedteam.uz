@@ -5,7 +5,8 @@ import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/student/Sidebar';
 import { notificationService } from '@/services';
-import { Bell } from 'lucide-react';
+import { Bell, Info, ShieldCheck } from 'lucide-react';
+import { usePushNotifications } from '@/hooks/use-push-notifications';
 
 
 export default function StudentLayout({
@@ -17,6 +18,7 @@ export default function StudentLayout({
     const router = useRouter();
     const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
     const [notifications, setNotifications] = React.useState<{ notifications: any[], count: number }>({ notifications: [], count: 0 });
+    const { permission, requestPermission, loading: notificationLoading } = usePushNotifications();
 
     useEffect(() => {
         if (!isLoading && user) {
@@ -93,7 +95,28 @@ export default function StudentLayout({
             </div>
 
             {/* Main Content Area */}
-            <div className="flex-1 min-w-0 flex flex-col pt-16 lg:pt-0 overflow-x-hidden">
+            <div className="flex-1 min-w-0 flex flex-col pt-16 lg:pt-0 overflow-x-hidden relative">
+                {/* Push Notification Banner */}
+                {permission === 'default' && (
+                    <div className="bg-primary/5 border-b border-primary/10 px-6 py-3 flex items-center justify-between gap-4 animate-in slide-in-from-top duration-500">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                <Bell size={16} />
+                            </div>
+                            <p className="text-sm text-gray-600 font-medium leading-tight">
+                                Kurs yangiliklari va darslarni o'tkazib yubormaslik uchun bildirishnomalarni yoqing.
+                            </p>
+                        </div>
+                        <button
+                            onClick={requestPermission}
+                            disabled={notificationLoading}
+                            className="px-6 py-2 bg-primary text-white text-xs font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95 whitespace-nowrap disabled:opacity-50"
+                        >
+                            {notificationLoading ? 'Yuklanmoqda...' : 'YOQISH'}
+                        </button>
+                    </div>
+                )}
+
                 <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-6 lg:py-10">
                     {children}
                 </main>

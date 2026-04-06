@@ -44,7 +44,7 @@ export default function Services() {
                             <div className="text-5xl mb-6 transform group-hover:scale-105 transition-transform duration-300">🎯</div>
                             <h3 className="text-3xl font-bold mb-4">Feedback</h3>
                             <p className="text-white/70 font-medium mb-8">
-                                Bizning kurslarimizda o’qigan minglab talabalarning samimiy fikrlari bilan tanishing.
+                                Bizning kurslarimizda o’qigan minglab talaba va shifokorlarning samimiy fikrlari bilan tanishing.
                             </p>
                             <a
                                 href="https://t.me/imedteam_feedback"
@@ -57,18 +57,20 @@ export default function Services() {
                         </div>
 
                         <div className="reveal bg-white rounded-3xl p-10 border border-slate-100 shadow-soft hover:shadow-card transition-all duration-300 group">
-                            <div className="text-5xl mb-6 transform group-hover:scale-105 transition-transform duration-300">🤝</div>
-                            <h3 className="text-3xl font-bold text-slate-900 mb-4 group-hover:text-primary transition-colors">Konsalting</h3>
-                            <p className="text-slate-500 font-medium mb-8">
-                                Professional jamoamiz bilan loyiha tahlili, roadmap va texnik qarorlar qabul qiling.
-                            </p>
+                            <div className="text-5xl mb-6 transform group-hover:scale-105 transition-transform duration-300">📚</div>
+                            <h3 className="text-3xl font-bold text-slate-900 mb-4 group-hover:text-primary transition-colors">Mualliflik Kitoblarimiz</h3>
+                            <div className="text-slate-500 font-medium mb-8 flex flex-col gap-1">
+                                <p>• Medical English</p>
+                                <p>• Gematalogiya</p>
+                                <p>• Antibiotiklar Farmakologiyasi</p>
+                            </div>
                             <a
                                 href="https://t.me/iMed_team"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex py-4 px-8 rounded-2xl bg-slate-100 hover:bg-primary hover:text-white text-slate-900 font-bold transition-all active:scale-95 shadow-sm"
+                                className="inline-flex py-4 px-8 rounded-2xl bg-primary text-white hover:bg-primary-600 font-bold transition-all active:scale-95 shadow-lg shadow-primary/20"
                             >
-                                Bog‘lanish
+                                Buyurtma berish
                             </a>
                         </div>
                     </div>

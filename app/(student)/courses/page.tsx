@@ -132,11 +132,11 @@ export default function CoursesPage() {
 
                 {/* ===== HORIZONTAL SUBJECT FILTERS ===== */}
                 <div className="relative group">
-                    <div className="flex items-center gap-3 overflow-x-auto pb-4 custom-scrollbar no-scrollbar">
+                    <div className="flex items-center gap-3 overflow-x-auto pb-4 custom-scrollbar">
                         {/* All Courses Pill */}
                         <button
                             onClick={() => setSelectedSubject(null)}
-                            className={`whitespace-nowrap px-6 py-3 rounded-2xl font-bold text-sm transition-all border-2 active:scale-95 flex items-center gap-2 ${selectedSubject === null
+                            className={`flex-shrink-0 whitespace-nowrap px-6 py-3 rounded-2xl font-bold text-sm transition-all border-2 active:scale-95 flex items-center gap-2 ${selectedSubject === null
                                 ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20'
                                 : 'bg-white border-gray-100 text-gray-600 hover:border-gray-200'
                                 }`}
@@ -150,7 +150,7 @@ export default function CoursesPage() {
                         {/* Free Courses Pill */}
                         <button
                             onClick={() => setSelectedSubject('free')}
-                            className={`whitespace-nowrap px-6 py-3 rounded-2xl font-bold text-sm transition-all border-2 active:scale-95 flex items-center gap-2 ${selectedSubject === 'free'
+                            className={`flex-shrink-0 whitespace-nowrap px-6 py-3 rounded-2xl font-bold text-sm transition-all border-2 active:scale-95 flex items-center gap-2 ${selectedSubject === 'free'
                                 ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-600/20'
                                 : 'bg-white border-gray-100 text-gray-600 hover:border-emerald-100 hover:text-emerald-600'
                                 }`}
@@ -167,7 +167,7 @@ export default function CoursesPage() {
                             <button
                                 key={subject.id}
                                 onClick={() => setSelectedSubject(subject.id)}
-                                className={`whitespace-nowrap px-6 py-3 rounded-2xl font-bold text-sm transition-all border-2 active:scale-95 flex items-center gap-2 ${selectedSubject === subject.id
+                                className={`flex-shrink-0 whitespace-nowrap px-6 py-3 rounded-2xl font-bold text-sm transition-all border-2 active:scale-95 flex items-center gap-2 ${selectedSubject === subject.id
                                     ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20'
                                     : 'bg-white border-gray-100 text-gray-600 hover:border-gray-200 hover:text-primary'
                                     }`}

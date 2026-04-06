@@ -19,7 +19,7 @@ export default function Contact() {
                         <div className="grid sm:grid-cols-2 gap-8">
                             {[
                                 { icon: '📍', label: 'Manzil', value: 'Farg\'ona shahar' },
-                                { icon: '📞', label: 'Telefon', value: '+998 94 016 44 22' },
+                                { icon: '📞', label: 'Telefon', value: '+998 55 055 13 14' },
                                 { icon: '✉️', label: 'Email', value: 'imedteam1@gmail.com' },
                                 { icon: '🕒', label: 'Ish vaqti', value: 'Du–Shan 9:00–18:00' }
                             ].map((item, i) => (

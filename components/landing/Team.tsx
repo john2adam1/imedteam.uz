@@ -45,7 +45,7 @@ export default function Team() {
     ];
 
     return (
-        <section id="team" className="py-12 bg-slate-50 relative">
+        <section id="team" className="py-20 bg-white relative">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="reveal text-center max-w-3xl mx-auto mb-10">
                     <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 tracking-tight leading-tight">
@@ -60,12 +60,12 @@ export default function Team() {
                     {teamMembers.map((member, idx) => (
                         <div
                             key={idx}
-                            className="reveal group bg-white rounded-3xl p-8 shadow-soft border border-slate-100 hover:shadow-card transition-all duration-300 hover:-translate-y-1 text-center"
+                            className="reveal group bg-slate-900 rounded-3xl p-8 shadow-2xl shadow-slate-900/10 border border-white/5 hover:shadow-primary/10 transition-all duration-300 hover:-translate-y-2 text-center"
                             style={{ transitionDelay: `${idx * 50}ms` }}
                         >
                             <div className="relative mx-auto w-24 h-24 mb-6">
                                 <div className="absolute inset-0 bg-primary/20 rounded-full rotate-3 group-hover:rotate-6 transition-transform duration-300"></div>
-                                <div className="absolute inset-0 bg-white rounded-full overflow-hidden border-2 border-slate-100 shadow-sm">
+                                <div className="absolute inset-0 bg-slate-800 rounded-full overflow-hidden border-2 border-white/10 shadow-sm">
                                     <img
                                         src={member.img}
                                         alt={member.name}
@@ -75,7 +75,7 @@ export default function Team() {
                                 </div>
                             </div>
 
-                            <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-primary transition-colors">
+                            <h3 className="text-xl font-bold text-white mb-2 group-hover:text-primary transition-colors">
                                 {member.name}
                             </h3>
 
@@ -83,18 +83,18 @@ export default function Team() {
                                 {member.role}
                             </p>
 
-                            <p className="text-slate-500 text-sm font-medium leading-relaxed line-clamp-4">
+                            <p className="text-slate-400 text-sm font-medium leading-relaxed line-clamp-4">
                                 {member.desc}
                             </p>
                         </div>
                     ))}
 
-                    <div className="reveal group rounded-3xl p-8 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-center hover:border-primary/20 hover:bg-white transition-all duration-300 shadow-sm hover:shadow-soft">
+                    <div className="reveal group rounded-3xl p-8 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-center hover:border-primary/40 hover:bg-slate-900 transition-all duration-500 group/link cursor-pointer">
                         <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-300">
                             <span className="text-3xl font-bold">+</span>
                         </div>
-                        <h3 className="text-lg font-bold text-slate-900 mb-2">30+ Ustozlar</h3>
-                        <p className="text-slate-500 text-sm font-medium">Jamoamizda yana o'nlab professional shifokorlar faoliyat yuritishadi.</p>
+                        <h3 className="text-lg font-bold text-slate-900 group-hover:text-white mb-2 transition-colors">30+ Ustozlar</h3>
+                        <p className="text-slate-500 group-hover:text-slate-400 text-sm font-medium transition-colors">Jamoamizda yana o'nlab professional shifokorlar faoliyat yuritishadi.</p>
                     </div>
                 </div>
             </div>
