@@ -3,7 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen, Activity, Bell, User, LogOut, Grid } from 'lucide-react';
+import { Home, Activity, Bell, User, LogOut, Grid } from 'lucide-react';
+import Image from 'next/image';
 import { useAuth } from '@/lib/auth-context';
 
 const navItems = [
@@ -27,11 +28,17 @@ export default function Sidebar({ className = '', onClose }: SidebarProps) {
             {/* Logo Area */}
             <div className="p-8 mb-4 flex justify-between items-center">
                 <Link href="/dashboard" className="flex items-center gap-3 group" onClick={onClose}>
-                    <div className="w-12 h-12 bg-primary rounded-[1rem] flex items-center justify-center text-white shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform">
-                        <BookOpen size={24} />
+                    <div className="w-12 h-12 relative group-hover:scale-110 transition-transform">
+                        <Image
+                            src="/assets/logo.png"
+                            alt="iMed Team"
+                            fill
+                            className="object-contain"
+                            priority
+                        />
                     </div>
                     <h2 className="text-2xl font-black text-gray-900 tracking-tighter">
-                        iMed <span className="text-primary italic">Team</span>
+                        iMed Team
                     </h2>
                 </Link>
                 {/* Close button for mobile */}
@@ -57,10 +64,10 @@ export default function Sidebar({ className = '', onClose }: SidebarProps) {
                             className={`flex items-center gap-4 px-6 py-4 rounded-[1.5rem] font-black transition-all duration-300 group
                                 ${isActive
                                     ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]'
-                                    : 'text-gray-400 hover:bg-slate-50 hover:text-gray-900'
+                                    : 'text-slate-700 hover:bg-slate-50 hover:text-primary'
                                 }`}
                         >
-                            <Icon size={22} className={isActive ? 'text-white' : 'text-gray-300 group-hover:text-primary transition-colors'} />
+                            <Icon size={22} className={isActive ? 'text-white' : 'text-slate-400 group-hover:text-primary transition-colors'} />
                             <span className="tracking-tight">{item.name}</span>
                             {isActive && (
                                 <div className="ml-auto w-1.5 h-1.5 bg-white rounded-full"></div>
@@ -74,7 +81,7 @@ export default function Sidebar({ className = '', onClose }: SidebarProps) {
             <div className="p-6 border-t border-slate-50 bg-slate-50/30">
                 <button
                     onClick={() => logout()}
-                    className="w-full flex items-center gap-4 px-6 py-4 rounded-[1.5rem] font-black text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all group"
+                    className="w-full flex items-center gap-4 px-6 py-4 rounded-[1.5rem] font-black text-slate-700 hover:bg-red-50 hover:text-red-500 transition-all group"
                 >
                     <LogOut size={22} className="group-hover:rotate-12 transition-transform" />
                     <span className="tracking-tight">Chiqish</span>
