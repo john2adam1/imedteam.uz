@@ -4,7 +4,7 @@ export default function Team() {
             name: "Himmatulloh Rahmatov",
             role: "Asoschi",
             desc: "“iMed Team” platformasi asoschisi. Farg’ona Shahar Bolalar Shifoxonasi. 3 yillik tajribaga ega Pediatr shifokor. “iMed Team” da pediatriya fani bo’yicha ma’ruzachi.",
-            img: "/assets/himmatulloh.jpg" // Updated path to typical public
+            img: "/assets/himmatulloh.jpg"
         },
         {
             name: "Ulug’bek Mahmudov",
@@ -38,9 +38,57 @@ export default function Team() {
         },
         {
             name: "Zohidjon Zaylobiddinov",
-            role: "IT mutahasisi",
+            role: "IT mutaxassisi",
             desc: "Toshkent Davlat Tibbiyot Universiteti bakalavr talabasi. 1 yildan buyon iMed Team jamoasida mobil ilova, website qurish va ularni ishini tashkillashtirish ishlarini boshqarib keladi.",
             img: "/assets/zohidjon.jpg"
+        },
+        {
+            name: "Mahliyo Rashidova",
+            role: "Ma'ruzachi",
+            desc: "“iMed Team” jamoasi a'zosi va tajribali mutaxassis shifokor.",
+            img: "/assets/mahliyorashidova.jpg"
+        },
+        {
+            name: "Muhammadqodir Arabboyev",
+            role: "Ma'ruzachi",
+            desc: "iMed Team jamoasi a'zosi va Central Asian Medical University Urologiya yoʻnalishi magistratura talabasi, Qoʻshtepa Tuman Poliklinika Shifokori",
+            img: "/assets/muhammadqodirarabboyev.jpg"
+        },
+        {
+            name: "Nilufar Mamadaliyeva",
+            role: "Ma'ruzachi",
+            desc: "“iMed Team” jamoasi a'zosi va tajribali Fiziologiya o'qituvchi",
+            img: "/assets/nilufarmamadaliyeva.png"
+        },
+        {
+            name: "Rahmonqul Nomozov",
+            role: "Ma'ruzachi",
+            desc: "“iMed Team” jamoasi a'zosi va Surxondaryo viloyat koʻp tarmoqli tibbiyot markazi Nefrologiya-gemodializ boʻlimida ishlayman. Klinik Ordinatorman.",
+            img: "/assets/rahmonqulnomozov.jpg"
+        },
+        {
+            name: "Sardorbek Mamurov",
+            role: "Ma'ruzachi",
+            desc: "“iMed Team” jamoasi a'zosi va Наманган вилояти Уйчи тумани Мамура шифо хусусий шифохонаси",
+            img: "/assets/sardorbekmamurov.JPG"
+        },
+        {
+            name: "Ulugbek Zaylobidinov",
+            role: "Ma'ruzachi",
+            desc: "“iMed Team” jamoasi a'zosi va tajribali mutaxassis shifokor.",
+            img: "/assets/ulugbekzaylobidinov.jpg"
+        },
+        {
+            name: "Umarbek Hikmatillayev",
+            role: "Ma'ruzachi",
+            desc: "Hikmatillayev Diyorbek iMed Team da 3- yildan beri anatomiyadan dars beradi va hozirda Farmed klinikasida travmatolog ortoped.",
+            img: "/assets/umarbekhikmatillayev.jpg"
+        },
+        {
+            name: "Yuldosheva Mohichehra",
+            role: "Ma'ruzachi",
+            desc: "IMed Team Pediatriya fanidan lektori.",
+            img: "/assets/yuldoshevamohichehra.jpg"
         }
     ];
 
