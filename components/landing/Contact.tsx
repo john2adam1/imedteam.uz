@@ -21,7 +21,7 @@ export default function Contact() {
                                 { icon: '📍', label: 'Manzil', value: 'Farg\'ona shahar' },
                                 { icon: '📞', label: 'Telefon', value: '+998 55 055 13 14' },
                                 { icon: '✉️', label: 'Email', value: 'imedteam1@gmail.com' },
-                                { icon: '🕒', label: 'Ish vaqti', value: 'Du–Shan 9:00–18:00' }
+                                { icon: '🕒', label: 'Ish vaqti', value: 'Du–Shan 10:00–18:00' }
                             ].map((item, i) => (
                                 <div key={i} className="flex flex-col gap-2">
                                     <span className="text-3xl mb-2">{item.icon}</span>
