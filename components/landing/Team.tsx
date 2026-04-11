@@ -1,4 +1,10 @@
+"use client";
+import { useState } from "react";
+
 export default function Team() {
+    const [showAll, setShowAll] = useState(false);
+    const VISIBLE_COUNT = 6;
+
     const teamMembers = [
         {
             name: "Himmatulloh Rahmatov",
@@ -111,7 +117,7 @@ export default function Team() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {teamMembers.map((member, idx) => (
+                    {teamMembers.slice(0, showAll ? teamMembers.length : VISIBLE_COUNT).map((member, idx) => (
                         <div
                             key={idx}
                             className="reveal group bg-slate-900 rounded-3xl p-8 shadow-2xl shadow-slate-900/10 border border-white/5 hover:shadow-primary/10 transition-all duration-300 hover:-translate-y-2 text-center"
@@ -142,15 +148,28 @@ export default function Team() {
                             </p>
                         </div>
                     ))}
-
-                    <div className="reveal group rounded-3xl p-8 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-center hover:border-primary/40 hover:bg-slate-900 transition-all duration-500 group/link cursor-pointer">
-                        <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-300">
-                            <span className="text-3xl font-bold">+</span>
-                        </div>
-                        <h3 className="text-lg font-bold text-slate-900 group-hover:text-white mb-2 transition-colors">30+ Ustozlar</h3>
-                        <p className="text-slate-500 group-hover:text-slate-400 text-sm font-medium transition-colors">Jamoamizda yana o'nlab professional shifokorlar faoliyat yuritishadi.</p>
-                    </div>
                 </div>
+
+                {teamMembers.length > VISIBLE_COUNT && (
+                    <div className="flex justify-center mt-12">
+                        <button
+                            onClick={() => setShowAll(!showAll)}
+                            className="group inline-flex items-center gap-3 px-8 py-4 bg-slate-900 text-white rounded-2xl font-semibold text-base hover:bg-primary transition-all duration-300 shadow-lg hover:shadow-primary/30 hover:-translate-y-1"
+                        >
+                            {showAll ? "Kamroq ko'rish" : `Yana ${teamMembers.length - VISIBLE_COUNT} ta ustozni ko'rish`}
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className={`w-5 h-5 transition-transform duration-300 ${showAll ? "rotate-180" : ""}`}
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={2.5}
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                    </div>
+                )}
             </div>
         </section>
     );
