@@ -14,6 +14,7 @@ export { activityService } from './activity';
 export { ratingService } from './rating';
 export { promocodeService } from './promocode';
 export { appRouteService } from './appRoute';
+export { sourceService } from './source';
 
 // Re-export API client utilities
 export { apiClient, setAuthToken, removeAuthToken } from '@/lib/api-client';

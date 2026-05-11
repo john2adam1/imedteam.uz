@@ -13,13 +13,21 @@ const firebaseConfig = {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "YOUR_APP_ID"
 };
 
-// Initialize Firebase
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+// Initialize Firebase only if config is valid
+const isConfigValid = firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY";
+
+const app = (getApps().length === 0 && isConfigValid)
+    ? initializeApp(firebaseConfig)
+    : (getApps().length > 0 ? getApp() : null);
 
 let messaging: Messaging | undefined;
 
-if (typeof window !== 'undefined') {
-    messaging = getMessaging(app);
+if (typeof window !== 'undefined' && app) {
+    try {
+        messaging = getMessaging(app);
+    } catch (err) {
+        console.warn('Firebase Messaging could not be initialized:', err);
+    }
 }
 
 export { app, messaging };

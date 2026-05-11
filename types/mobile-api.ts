@@ -151,6 +151,16 @@ export interface SourceMobile {
   order_num: number;
   type: string;
   url: string;
+  video_url?: string;
+}
+
+export interface SourceUpdateBody {
+  id: string;
+  name?: string;
+  url?: string;
+  video_url?: string;
+  order_num?: number;
+  file?: File;
 }
 
 export interface SourceLessonMobileRes {

@@ -36,8 +36,7 @@ export default function ProfilePage() {
         fetchActivityStats();
         if (user) {
             setEditName(user.name || '');
-            const phone = user.phone_number || '';
-            setEditPhone(phone.startsWith('+') ? phone : (phone ? `+${phone}` : '+'));
+            setEditPhone(user.phone_number || '');
             setEditEmail(user.email || '');
         }
     }, [user]);
@@ -46,8 +45,7 @@ export default function ProfilePage() {
     useEffect(() => {
         if (showEditProfileForm && user) {
             setEditName(user.name || '');
-            const phone = user.phone_number || '';
-            setEditPhone(phone.startsWith('+') ? phone : (phone ? `+${phone}` : '+'));
+            setEditPhone(user.phone_number || '');
             setEditEmail(user.email || '');
             setError('');
         }
@@ -71,26 +69,26 @@ export default function ProfilePage() {
         setLoading(true);
 
         try {
-            try {
-                await profileService.updateProfile({
-                    name: editName,
-                    phone_number: editPhone.startsWith('+') ? editPhone : `+${editPhone}`,
-                    email: editEmail || undefined,
-                    image: editImage || undefined,
-                });
-            } catch (updateErr: any) {
-                // If backend fails because of email field (e.g., "phone number not valid" error incorrectly triggered)
-                // or any validator failure related to missing fields, try fallback without it
-                if (updateErr.message?.includes('phone') || updateErr.message?.includes('valid')) {
-                    await profileService.updateProfile({
-                        name: editName,
-                        phone_number: editPhone.startsWith('+') ? editPhone : `+${editPhone}`,
-                        image: editImage || undefined,
-                    });
-                } else {
-                    throw updateErr;
-                }
+            const phoneToSend = editPhone.trim();
+            const formattedPhone = phoneToSend ?
+                (phoneToSend.startsWith('+') ? phoneToSend : `+${phoneToSend}`) :
+                undefined;
+
+            // Only send fields if they are not just '+' or empty
+            const payload: any = {
+                name: editName,
+                image: editImage || undefined,
+            };
+
+            if (!user?.email && formattedPhone && formattedPhone.length > 5) {
+                payload.phone_number = formattedPhone;
             }
+
+            if (user?.email && editEmail && editEmail.includes('@')) {
+                payload.email = editEmail;
+            }
+
+            await profileService.updateProfile(payload);
 
             await refreshUser();
             setMessage('Profil muvaffaqiyatli yangilandi');
@@ -170,8 +168,11 @@ export default function ProfilePage() {
 
                         <h3 className="text-2xl font-black text-gray-900 mb-1">{user?.name}</h3>
                         <p className="text-gray-400 font-medium mb-8 flex flex-col items-center justify-center gap-1">
-                            <span className="flex items-center gap-2"><Phone size={14} /> {user?.phone_number}</span>
-                            {user?.email && <span className="flex items-center gap-2 text-xs opacity-75">{user.email}</span>}
+                            {!user?.email ? (
+                                <span className="flex items-center gap-2"><Phone size={14} /> {user?.phone_number}</span>
+                            ) : (
+                                <span className="flex items-center gap-2 text-xs opacity-75">{user.email}</span>
+                            )}
                         </p>
 
 
@@ -371,40 +372,38 @@ export default function ProfilePage() {
                                 />
                             </div>
 
-                            {user?.phone_number && (
+                            {!user?.email ? (
                                 <div>
                                     <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Telefon raqam</label>
                                     <input
                                         type="tel"
                                         value={editPhone}
+                                        readOnly
                                         maxLength={13}
+                                        placeholder="+998901234567"
                                         onChange={(e) => {
                                             const val = e.target.value;
                                             if (val === '' || val === '+') {
-                                                setEditPhone('+');
+                                                setEditPhone(val);
                                             } else {
                                                 // Allow only + and digits
                                                 const cleanVal = val.startsWith('+') ? '+' + val.slice(1).replace(/\D/g, '') : '+' + val.replace(/\D/g, '');
                                                 setEditPhone(cleanVal.slice(0, 13));
                                             }
                                         }}
-                                        onFocus={(e) => {
-                                            if (!editPhone) setEditPhone('+');
-                                        }}
-                                        className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
+                                        className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 outline-none transition-all font-bold text-gray-400 cursor-not-allowed"
                                     />
                                 </div>
-                            )}
-
-                            {user?.email && (
+                            ) : (
                                 <div>
                                     <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Email manzil</label>
                                     <input
                                         type="email"
                                         value={editEmail}
+                                        readOnly
                                         onChange={(e) => setEditEmail(e.target.value)}
                                         placeholder="example@mail.com"
-                                        className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 focus:border-primary/20 focus:ring-4 focus:ring-primary/5 outline-none transition-all font-bold text-gray-700 hover:border-gray-200"
+                                        className="w-full px-6 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50 outline-none transition-all font-bold text-gray-400 cursor-not-allowed"
                                     />
                                 </div>
                             )}
