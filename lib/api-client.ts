@@ -82,7 +82,12 @@ export async function apiClient<T>(
 
         return data as T;
     } catch (error: any) {
-        console.error(`[API Error] ${url}:`, error);
+        // Only log full URL and error details in development
+        if (process.env.NODE_ENV !== 'production') {
+            console.error(`[API Error] ${url}:`, error);
+        } else {
+            console.error(`[API Error]:`, error.message || 'An error occurred');
+        }
         throw error;
     }
 }

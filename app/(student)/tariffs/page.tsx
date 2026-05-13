@@ -34,9 +34,12 @@ function TariffsContent() {
                             courseData.price.every(p => p.price === 0)
                         );
 
+                        // ✅ CAN BUY CHECK: Redirect if course is not for sale
+                        const cannotBuy = !isFree && courseData.can_buy === false;
+
                         // If free, redirect immediately and STOP here
-                        if (isFree) {
-                            console.log('Redirecting free course:', courseId);
+                        if (isFree || cannotBuy) {
+                            console.log(isFree ? 'Redirecting free course:' : 'Redirecting non-purchasable course:', courseId);
                             router.replace(`/courses/${courseId}`);
                             return;
                         }

@@ -162,7 +162,7 @@ export default function CourseDetailPage() {
                             </div>
                         </div>
 
-                        {/* ✅ FIX: Show appropriate access message/button based on course type */}
+                        {/* ✅ ACCESS CONTROL: Buy button only if not free and can_buy is true */}
                         {course.has_access ? (
                             <div className="flex items-center gap-3 py-4 px-6 rounded-2xl font-bold bg-primary/5 text-primary border border-primary/10">
                                 <span className="text-xl">✅</span>
@@ -176,13 +176,18 @@ export default function CourseDetailPage() {
                             >
                                 {isEnrolling ? 'Yuklanmoqda...' : 'O\'RGANISHNI BOSHLASH'}
                             </button>
-                        ) : (
+                        ) : course.can_buy ? (
                             <Link
                                 href={`/tariffs?courseId=${id}`}
                                 className="w-full py-5 bg-primary text-white rounded-2xl font-black text-center shadow-lg shadow-primary/20 hover:bg-primary-600 transition-all active:scale-[0.98] tracking-widest uppercase text-sm"
                             >
                                 Kursni sotib olish
                             </Link>
+                        ) : (
+                            <div className="flex items-center gap-3 py-4 px-6 rounded-2xl font-bold bg-amber-50 text-amber-600 border border-amber-100">
+                                <span className="text-xl">⏳</span>
+                                Sotuv hozircha yopilgan
+                            </div>
                         )}
                     </div>
                 </div>

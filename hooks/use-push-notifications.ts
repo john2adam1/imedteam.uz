@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getMessaging, getToken } from 'firebase/messaging';
-import { app } from '@/lib/firebase';
+import { app, messaging } from '@/lib/firebase';
 import { profileService } from '@/services/profile';
 import { useAuth } from '@/lib/auth-context';
 
@@ -22,7 +22,7 @@ export const usePushNotifications = () => {
         if (sessionStorage.getItem('fcm_token_synced')) return;
 
         try {
-            const messaging = getMessaging(app);
+            if (!messaging) return;
             const token = await getToken(messaging, {
                 vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY
             });

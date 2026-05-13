@@ -18,7 +18,7 @@ const isConfigValid = firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_A
 
 const app = (getApps().length === 0 && isConfigValid)
     ? initializeApp(firebaseConfig)
-    : (getApps().length > 0 ? getApp() : null);
+    : (getApps().length > 0 ? getApp() : undefined);
 
 let messaging: Messaging | undefined;
 
