@@ -10,7 +10,7 @@ export default function Team() {
             name: "Himmatulloh Rahmatov",
             role: "Asoschi",
             desc: "“iMed Team” platformasi asoschisi. Farg’ona Shahar Bolalar Shifoxonasi. 3 yillik tajribaga ega Pediatr shifokor. “iMed Team” da pediatriya fani bo’yicha ma’ruzachi.",
-            img: "/assets/himmatulloh.jpg"
+            img: "/assets/himmatulloh.png"
         },
         {
             name: "Ulug’bek Mahmudov",
