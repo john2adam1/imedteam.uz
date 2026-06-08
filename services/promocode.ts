@@ -9,10 +9,7 @@ export const promocodeService = {
     check: async (data: PromocodeReq): Promise<PromocodeRes> => {
         return apiClient('/promocode/check', {
             method: 'POST',
-            body: JSON.stringify({
-                ...data,
-                promocode: data.code // Send both to be safe
-            }),
+            body: JSON.stringify(data),
         });
     },
 };

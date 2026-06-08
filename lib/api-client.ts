@@ -9,7 +9,9 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://prod.axadjonovs
 
 export interface ApiClientOptions extends RequestInit {
     requiresAuth?: boolean;
-    namespace?: 'mobile';
+    namespace?: 'mobile' | 'web';
+    /** @internal Used to prevent infinite retry loops */
+    _retriedWithoutAuth?: boolean;
 }
 
 /**
@@ -20,7 +22,7 @@ export async function apiClient<T>(
     endpoint: string,
     options: ApiClientOptions = {}
 ): Promise<T> {
-    const { requiresAuth = true, namespace = 'mobile', ...fetchOptions } = options;
+    const { requiresAuth = true, namespace = 'mobile', _retriedWithoutAuth = false, ...fetchOptions } = options;
 
     const deviceId = getDeviceId();
 
@@ -57,16 +59,6 @@ export async function apiClient<T>(
             headers,
         });
 
-        if (response.status === 401 || response.status === 403) {
-            removeAuthToken();
-            /*
-            if (typeof window !== 'undefined') {
-                window.location.href = '/auth/login';
-            }
-            */
-            throw new Error('Sessiya muddati tugadi yoki boshqa qurilmada kirilgan');
-        }
-
         const text = await response.text();
         let data;
         try {
@@ -75,6 +67,29 @@ export async function apiClient<T>(
             data = { message: text };
         }
 
+        if (response.status === 403) {
+            throw new Error(data.message || data.error || 'Ruxsat yo\'q');
+        }
+
+        if (response.status === 401) {
+            const hadToken = !!headers['Authorization'];
+            removeAuthToken();
+
+            // Stale/invalid token — retry once without Authorization header
+            if (hadToken && !_retriedWithoutAuth) {
+                return apiClient<T>(endpoint, {
+                    ...options,
+                    requiresAuth: false,
+                    _retriedWithoutAuth: true,
+                });
+            }
+
+            if (requiresAuth) {
+                throw new Error('Sessiya muddati tugadi yoki boshqa qurilmada kirilgan');
+            }
+
+            throw new Error(data.message || data.error || `API error: ${response.status}`);
+        }
 
         if (!response.ok) {
             throw new Error(data.message || data.error || `API error: ${response.status}`);
@@ -82,10 +97,12 @@ export async function apiClient<T>(
 
         return data as T;
     } catch (error: any) {
-        // Only log full URL and error details in development
-        if (process.env.NODE_ENV !== 'production') {
+        const isExpectedAuthFailure =
+            error.message === 'Sessiya muddati tugadi yoki boshqa qurilmada kirilgan';
+
+        if (process.env.NODE_ENV !== 'production' && !isExpectedAuthFailure) {
             console.error(`[API Error] ${url}:`, error);
-        } else {
+        } else if (process.env.NODE_ENV === 'production' && !isExpectedAuthFailure) {
             console.error(`[API Error]:`, error.message || 'An error occurred');
         }
         throw error;

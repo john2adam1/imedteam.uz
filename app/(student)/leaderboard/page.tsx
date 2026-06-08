@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useMemo } from 'react';
 import { ratingService } from '@/services';
 import { RatingResponse, RatingUser } from '@/types/mobile-api';
+import { useAuth } from '@/lib/auth-context';
 import { Star, Crown, ChevronDown, Clock, Trophy } from 'lucide-react';
 import Image from 'next/image';
 
@@ -14,6 +15,7 @@ const PERIODS = [
 ];
 
 export default function LeaderboardPage() {
+    const { isLoading: authLoading, isAuthenticated } = useAuth();
     const [ratings, setRatings] = useState<RatingResponse | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [period, setPeriod] = useState<'day' | 'week' | 'month' | 'year' | 'total'>('total');
@@ -22,9 +24,10 @@ export default function LeaderboardPage() {
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        if (authLoading || !isAuthenticated) return;
         fetchRatings();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [period]);
+    }, [period, authLoading, isAuthenticated]);
 
     useEffect(() => {
         const updateTime = () => {
@@ -50,7 +53,7 @@ export default function LeaderboardPage() {
     const fetchRatings = async () => {
         setIsLoading(true);
         try {
-            const response = await ratingService.getRating({ type: period });
+            const response = await ratingService.getRating({ type: period, limit: 100 });
             setRatings(response);
         } catch (error) {
             console.error('Failed to fetch ratings:', error);
@@ -73,20 +76,23 @@ export default function LeaderboardPage() {
         return `${pad(minutes)}d ${pad(seconds)}s`;
     };
 
-    const { podiumItems, otherItems } = useMemo(() => {
+    const { podiumItems, otherItems, meOutsideTop } = useMemo(() => {
         const allItems = ratings?.items || [];
-        // Sort specifically for podium: 2nd, 1st, 3rd
         const podium = [
-            allItems[1], // 2nd
-            allItems[0], // 1st
-            allItems[2]  // 3rd
+            allItems[1],
+            allItems[0],
+            allItems[2],
         ].filter((u): u is RatingUser => !!u);
 
         const others = allItems.slice(3);
-        return { podiumItems: podium, otherItems: others };
+        const me = ratings?.me;
+        const meInList = me ? allItems.some((u) => u.user_id === me.user_id) : false;
+        const meOutsideTop = me && !meInList ? me : null;
+
+        return { podiumItems: podium, otherItems: others, meOutsideTop };
     }, [ratings]);
 
-    if (isLoading && !ratings) {
+    if ((isLoading || authLoading) && !ratings) {
         return (
             <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 space-y-4">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary/20 border-t-primary"></div>
@@ -206,6 +212,30 @@ export default function LeaderboardPage() {
                 </div>
 
                 <div className="grid gap-4">
+                    {meOutsideTop && (
+                        <div className="bg-primary/5 p-4 sm:p-5 rounded-[2rem] flex items-center justify-between gap-4 border-2 border-primary/20 ring-2 ring-primary/10">
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 text-center font-black text-primary italic">
+                                    #{meOutsideTop.rank}
+                                </div>
+                                <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center overflow-hidden border border-primary/20 shadow-sm">
+                                    {meOutsideTop.image_url ? (
+                                        <img src={meOutsideTop.image_url} alt={meOutsideTop.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <span className="text-lg font-black text-primary">{meOutsideTop.name.charAt(0)}</span>
+                                    )}
+                                </div>
+                                <span className="font-black tracking-tight text-primary">
+                                    {meOutsideTop.name} (Siz)
+                                </span>
+                            </div>
+                            <div className="bg-white/80 backdrop-blur-sm px-4 py-2 rounded-xl text-[11px] font-black text-primary shadow-sm flex items-center gap-2 border border-primary/10">
+                                <Clock size={12} />
+                                {formatActivity(meOutsideTop.activity)}
+                            </div>
+                        </div>
+                    )}
+
                     {otherItems.length > 0 ? (
                         otherItems.map((user) => (
                             <div

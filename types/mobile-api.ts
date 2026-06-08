@@ -406,7 +406,6 @@ export interface OrderCreateBody {
   tariff_id: string;
   course_id?: string;
   promocode_id?: string;
-  payment_method?: string;
 }
 
 export interface OrderRes {
@@ -493,12 +492,11 @@ export interface PaginationParams {
 export interface CourseQueryParams extends PaginationParams {
   name?: string;
   subject_id?: string;
-  is_active?: string;
+  is_public?: boolean;
 }
 
 export interface SubjectQueryParams extends PaginationParams {
   name?: string;
-  is_active?: string;
 }
 
 export interface NotificationQueryParams {
@@ -514,6 +512,7 @@ export interface ActivityQueryParams {
 
 export interface RatingQueryParams {
   type?: 'day' | 'week' | 'month' | 'year' | 'total';
+  limit?: number;
 }
 
 // ============================================================================
@@ -523,7 +522,7 @@ export interface RatingQueryParams {
 export type Language = 'uz' | 'ru' | 'en';
 
 export interface PromocodeReq {
-  code: string;
+  promocode: string;
   tariff_id?: string;
   course_id?: string;
 }

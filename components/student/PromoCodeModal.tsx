@@ -47,7 +47,7 @@ export function PromoCodeModal({
 
         try {
             const res = await promocodeService.check({
-                code: promoCode,
+                promocode: promoCode,
                 course_id: courseId,
                 tariff_id: tariffId
             });

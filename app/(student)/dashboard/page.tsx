@@ -15,7 +15,7 @@ import BannerSlider from '@/components/student/BannerSlider';
 import { cn } from '@/lib/utils';
 
 export default function AppHome() {
-    const { user: authUser } = useAuth();
+    const { user: authUser, isLoading: authLoading, isAuthenticated } = useAuth();
     const [userCourses, setUserCourses] = useState<{ user_courses: any[], count: number }>({ user_courses: [], count: 0 });
     const [banners, setBanners] = useState<{ banners: any[], count: number }>({ banners: [], count: 0 });
     const [activity, setActivity] = useState<any>(null);
@@ -24,10 +24,11 @@ export default function AppHome() {
     const router = useRouter();
 
     useEffect(() => {
+        if (authLoading) return;
+
         const loadDashboardData = async () => {
             setLoading(true);
 
-            // Fetch data individually to avoid total failure if one endpoint is down
             const fetchData = async (serviceMethod: () => Promise<any>, stateSetter: (data: any) => void, label: string) => {
                 try {
                     const data = await serviceMethod();
@@ -37,7 +38,11 @@ export default function AppHome() {
                 }
             };
 
-            // Using allSettled to ensure we try to load everything even if some fail
+            if (!isAuthenticated) {
+                setLoading(false);
+                return;
+            }
+
             await Promise.allSettled([
                 fetchData(() => courseService.getUserCourses(), setUserCourses, 'user courses'),
                 fetchData(() => bannerService.getBanners(), setBanners, 'banners'),
@@ -49,7 +54,7 @@ export default function AppHome() {
         };
 
         loadDashboardData();
-    }, []);
+    }, [authLoading, isAuthenticated]);
 
     // Memoize the derived statistics
     const stats = useMemo(() => {

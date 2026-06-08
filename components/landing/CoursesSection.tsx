@@ -1,63 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { courseService, subjectService } from '@/services';
-import { CourseMobileRes, Subject } from '@/types/mobile-api';
-import Link from 'next/link';
-import { Grid } from 'lucide-react';
-
 export default function CoursesSection() {
-    const [subjects, setSubjects] = useState<Subject[]>([]);
-    const [courses, setCourses] = useState<CourseMobileRes[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const [subjectsData, coursesData] = await Promise.all([
-                    subjectService.getAll().catch(() => ({ subjects: [], count: 0 })),
-                    courseService.getCourses().catch(() => ({ courses: [], count: 0 })),
-                ]);
-
-                // Handle subjects data
-                if (Array.isArray(subjectsData)) {
-                    setSubjects(subjectsData);
-                } else if (subjectsData && typeof subjectsData === 'object') {
-                    setSubjects((subjectsData as any).subjects || (subjectsData as any).items || []);
-                }
-
-                // Handle courses data
-                if (Array.isArray(coursesData)) {
-                    setCourses(coursesData);
-                } else if (coursesData && typeof coursesData === 'object') {
-                    setCourses((coursesData as any).courses || (coursesData as any).items || []);
-                }
-            } catch (error) {
-                console.error('Failed to load course data', error);
-            } finally {
-                setLoading(false);
-            }
-        }
-        fetchData();
-    }, []);
-
-    // Group courses by subject - searching for subject in name or using any available field
-    // If the API doesn't return subject_id directly in the list, we might need to handle it differently
-    // For now, let's use a looser type to avoid TS errors on subject_id
-    const getCoursesBySubject = (subjectId: string) => {
-        return courses.filter((course: any) => course.subject_id === subjectId);
-    };
-
-    if (loading) {
-        return <div className="py-20 text-center"><div className="animate-spin inline-block w-8 h-8 border-4 border-primary-500 rounded-full border-t-transparent"></div></div>;
-    }
-
     return (
         <section id="courses" className="py-12 bg-slate-50 relative overflow-hidden">
             <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl -z-10"></div>
 
             <div className="max-w-7xl mx-auto px-6">
-                {/* Curriculum Details */}
                 <div className="mt-10 max-w-5xl mx-auto">
                     <div className="reveal text-center max-w-2xl mx-auto mb-10">
                         <h3 className="text-3xl font-extrabold text-slate-900">Kurs yo‘nalishlari</h3>
@@ -65,7 +13,6 @@ export default function CoursesSection() {
                     </div>
 
                     <div className="grid gap-4">
-                        {/* Fundamental */}
                         <details className="reveal group rounded-2xl border border-slate-200 bg-white p-5 open:shadow-soft transition-all">
                             <summary className="flex cursor-pointer items-center justify-between gap-4 select-none list-none [&::-webkit-details-marker]:hidden">
                                 <span className="font-bold text-lg text-slate-900">Fundamental fanlar</span>
@@ -84,7 +31,6 @@ export default function CoursesSection() {
                             </div>
                         </details>
 
-                        {/* Preklinik */}
                         <details className="reveal group rounded-2xl border border-slate-200 bg-white p-5 open:shadow-soft transition-all">
                             <summary className="flex cursor-pointer items-center justify-between gap-4 select-none list-none [&::-webkit-details-marker]:hidden">
                                 <span className="font-bold text-lg text-slate-900">Preklinik fanlar</span>
@@ -101,7 +47,6 @@ export default function CoursesSection() {
                             </div>
                         </details>
 
-                        {/* Klinik */}
                         <details className="reveal group rounded-2xl border border-slate-200 bg-white p-5 open:shadow-soft transition-all">
                             <summary className="flex cursor-pointer items-center justify-between gap-4 select-none list-none [&::-webkit-details-marker]:hidden">
                                 <span className="font-bold text-lg text-slate-900">Klinik fanlar</span>

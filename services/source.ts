@@ -18,7 +18,7 @@ export const sourceService = {
         return apiClient<any>(`/source/${id}/update`, {
             method: 'PUT',
             body: formData,
-            namespace: 'web' as any, // Bypass the mobile default
+            namespace: 'web',
         });
     },
 };

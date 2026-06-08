@@ -132,13 +132,8 @@ function TariffsContent() {
             const orderData: OrderCreateBody = {
                 tariff_id: tariffId,
                 course_id: courseId || undefined,
-                payment_method: 'click'
             };
 
-            if (promoCode) {
-                // @ts-ignore
-                orderData.promocode = promoCode;
-            }
             if (promoId) {
                 orderData.promocode_id = promoId;
             }

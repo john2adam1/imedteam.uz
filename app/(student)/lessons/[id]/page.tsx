@@ -9,12 +9,12 @@ import { getMediaUrl } from '@/lib/utils';
 import PDFViewer from '@/components/ui/PDFViewer';
 import confetti from 'canvas-confetti';
 import dynamic from 'next/dynamic';
-import 'plyr-react/plyr.css';
+import 'plyr/dist/plyr.css';
 import { useAuth } from '@/lib/auth-context';
 import VideoEditModal from '@/components/student/VideoEditModal';
 import { Settings, Edit3 } from 'lucide-react';
 
-const Plyr = dynamic<any>(() => import('plyr-react').then((mod) => mod.Plyr as any), { ssr: false });
+const Plyr = dynamic<any>(() => import('@/components/ui/CustomPlyr'), { ssr: false });
 
 const getYoutubeId = (url: string = '') => {
     if (!url) return '';
@@ -306,11 +306,11 @@ export default function LessonPage() {
                                             onContextMenu={(e) => e.preventDefault()}
                                         >
                                             {isMounted && (
-                                                <div key={`${v.id}-${useYoutube ? 'yt' : 'srv'}`} className="w-full h-full">
+                                                <div key={v.id} className="w-full h-full">
                                                     {useYoutube ? (
-                                                        <YoutubePlayer v={v} onFallback={() => setVideoFallbackMap(prev => ({ ...prev, [v.id]: true }))} />
+                                                        <YoutubePlayer key={`${v.id}-yt`} v={v} onFallback={() => setVideoFallbackMap(prev => ({ ...prev, [v.id]: true }))} />
                                                     ) : (
-                                                        <ServerPlayer v={v} />
+                                                        <ServerPlayer key={`${v.id}-srv`} v={v} />
                                                     )}
                                                 </div>
                                             )}

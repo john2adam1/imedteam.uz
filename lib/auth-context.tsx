@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { authService, profileService } from '@/services';
 import { UserRes, UserLoginReq, UserCheckReq, UserRegisterReq } from '@/types/mobile-api';
 import { getCookie } from './cookies';
+import { removeAuthToken } from './api-client';
 
 interface AuthContextType {
     user: UserRes | null;
@@ -33,9 +34,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 try {
                     const userData = await profileService.getUserProfile();
                     setUser(userData);
-                } catch (error: any) {
-                    console.error('Failed to fetch user profile:', error);
-                    setIsLoading(false);
+                } catch {
+                    removeAuthToken();
+                    setUser(null);
                 }
             }
             setIsLoading(false);
