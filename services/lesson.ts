@@ -23,6 +23,13 @@ export const lessonService = {
         const response = await apiClient<SourceLessonMobileRes>(`/lesson/${lessonId}`);
 
         // Transform media URLs
+        if (response.videos) {
+            response.videos = response.videos.map(v => ({
+                ...v,
+                video_url: v.video_url ? getMediaUrl(v.video_url) : undefined
+            }));
+        }
+
         if (response.documents) {
             response.documents = response.documents.map(doc => ({
                 ...doc,

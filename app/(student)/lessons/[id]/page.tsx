@@ -5,31 +5,44 @@ import { lessonService, activityService } from '@/services';
 import { SourceLessonMobileRes, SourceMobile } from '@/types/mobile-api';
 import { useRouter, useParams } from 'next/navigation';
 import { Play, FileText, ClipboardList, ArrowLeft, CheckCircle2, Youtube, AlertCircle } from 'lucide-react';
-import { getMediaUrl } from '@/lib/utils';
+import { getMediaUrl, isVideoUrl } from '@/lib/utils';
 import PDFViewer from '@/components/ui/PDFViewer';
 import confetti from 'canvas-confetti';
 import dynamic from 'next/dynamic';
 import 'plyr/dist/plyr.css';
 import { useAuth } from '@/lib/auth-context';
-import VideoEditModal from '@/components/student/VideoEditModal';
-import { Settings, Edit3 } from 'lucide-react';
+import { Settings } from 'lucide-react';
 
 const Plyr = dynamic<any>(() => import('@/components/ui/CustomPlyr'), { ssr: false });
 
 const getYoutubeId = (url: string = '') => {
     if (!url) return '';
+
+    // Clean URL
+    const cleanUrl = url.trim();
+
+    // If it's already an ID (11 chars, no symbols)
+    if (/^[a-zA-Z0-9_-]{11}$/.test(cleanUrl)) return cleanUrl;
+
     try {
-        const urlObj = new URL(url.includes('://') ? url : `https://${url}`);
-        if (urlObj.hostname === 'youtu.be') return urlObj.pathname.slice(1).split(/[?#]/)[0];
-        if (urlObj.hostname.includes('youtube.com')) {
+        const urlObj = new URL(cleanUrl.includes('://') ? cleanUrl : `https://${cleanUrl}`);
+        const hostname = urlObj.hostname.replace('www.', '');
+
+        if (hostname === 'youtu.be') {
+            return urlObj.pathname.slice(1).split(/[?#]/)[0];
+        }
+
+        if (hostname === 'youtube.com' || hostname === 'm.youtube.com') {
             if (urlObj.pathname.includes('/watch')) return urlObj.searchParams.get('v') || '';
             if (urlObj.pathname.includes('/shorts/')) return urlObj.pathname.split('/shorts/')[1].split(/[?#]/)[0];
+            if (urlObj.pathname.includes('/live/')) return urlObj.pathname.split('/live/')[1].split(/[?#]/)[0];
             if (urlObj.pathname.includes('/embed/')) return urlObj.pathname.split('/embed/')[1].split(/[?#]/)[0];
+            if (urlObj.pathname.includes('/v/')) return urlObj.pathname.split('/v/')[1].split(/[?#]/)[0];
         }
     } catch (e) {
-        // Fallback for non-standard formats
-        if (url.includes('youtu.be/')) return url.split('youtu.be/')[1].split(/[?#]/)[0];
-        if (url.includes('v=')) return url.split('v=')[1].split(/[&?#]/)[0];
+        // Regex fallback for non-URL strings or failed parsing
+        const match = cleanUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/|live\/))([^"&?\/\s]{11})/);
+        if (match) return match[1];
     }
     return '';
 };
@@ -93,7 +106,6 @@ export default function LessonPage() {
     const [error, setError] = useState('');
     const [startTime] = useState(Date.now());
     const [viewPdf, setViewPdf] = useState<{ url: string; name: string } | null>(null);
-    const [editingVideo, setEditingVideo] = useState<SourceMobile | null>(null);
     const [isMounted, setIsMounted] = useState(false);
     const [videoFallbackMap, setVideoFallbackMap] = useState<Record<string, boolean>>({});
 
@@ -244,15 +256,7 @@ export default function LessonPage() {
                 />
             )}
 
-            {/* Video Edit Modal */}
-            {editingVideo && (
-                <VideoEditModal
-                    isOpen={!!editingVideo}
-                    onClose={() => setEditingVideo(null)}
-                    video={editingVideo}
-                    onSuccess={fetchLesson}
-                />
-            )}
+
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                 {/* Main Content: Video and Completion */}
@@ -275,30 +279,12 @@ export default function LessonPage() {
                                                     <h3 className="font-bold text-gray-900">
                                                         {lesson.videos.length > 1 ? `${idx + 1}-video lavha` : 'Video darslik'}
                                                     </h3>
-                                                    {useYoutube ? (
-                                                        <span className="text-[10px] text-red-600 font-black uppercase tracking-widest mt-0.5 flex items-center gap-1">
-                                                            <Youtube size={10} /> YouTube orqali yuklanmoqda
-                                                        </span>
-                                                    ) : hasServerFallback ? (
-                                                        <span className="text-[10px] text-emerald-600 font-black uppercase tracking-widest mt-0.5 flex items-center gap-1">
-                                                            <CheckCircle2 size={10} /> Server orqali yuklandi (Fallback)
-                                                        </span>
-                                                    ) : (
+                                                    {lesson.videos.length > 1 && (
                                                         <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest mt-0.5 flex items-center gap-1">
-                                                            <AlertCircle size={10} /> Video manbasi topilmadi
+                                                            {idx + 1}-qism
                                                         </span>
                                                     )}
                                                 </div>
-                                            </div>
-
-                                            <div className="flex items-center gap-2">
-                                                <button
-                                                    onClick={() => setEditingVideo(v)}
-                                                    className="p-2.5 rounded-xl bg-slate-50 text-gray-400 hover:text-primary hover:bg-primary/5 transition-all group/edit"
-                                                    title="Videoni tahrirlash"
-                                                >
-                                                    <Edit3 size={18} className="group-hover/edit:rotate-12 transition-transform" />
-                                                </button>
                                             </div>
                                         </div>
                                         <div
@@ -307,11 +293,30 @@ export default function LessonPage() {
                                         >
                                             {isMounted && (
                                                 <div key={v.id} className="w-full h-full">
-                                                    {useYoutube ? (
-                                                        <YoutubePlayer key={`${v.id}-yt`} v={v} onFallback={() => setVideoFallbackMap(prev => ({ ...prev, [v.id]: true }))} />
-                                                    ) : (
-                                                        <ServerPlayer key={`${v.id}-srv`} v={v} />
-                                                    )}
+                                                    {(() => {
+                                                        const ytid = getYoutubeId(v.url);
+                                                        const useYoutube = !!ytid && !videoFallbackMap[v.id];
+
+                                                        if (useYoutube) {
+                                                            return <YoutubePlayer key={`${v.id}-yt`} v={v} onFallback={() => setVideoFallbackMap(prev => ({ ...prev, [v.id]: true }))} />;
+                                                        }
+
+                                                        // Use server video if ytid is missing OR if youtube failed/is blocked
+                                                        if (v.video_url || isVideoUrl(v.url)) {
+                                                            const finalUrl = v.video_url || v.url;
+                                                            return <ServerPlayer key={`${v.id}-srv`} v={{ ...v, video_url: finalUrl }} />;
+                                                        }
+
+                                                        return (
+                                                            <div className="flex flex-col items-center justify-center h-full text-white/50 gap-4 p-10 text-center">
+                                                                <AlertCircle size={48} className="opacity-20" />
+                                                                <div>
+                                                                    <p className="text-sm font-bold">Video mavjud emas</p>
+                                                                    <p className="text-xs opacity-50">Kechirasiz, ushbu videoni yuklab bo'lmadi</p>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })()}
                                                 </div>
                                             )}
                                         </div>

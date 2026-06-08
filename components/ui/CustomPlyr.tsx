@@ -23,10 +23,6 @@ const CustomPlyr = forwardRef<any, PlyrProps>((props, ref) => {
         const player = new Plyr(elementRef.current, props.options || {});
         playerRef.current = player;
 
-        if (props.source) {
-            player.source = props.source;
-        }
-
         if (props.onReady) {
             player.on('ready', () => props.onReady!(player));
             if (player.ready) props.onReady!(player);
@@ -46,18 +42,34 @@ const CustomPlyr = forwardRef<any, PlyrProps>((props, ref) => {
 
     // Update source when it changes
     useEffect(() => {
-        if (playerRef.current && props.source) {
-            // Avoid redundant source updates
-            const currentSource = playerRef.current.source;
-            if (JSON.stringify(currentSource) !== JSON.stringify(props.source)) {
-                playerRef.current.source = props.source;
+        if (!playerRef.current) return;
+
+        const updateSource = () => {
+            if (!playerRef.current) return;
+            try {
+                const currentSource = playerRef.current.source;
+                if (JSON.stringify(currentSource) !== JSON.stringify(props.source)) {
+                    playerRef.current.source = props.source;
+                }
+            } catch (err) {
+                console.warn('Plyr source update failed:', err);
+                // Potential retry if needed, but usually once ready it works
             }
+        };
+
+        if (playerRef.current.ready) {
+            updateSource();
+        } else {
+            playerRef.current.once('ready', updateSource);
         }
     }, [props.source]);
 
     return (
-        <div className="plyr-react plyr w-full h-full">
-            <div ref={elementRef} className="w-full h-full" />
+        <div className="plyr-react plyr w-full h-full overflow-hidden rounded-inherit">
+            <div
+                ref={elementRef}
+                className="w-full h-full"
+            />
         </div>
     );
 });

@@ -48,11 +48,25 @@ export function getMediaUrl(url: string | undefined | null): string {
     return url;
   }
 
+  const baseUrl = 'https://prod.axadjonovsardorbek.uz';
+
+  // Handle case where path starts with /media
   if (url.startsWith('/media')) {
-    return `https://prod.imedteam.uz${url}`;
+    return `${baseUrl}${url}`;
   }
 
-  return url;
+  // Handle case where it's a storage ID like "uuid:path" or just a path
+  if (url.includes(':') && !url.includes('://')) {
+    const path = url.split(':').pop();
+    return `${baseUrl}/media/${path}`;
+  }
+
+  // Fallback for relative paths
+  if (!url.startsWith('/')) {
+    return `${baseUrl}/media/${url}`;
+  }
+
+  return `${baseUrl}${url}`;
 }
 
 /**
