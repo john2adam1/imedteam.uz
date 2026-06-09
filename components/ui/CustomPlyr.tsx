@@ -2,7 +2,7 @@
 
 import React, { forwardRef, useEffect, useRef } from 'react';
 import * as PlyrModule from 'plyr';
-const Plyr = (PlyrModule as any).default || PlyrModule;
+const PlyrClass = (PlyrModule as any).default || PlyrModule;
 import 'plyr/dist/plyr.css';
 
 interface PlyrProps {
@@ -11,21 +11,40 @@ interface PlyrProps {
     onReady?: (player: any) => void;
 }
 
+/**
+ * CustomPlyr – wraps the Plyr library.
+ *
+ * Plyr requires:
+ *  - A <video> element for HTML5 sources (mp4, webm, …)
+ *  - A <div> element for YouTube / Vimeo embeds
+ *
+ * We detect the provider from `source.sources[0].provider` and render
+ * the correct element so both playback modes work correctly.
+ */
 const CustomPlyr = forwardRef<any, PlyrProps>((props, ref) => {
-    const elementRef = useRef<HTMLDivElement>(null);
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const divRef = useRef<HTMLDivElement>(null);
     const playerRef = useRef<any>(null);
 
-    useEffect(() => {
-        if (!elementRef.current) return;
+    // Determine which element type this source needs
+    const isYoutube = props.source?.sources?.[0]?.provider === 'youtube' ||
+        props.source?.sources?.[0]?.provider === 'vimeo';
 
-        // Use the element reference directly instead of a selector
-        // This avoids issues with multiple players on the same page
-        const player = new Plyr(elementRef.current, props.options || {});
+    useEffect(() => {
+        const el = isYoutube ? divRef.current : videoRef.current;
+        if (!el) return;
+
+        const player = new PlyrClass(el, props.options || {});
         playerRef.current = player;
 
         if (props.onReady) {
             player.on('ready', () => props.onReady!(player));
             if (player.ready) props.onReady!(player);
+        }
+
+        // Set initial source
+        if (props.source) {
+            player.source = props.source;
         }
 
         if (ref) {
@@ -34,42 +53,37 @@ const CustomPlyr = forwardRef<any, PlyrProps>((props, ref) => {
         }
 
         return () => {
-            if (playerRef.current) {
-                playerRef.current.destroy();
-            }
+            try { playerRef.current?.destroy(); } catch (_) { }
+            playerRef.current = null;
         };
-    }, []);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isYoutube]);
 
-    // Update source when it changes
+    // Update source when it changes (without re-initialising the player)
     useEffect(() => {
-        if (!playerRef.current) return;
+        if (!playerRef.current || !props.source) return;
 
-        const updateSource = () => {
-            if (!playerRef.current) return;
+        const apply = () => {
             try {
-                const currentSource = playerRef.current.source;
-                if (JSON.stringify(currentSource) !== JSON.stringify(props.source)) {
-                    playerRef.current.source = props.source;
-                }
+                playerRef.current.source = props.source;
             } catch (err) {
                 console.warn('Plyr source update failed:', err);
-                // Potential retry if needed, but usually once ready it works
             }
         };
 
         if (playerRef.current.ready) {
-            updateSource();
+            apply();
         } else {
-            playerRef.current.once('ready', updateSource);
+            playerRef.current.once('ready', apply);
         }
     }, [props.source]);
 
     return (
-        <div className="plyr-react plyr w-full h-full overflow-hidden rounded-inherit">
-            <div
-                ref={elementRef}
-                className="w-full h-full"
-            />
+        <div className="plyr-react w-full h-full overflow-hidden">
+            {isYoutube
+                ? <div ref={divRef} className="w-full h-full" />
+                : <video ref={videoRef} className="w-full h-full" playsInline controls />
+            }
         </div>
     );
 });

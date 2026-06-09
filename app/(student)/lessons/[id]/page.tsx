@@ -4,93 +4,87 @@ import { useEffect, useState } from 'react';
 import { lessonService, activityService } from '@/services';
 import { SourceLessonMobileRes, SourceMobile } from '@/types/mobile-api';
 import { useRouter, useParams } from 'next/navigation';
-import { Play, FileText, ClipboardList, ArrowLeft, CheckCircle2, Youtube, AlertCircle } from 'lucide-react';
-import { getMediaUrl, isVideoUrl } from '@/lib/utils';
+import { Play, FileText, ClipboardList, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react';
+import { getMediaUrl } from '@/lib/utils';
 import PDFViewer from '@/components/ui/PDFViewer';
 import confetti from 'canvas-confetti';
-import dynamic from 'next/dynamic';
-import 'plyr/dist/plyr.css';
 import { useAuth } from '@/lib/auth-context';
-import { Settings } from 'lucide-react';
 
-const Plyr = dynamic<any>(() => import('@/components/ui/CustomPlyr'), { ssr: false });
-
-const getYoutubeId = (url: string = '') => {
+/** Extracts YouTube video ID from any YouTube URL format */
+const getYoutubeId = (url: string = ''): string => {
     if (!url) return '';
-
-    // Clean URL
     const cleanUrl = url.trim();
-
-    // If it's already an ID (11 chars, no symbols)
     if (/^[a-zA-Z0-9_-]{11}$/.test(cleanUrl)) return cleanUrl;
-
     try {
-        const urlObj = new URL(cleanUrl.includes('://') ? cleanUrl : `https://${cleanUrl}`);
-        const hostname = urlObj.hostname.replace('www.', '');
-
-        if (hostname === 'youtu.be') {
-            return urlObj.pathname.slice(1).split(/[?#]/)[0];
-        }
-
-        if (hostname === 'youtube.com' || hostname === 'm.youtube.com') {
-            if (urlObj.pathname.includes('/watch')) return urlObj.searchParams.get('v') || '';
-            if (urlObj.pathname.includes('/shorts/')) return urlObj.pathname.split('/shorts/')[1].split(/[?#]/)[0];
-            if (urlObj.pathname.includes('/live/')) return urlObj.pathname.split('/live/')[1].split(/[?#]/)[0];
-            if (urlObj.pathname.includes('/embed/')) return urlObj.pathname.split('/embed/')[1].split(/[?#]/)[0];
-            if (urlObj.pathname.includes('/v/')) return urlObj.pathname.split('/v/')[1].split(/[?#]/)[0];
+        const u = new URL(cleanUrl.includes('://') ? cleanUrl : `https://${cleanUrl}`);
+        const host = u.hostname.replace('www.', '');
+        if (host === 'youtu.be') return u.pathname.slice(1).split(/[?#]/)[0];
+        if (host === 'youtube.com' || host === 'm.youtube.com') {
+            if (u.pathname.includes('/watch')) return u.searchParams.get('v') || '';
+            if (u.pathname.includes('/shorts/')) return u.pathname.split('/shorts/')[1].split(/[?#]/)[0];
+            if (u.pathname.includes('/live/')) return u.pathname.split('/live/')[1].split(/[?#]/)[0];
+            if (u.pathname.includes('/embed/')) return u.pathname.split('/embed/')[1].split(/[?#]/)[0];
         }
     } catch (e) {
-        // Regex fallback for non-URL strings or failed parsing
-        const match = cleanUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/|live\/))([^"&?\/\s]{11})/);
-        if (match) return match[1];
+        const m = cleanUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/|live\/))([a-zA-Z0-9_-]{11})/);
+        if (m) return m[1];
     }
     return '';
 };
 
-// Static Plyr options to prevent re-initialization on every render
-const YOUTUBE_OPTIONS = {
-    youtube: { noCookie: false, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1 },
-    settings: ['quality', 'speed'],
-    controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen']
-};
-
-const SERVER_OPTIONS = {
-    controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'],
-    settings: ['quality', 'speed'],
-};
-
-// Separate components to isolate lifecycle and prevent provider switching crashes
-const YoutubePlayer = ({ v, onFallback }: { v: SourceMobile, onFallback: () => void }) => {
+/** YouTube player – custom thumbnail + lazy iframe (no YouTube links visible until play) */
+const YTPlayer = ({ v }: { v: SourceMobile }) => {
+    const [playing, setPlaying] = useState(false);
     const ytid = getYoutubeId(v.url);
-    if (!ytid) return null;
+
+    if (!ytid) {
+        return (
+            <div className="flex flex-col items-center justify-center h-full text-white/50 gap-4 p-10 text-center">
+                <AlertCircle size={48} className="opacity-20" />
+                <div>
+                    <p className="text-sm font-bold">Video mavjud emas</p>
+                    <p className="text-xs opacity-50">Kechirasiz, ushbu video yuklanmadi</p>
+                </div>
+            </div>
+        );
+    }
+
+    // Thumbnail holati — YouTube elementi umuman yo'q
+    if (!playing) {
+        return (
+            <div
+                className="relative w-full h-full cursor-pointer bg-black group/play"
+                onClick={() => setPlaying(true)}
+            >
+                {/* YouTube thumbnail */}
+                <img
+                    src={`https://img.youtube.com/vi/${ytid}/maxresdefault.jpg`}
+                    onError={(e) => { (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${ytid}/hqdefault.jpg`; }}
+                    alt="Video thumbnail"
+                    className="absolute inset-0 w-full h-full object-cover"
+                />
+                {/* Custom play tugmasi */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-[68px] h-[48px] bg-red-600 rounded-xl flex items-center justify-center shadow-2xl group-hover/play:bg-red-500 group-hover/play:scale-110 transition-all duration-200">
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="white">
+                            <path d="M8 5v14l11-7z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Playing holati — iframe autoplay bilan yuklanadi
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
 
     return (
-        <Plyr
-            source={{
-                type: 'video',
-                sources: [{ src: ytid, provider: 'youtube' }],
-            }}
-            options={YOUTUBE_OPTIONS}
-            onReady={(plyr: any) => {
-                plyr.on('error', () => {
-                    console.log("YouTube error detected, triggering fallback...");
-                    onFallback();
-                });
-            }}
-        />
-    );
-};
-
-const ServerPlayer = ({ v }: { v: SourceMobile }) => {
-    if (!v.video_url) return null;
-
-    return (
-        <Plyr
-            source={{
-                type: 'video',
-                sources: [{ src: getMediaUrl(v.video_url), type: 'video/mp4' }],
-            }}
-            options={SERVER_OPTIONS}
+        <iframe
+            src={`https://www.youtube-nocookie.com/embed/${ytid}?autoplay=1&modestbranding=1&rel=0&iv_load_policy=3&disablekb=0${origin ? `&origin=${origin}` : ''}`}
+            title="Video darslik"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            className="absolute inset-0 w-full h-full border-0"
         />
     );
 };
@@ -106,33 +100,13 @@ export default function LessonPage() {
     const [error, setError] = useState('');
     const [startTime] = useState(Date.now());
     const [viewPdf, setViewPdf] = useState<{ url: string; name: string } | null>(null);
-    const [isMounted, setIsMounted] = useState(false);
-    const [videoFallbackMap, setVideoFallbackMap] = useState<Record<string, boolean>>({});
-
-    useEffect(() => {
-        setIsMounted(true);
-    }, []);
 
     useEffect(() => {
         if (!id) return;
         fetchLesson();
     }, [id]);
 
-    // Automatic YouTube accessibility check
-    useEffect(() => {
-        if (lesson?.videos) {
-            const img = new Image();
-            img.src = `https://www.youtube.com/favicon.ico?t=${Date.now()}`;
-            img.onerror = () => {
-                console.log("YouTube potentially blocked, triggering fallbacks");
-                const fallbacks: Record<string, boolean> = {};
-                lesson.videos?.forEach(v => {
-                    if (v.video_url) fallbacks[v.id] = true;
-                });
-                setVideoFallbackMap(prev => ({ ...prev, ...fallbacks }));
-            };
-        }
-    }, [lesson]);
+
 
     const fetchLesson = async () => {
         try {
@@ -264,65 +238,34 @@ export default function LessonPage() {
                     {/* Video Player */}
                     {lesson.videos && lesson.videos.length > 0 ? (
                         <div className="space-y-6">
-                            {lesson.videos.map((v, idx) => {
-                                const useYoutube = v.url && !videoFallbackMap[v.id];
-                                const hasServerFallback = !!v.video_url;
-
-                                return (
-                                    <div key={v.id} className="group">
-                                        <div className="flex items-center justify-between mb-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
-                                                    <Play size={14} fill="currentColor" />
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <h3 className="font-bold text-gray-900">
-                                                        {lesson.videos.length > 1 ? `${idx + 1}-video lavha` : 'Video darslik'}
-                                                    </h3>
-                                                    {lesson.videos.length > 1 && (
-                                                        <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest mt-0.5 flex items-center gap-1">
-                                                            {idx + 1}-qism
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
+                            {lesson.videos.map((v, idx) => (
+                                <div key={v.id} className="group">
+                                    {/* Video header */}
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
+                                            <Play size={14} fill="currentColor" />
                                         </div>
-                                        <div
-                                            className="aspect-video bg-black rounded-[2rem] overflow-hidden shadow-2xl ring-1 ring-white/10 group-hover:ring-primary/20 transition-all duration-500 relative [&_.plyr]:h-full [&_.plyr]:w-full [&_.plyr__video-wrapper]:h-full"
-                                            onContextMenu={(e) => e.preventDefault()}
-                                        >
-                                            {isMounted && (
-                                                <div key={v.id} className="w-full h-full">
-                                                    {(() => {
-                                                        const ytid = getYoutubeId(v.url);
-                                                        const useYoutube = !!ytid && !videoFallbackMap[v.id];
-
-                                                        if (useYoutube) {
-                                                            return <YoutubePlayer key={`${v.id}-yt`} v={v} onFallback={() => setVideoFallbackMap(prev => ({ ...prev, [v.id]: true }))} />;
-                                                        }
-
-                                                        // Use server video if ytid is missing OR if youtube failed/is blocked
-                                                        if (v.video_url || isVideoUrl(v.url)) {
-                                                            const finalUrl = v.video_url || v.url;
-                                                            return <ServerPlayer key={`${v.id}-srv`} v={{ ...v, video_url: finalUrl }} />;
-                                                        }
-
-                                                        return (
-                                                            <div className="flex flex-col items-center justify-center h-full text-white/50 gap-4 p-10 text-center">
-                                                                <AlertCircle size={48} className="opacity-20" />
-                                                                <div>
-                                                                    <p className="text-sm font-bold">Video mavjud emas</p>
-                                                                    <p className="text-xs opacity-50">Kechirasiz, ushbu videoni yuklab bo'lmadi</p>
-                                                                </div>
-                                                            </div>
-                                                        );
-                                                    })()}
-                                                </div>
+                                        <div className="flex flex-col">
+                                            <h3 className="font-bold text-gray-900">
+                                                {lesson.videos.length > 1 ? `${idx + 1}-video lavha` : 'Video darslik'}
+                                            </h3>
+                                            {lesson.videos.length > 1 && (
+                                                <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest mt-0.5">
+                                                    {idx + 1}-qism
+                                                </span>
                                             )}
                                         </div>
                                     </div>
-                                );
-                            })}
+
+                                    {/* YouTube player */}
+                                    <div
+                                        className="aspect-video bg-black rounded-[2rem] overflow-hidden shadow-2xl ring-1 ring-white/10 group-hover:ring-primary/20 transition-all duration-500 relative"
+                                        onContextMenu={(e) => e.preventDefault()}
+                                    >
+                                        <YTPlayer v={v} />
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     ) : (
                         <div className="aspect-video bg-slate-50 rounded-[2.5rem] border-2 border-dashed border-gray-100 flex flex-col items-center justify-center text-gray-400">
