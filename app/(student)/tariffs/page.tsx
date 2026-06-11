@@ -87,8 +87,8 @@ function TariffsContent() {
         }).format(numPrice);
     };
 
-    // ✅ ROBUST TARIFF FILTERING: Exclude free courses and invalid prices
-    const displayedTariffs = tariffs?.tariffs?.filter((tariff: any) => {
+    // ✅ ROBUST TARIFF FILTERING: Exclude free courses and invalid prices, then sort based on backend price array order or duration
+    const displayedTariffs = (tariffs?.tariffs?.filter((tariff: any) => {
         if (!courseId) return true;
         if (!selectedCourse?.price) return false;
 
@@ -102,7 +102,18 @@ function TariffsContent() {
 
         const coursePrice = selectedCourse.price.find(p => p.tariff_id === tariff.id);
         return coursePrice !== undefined && typeof coursePrice.price === 'number' && !isNaN(coursePrice.price);
-    }) || [];
+    }) || []).sort((a: any, b: any) => {
+        // If sorting based on course price array order:
+        if (courseId && selectedCourse?.price) {
+            const indexA = selectedCourse.price.findIndex(p => p.tariff_id === a.id);
+            const indexB = selectedCourse.price.findIndex(p => p.tariff_id === b.id);
+            if (indexA !== -1 && indexB !== -1) {
+                return indexA - indexB; // Match backend's "price" array order exactly
+            }
+        }
+        // Fallback to sorting by duration natively
+        return Number(a.duration || 0) - Number(b.duration || 0);
+    });
 
     const handlePurchase = (tariff: any) => {
         if (!courseId) {
