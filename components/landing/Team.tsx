@@ -82,7 +82,7 @@ export default function Team() {
             name: "Ulugbek Zaylobidinov",
             role: "Ma'ruzachi",
             desc: "“iMed Team” jamoasi a'zosi va tajribali mutaxassis shifokor.",
-            img: "/assets/ulugbekzaylobidinov.jpg"
+            img: "/assets/ulugbekzaylobidinov.png"
         },
         {
             name: "Hikmatillayev Diyorbek",
@@ -101,6 +101,12 @@ export default function Team() {
             role: "Ma'ruzachi",
             desc: "“iMed Team” platformasi o’quv bo’limi product manageri. Preklinik Patologiya fanlari, Biokimyo, Fiziologiya, Nevrologiya kabi fanlarni va Gematologiya, Kardiologiya, Qon-Tomir patologiyasi kitobi muallifi. Hozirda Germaniyada Neyrojarrohlik bo’yicha o’qishni davom ettirmoqda.",
             img: "/assets/behzodmadaminov.jpg"
+        },
+        {
+            name: "Elyor Fayzullayev",
+            role: "Ma'ruzachi",
+            desc: "Kardiolog shifokor. Tez tibbiy yordam shifokori. \"iMed Team\" platformasida Tez tibbiy yordam fanidan lektor va Klinik Laborator diagnostika fanidan lektor.",
+            img: "/assets/elyorfayzulla.png"
         }
     ];
 
